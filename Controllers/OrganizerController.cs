@@ -5,7 +5,8 @@ namespace Schedify.Controllers.Organizer
     public class OrganizerController : Controller
     {
         [Route("organizer/dashboard")]
-        public ActionResult Index()
+        [HttpGet]
+        public ActionResult Dashboard()
         {
             return View();
         }

@@ -34,7 +34,7 @@ public class AuthController : Controller
         HttpContext.Session.SetString("UserEmail", user.Email);
         HttpContext.Session.SetString("UserFullName", $"{user.FirstName} {user.LastName}");
 
-        return RedirectToAction("Index", "Home");
+        return RedirectToAction("Dashboard", "Organizer");
     }
 
     [Route("register")]
@@ -67,7 +67,7 @@ public class AuthController : Controller
     [HttpPost("login/organizer")]
     public ActionResult GoToDashboard()
     {
-        return RedirectToAction("Index", "Dashboard", new { area = "Organizer" });
+        return RedirectToAction("Dashboard", "Organizer");
     }
 }
 
