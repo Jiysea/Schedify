@@ -2,8 +2,3 @@
 // for details on configuring this project to bundle and minify static web assets.
 
 // Write your JavaScript code.
-import Alpine from 'alpinejs'
-
-window.Alpine = Alpine
-
-Alpine.start()

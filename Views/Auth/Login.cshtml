@@ -1,9 +1,9 @@
 @{
     ViewData["Title"] = "Login to Schedify";
-    Layout = "_GuestLayout";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
 }
 
-<div class="p-5 bg-charcoal-950 flex min-h-screen flex-col items-center justify-center">
+<div class="p-5 bg-coffee-950 flex min-h-screen flex-col items-center justify-center">
 
     @* White Box *@
     <div class="bg-coffee-50 p-2 grid rounded-2xl shadow-xl sm:max-w-2xl">
@@ -27,7 +27,7 @@
                     <p class="text-coffee-600 mt-2 text-sm">The All-in-One Hub for Events & Engagement</p>
                 </div>
 
-                <form id="loginForm" hx-post="/Auth/Login" hx-target="#loginFeedback" hx-swap="innerHTML"
+                <form id="loginForm" hx-post="/login/organizer"
                     class="gap-2 flex flex-col pb-2">
                     <div class="relative">
                         <span class="gap-2 relative flex items-center">
@@ -37,11 +37,12 @@
                                     d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z"
                                     clip-rule="evenodd" />
                             </svg>
-                        </span>
                         <input type="email" id="email" name="Email"
                             class="input-coffee ps-8 py-2 focus:ring-2 focus:ring-offset-2 focus:ring-coffee-500"
-                            hx-post="/Auth/ValidateEmail" hx-trigger="keyup changed delay:500ms"
-                            hx-target="#emailFeedback" hx-swap="innerHTML" placeholder="Email">
+                         
+                         placeholder="Email">
+                            
+                        </span>
                     </div>
 
                     <div class="relative">
@@ -52,15 +53,15 @@
                                     d="M12 1.5a5.25 5.25 0 0 0-5.25 5.25v3a3 3 0 0 0-3 3v6.75a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3v-6.75a3 3 0 0 0-3-3v-3c0-2.9-2.35-5.25-5.25-5.25Zm3.75 8.25v-3a3.75 3.75 0 1 0-7.5 0v3h7.5Z"
                                     clip-rule="evenodd" />
                             </svg>
-                        </span>
                         <input type="password" id="password" name="Password"
                             class="input-coffee ps-8 py-2 focus:ring-2 focus:ring-offset-2 focus:ring-coffee-500"
                             placeholder="Password">
+                        </span>
                     </div>
 
                     @* Sign In Button *@
                     <div class="mt-4 flex flex-col">
-                        <button type="submit"
+                        @* <button type="submit"
                             class="button-coffee py-2 focus:ring-2 focus:ring-offset-2 focus:ring-coffee-500">
                             <span>Sign In</span>
 
@@ -73,7 +74,21 @@
                                         stroke="none" fill="currentColor" fill-rule="evenodd"></path>
                                 </g>
                             </svg>
-                        </button>
+                        </button> *@
+                        <a href="/organizer/dashboard" type="button"
+                            class="button-coffee py-2 focus:ring-2 focus:ring-offset-2 focus:ring-coffee-500">
+                            <span>Sign In</span>
+
+                            <svg xmlns="http://www.w3.org/2000/svg" class="size-5"
+                                xmlns:xlink="http://www.w3.org/1999/xlink" width="400" height="400"
+                                viewBox="0, 0, 400,400">
+                                <g>
+                                    <path
+                                        d="M295.703 104.354 C 288.091 108.313,284.738 117.130,287.918 124.830 C 288.731 126.797,298.250 136.876,317.407 156.055 L 345.695 184.375 178.190 184.375 L 10.684 184.375 7.316 186.349 C -2.632 192.179,-2.632 207.821,7.316 213.651 L 10.684 215.625 178.190 215.625 L 345.695 215.625 317.407 243.945 C 287.868 273.517,286.719 274.922,286.719 281.450 C 286.719 291.748,296.214 298.639,307.490 296.523 C 310.798 295.903,394.561 214.221,398.124 208.143 C 400.760 203.645,400.760 196.355,398.123 191.857 C 395.754 187.814,311.819 104.984,309.009 103.915 C 305.871 102.722,298.364 102.970,295.703 104.354 "
+                                        stroke="none" fill="currentColor" fill-rule="evenodd"></path>
+                                </g>
+                            </svg>
+                        </a>
                     </div>
 
                     @* Register *@
@@ -81,7 +96,7 @@
                         <span class="text-coffee-700">
                             Not yet registered?
                         </span>
-                        <a href="/servers"
+                        <a href="/register"
                             class="text-pumpkin-500 hover:text-pumpkin-600 active:text-pumpkin-700 font-semibold underline underline-offset-4">
                             Register here
                         </a>

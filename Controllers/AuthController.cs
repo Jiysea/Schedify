@@ -4,11 +4,16 @@ namespace Schedify.Controllers
 {
     public class AuthController : Controller
     {
-        // GET: AuthController
-        public ActionResult Login()
+        [Route("login")]
+        public ActionResult Index()
         {
-            return View();
+            return View("Login");
         }
 
+        [HttpPost("login/organizer")]
+        public ActionResult GoToDashboard()
+        {
+            return RedirectToAction("Index", "Dashboard", new { area = "Organizer" });
+        }
     }
 }
