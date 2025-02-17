@@ -8,9 +8,9 @@ namespace Schedify.Models;
 public class Conversation
 {
     [Key]
-    public Guid Id { get; set; } = Guid.NewGuid();
+    public int Id { get; set; }
 
-    public Guid EventId { get; set; }
+    public int EventId { get; set; }
     public Event Event { get; set; } = null!;
 
     [Required]
@@ -23,7 +23,7 @@ public class Conversation
 
     [Column(TypeName = "datetime2")]
     [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-    public DateTime UpdatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
     // Dependents
     public ICollection<ConversationUser> ConversationUsers { get; } = new List<ConversationUser>();

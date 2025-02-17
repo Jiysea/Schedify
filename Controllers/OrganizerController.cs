@@ -2,13 +2,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Schedify.Controllers.Organizer
 {
-    [Area("Organizer")]
-    public class DashboardController : Controller
+    public class OrganizerController : Controller
     {
         [Route("organizer/dashboard")]
         public ActionResult Index()
         {
-            return View("~/Views/Organizer/Dashboard/Index.cshtml");
+            return View();
         }
 
     }

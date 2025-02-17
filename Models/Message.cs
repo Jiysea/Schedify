@@ -8,19 +8,20 @@ namespace Schedify.Models;
 public class Message
 {
     [Key]
-    public Guid Id { get; set; } = Guid.NewGuid();
+    public int Id { get; set; }
 
-    public Guid UserId { get; set; }
+    public int UserId { get; set; }
     public User User { get; set; } = null!;
 
-    public Guid ConversationId { get; set; }
+    public int ConversationId { get; set; }
     public Conversation Conversation { get; set; } = null!;
 
     [Required]
     [StringLength(100)]
     public required string Content { get; set; }
 
-    public MessageStatus Status { get; set; }
+    [Required]
+    public required string Status { get; set; }
 
     [Column(TypeName = "datetime2")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -28,5 +29,5 @@ public class Message
 
     [Column(TypeName = "datetime2")]
     [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-    public DateTime UpdatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }

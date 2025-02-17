@@ -8,15 +8,17 @@ namespace Schedify.Models;
 public class ActivityLog
 {
     [Key]
-    public Guid Id { get; set; } = Guid.NewGuid();
+    public int Id { get; set; }
 
-    public Guid UserId { get; set; }
+    public int UserId { get; set; }
     public User User { get; set; } = null!;
 
+    [Required]
     [StringLength(150)]
-    public string Description { get; set; } = string.Empty;
+    public required string Description { get; set; }
 
-    public ActivityLogType Type { get; set; }
+    [Required]
+    public required string Type { get; set; }
 
     [Column(TypeName = "datetime2")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

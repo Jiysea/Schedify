@@ -1,4 +1,44 @@
+@model User;
+
 @{
     ViewData["Title"] = "Register an Account";
-    Layout = "_GuestLayout";
+}
+
+<div class="">
+    <h2>Register</h2>
+
+    <form class="" method="post" asp-action="Register" asp-controller="Auth">
+        <label>First Name:</label>
+        <input type="text" asp-for="FirstName" required />
+
+        <label>Middle Name:</label>
+        <input type="text" asp-for="MiddleName" />
+
+        <label>Last Name:</label>
+        <input type="text" asp-for="LastName" required />
+
+        <label>Extension Name:</label>
+        <input type="text" asp-for="ExtensionName" />
+
+        <label>Email:</label>
+        <input type="email" asp-for="Email" required />
+
+        <label>Password:</label>
+        <input type="password" asp-for="PasswordHash" required />
+
+        <label>Birthdate:</label>
+        <input type="date" asp-for="Birthdate">
+
+        <label>Type of Account:</label>
+        <select asp-for="Role">
+            <option selected value="Attendee">Attendee</option>
+            <option value="Organizer">Organizer</option>
+        </select>
+
+        <button type="submit">Register</button>
+    </form>
+</div>
+@if (!ViewData.ModelState.IsValid)
+{
+    <p style="color:red;">@ViewData.ModelState.Values.First().Errors.FirstOrDefault()?.ErrorMessage</p>
 }

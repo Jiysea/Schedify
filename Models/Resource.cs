@@ -8,16 +8,17 @@ namespace Schedify.Models;
 public class Resource
 {
     [Key]
-    public Guid Id { get; set; } = Guid.NewGuid();
+    public int Id { get; set; }
 
-    public Guid EventId { get; set; }
+    public int EventId { get; set; }
     public Event Event { get; set; } = null!;
 
     [Required]
     [StringLength(100)]
     public required string Name { get; set; }
 
-    public ResourceType Type { get; set; }
+    [Required]
+    public required string Type { get; set; }
 
     [Required]
     [DataType(DataType.Currency)]
@@ -35,5 +36,5 @@ public class Resource
 
     [Column(TypeName = "datetime2")]
     [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-    public DateTime UpdatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }

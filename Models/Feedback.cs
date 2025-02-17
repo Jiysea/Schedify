@@ -8,19 +8,19 @@ namespace Schedify.Models;
 public class Feedback
 {
     [Key]
-    public Guid Id { get; set; } = Guid.NewGuid();
+    public int Id { get; set; }
 
-    public Guid UserId { get; set; }
+    public int UserId { get; set; }
     public User User { get; set; } = null!;
 
-    public Guid EventId { get; set; }
+    public int EventId { get; set; }
     public Event Event { get; set; } = null!;
 
     [Required]
     public required int Rating { get; set; }
 
     [StringLength(100)]
-    public string Comments { get; set; } = string.Empty;
+    public string? Comments { get; set; }
 
     [Column(TypeName = "datetime2")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -28,5 +28,5 @@ public class Feedback
 
     [Column(TypeName = "datetime2")]
     [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-    public DateTime UpdatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }

@@ -54,52 +54,52 @@ public class ApplicationDbContext : DbContext
             .HasForeignKey(e => e.ConversationId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Enums (User)
-        modelBuilder.Entity<User>()
-            .Property(e => e.Role)
-            .HasConversion(
-                v => v.ToString(),
-                v => (UserRoles)Enum.Parse(typeof(UserRoles), v))
-            .HasMaxLength(15);
+        // // Enums (User)
+        // modelBuilder.Entity<User>()
+        //     .Property(e => e.Role)
+        //     .HasConversion(
+        //         v => v.ToString(),
+        //         v => (UserRoles)Enum.Parse(typeof(UserRoles), v))
+        //     .HasMaxLength(15);
 
-        // Enums (Event)
-        modelBuilder.Entity<Event>()
-            .Property(e => e.Status)
-            .HasConversion(
-                v => v.ToString(),
-                v => (EventStatus)Enum.Parse(typeof(EventStatus), v))
-            .HasMaxLength(15);
+        // // Enums (Event)
+        // modelBuilder.Entity<Event>()
+        //     .Property(e => e.Status)
+        //     .HasConversion(
+        //         v => v.ToString(),
+        //         v => (EventStatus)Enum.Parse(typeof(EventStatus), v))
+        //     .HasMaxLength(15);
 
-        // Enums (EventBooking)
-        modelBuilder.Entity<EventBooking>()
-            .Property(e => e.Status)
-            .HasConversion(
-                v => v.ToString(),
-                v => (BookingStatus)Enum.Parse(typeof(BookingStatus), v))
-            .HasMaxLength(15);
+        // // Enums (EventBooking)
+        // modelBuilder.Entity<EventBooking>()
+        //     .Property(e => e.Status)
+        //     .HasConversion(
+        //         v => v.ToString(),
+        //         v => (BookingStatus)Enum.Parse(typeof(BookingStatus), v))
+        //     .HasMaxLength(15);
 
-        // Enums (Message)
-        modelBuilder.Entity<Message>()
-            .Property(e => e.Status)
-            .HasConversion(
-                v => v.ToString(),
-                v => (MessageStatus)Enum.Parse(typeof(MessageStatus), v))
-            .HasMaxLength(15);
+        // // Enums (Message)
+        // modelBuilder.Entity<Message>()
+        //     .Property(e => e.Status)
+        //     .HasConversion(
+        //         v => v.ToString(),
+        //         v => (MessageStatus)Enum.Parse(typeof(MessageStatus), v))
+        //     .HasMaxLength(15);
 
-        // Enums (Resource)
-        modelBuilder.Entity<Resource>()
-            .Property(e => e.Type)
-            .HasConversion(
-                v => v.ToString(),
-                v => (ResourceType)Enum.Parse(typeof(ResourceType), v))
-            .HasMaxLength(30);
+        // // Enums (Resource)
+        // modelBuilder.Entity<Resource>()
+        //     .Property(e => e.Type)
+        //     .HasConversion(
+        //         v => v.ToString(),
+        //         v => (ResourceType)Enum.Parse(typeof(ResourceType), v))
+        //     .HasMaxLength(30);
 
-        // Enums (ActivityLog)
-        modelBuilder.Entity<ActivityLog>()
-           .Property(e => e.Type)
-           .HasConversion(
-               v => v.ToString(),
-               v => (ActivityLogType)Enum.Parse(typeof(ActivityLogType), v))
-           .HasMaxLength(15);
+        // // Enums (ActivityLog)
+        // modelBuilder.Entity<ActivityLog>()
+        //    .Property(e => e.Type)
+        //    .HasConversion(
+        //        v => v.ToString(),
+        //        v => (ActivityLogType)Enum.Parse(typeof(ActivityLogType), v))
+        //    .HasMaxLength(15);
     }
 }

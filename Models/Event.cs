@@ -7,9 +7,9 @@ namespace Schedify.Models;
 public class Event
 {
     [Key]
-    public Guid Id { get; set; } = Guid.NewGuid();
+    public int Id { get; set; }
 
-    public Guid UserId { get; set; }
+    public int UserId { get; set; }
     public User User { get; set; } = null!;
 
     [Required]
@@ -30,7 +30,8 @@ public class Event
     [DataType(DataType.DateTime)]
     public required DateTime EndAt { get; set; }
 
-    public EventStatus Status { get; set; }
+    [Required]
+    public required string Status { get; set; }
 
     [Required]
     [DataType(DataType.Currency)]
@@ -44,7 +45,7 @@ public class Event
     public required string AddressLine1 { get; set; }
 
     [StringLength(150)]
-    public string AddressLine2 { get; set; } = string.Empty;
+    public string? AddressLine2 { get; set; }
 
     [Required]
     [StringLength(50)]
@@ -60,7 +61,7 @@ public class Event
 
     [Column(TypeName = "datetime2")]
     [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-    public DateTime UpdatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
     // Dependents
     public ICollection<EventBooking> EventBookings { get; } = new List<EventBooking>();

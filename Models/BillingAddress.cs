@@ -8,9 +8,9 @@ namespace Schedify.Models;
 public class BillingAddress
 {
     [Key]
-    public Guid Id { get; set; } = Guid.NewGuid();
+    public int Id { get; set; }
 
-    public Guid UserId { get; set; }
+    public int UserId { get; set; }
     public User User { get; set; } = null!;
 
     [Required]
@@ -18,7 +18,7 @@ public class BillingAddress
     public required string AddressLine1 { get; set; }
 
     [StringLength(150)]
-    public string AddressLine2 { get; set; } = string.Empty;
+    public string? AddressLine2 { get; set; }
 
     [Required]
     [StringLength(50)]
@@ -34,5 +34,5 @@ public class BillingAddress
 
     [Column(TypeName = "datetime2")]
     [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-    public DateTime UpdatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }

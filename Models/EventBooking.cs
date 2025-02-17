@@ -8,15 +8,16 @@ namespace Schedify.Models;
 public class EventBooking
 {
     [Key]
-    public Guid Id { get; set; } = Guid.NewGuid();
+    public int Id { get; set; }
 
-    public Guid UserId { get; set; }
+    public int UserId { get; set; }
     public User User { get; set; } = null!;
 
-    public Guid EventId { get; set; }
+    public int EventId { get; set; }
     public Event Event { get; set; } = null!;
 
-    public BookingStatus Status { get; set; }
+    [Required]
+    public required string Status { get; set; }
 
     [DataType(DataType.Currency)]
     [Range(typeof(decimal), "0.01", "79228162514264337593543950335")]
@@ -30,5 +31,5 @@ public class EventBooking
 
     [Column(TypeName = "datetime2")]
     [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-    public DateTime UpdatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }

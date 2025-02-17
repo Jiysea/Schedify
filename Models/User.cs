@@ -7,21 +7,21 @@ public class User
 {
 
     [Key]
-    public Guid Id { get; set; } = Guid.NewGuid();
+    public int Id { get; set; }
 
     [Required]
     [StringLength(50)]
     public required string FirstName { get; set; }
 
     [StringLength(35)]
-    public string MiddleName { get; set; } = string.Empty;
+    public string? MiddleName { get; set; }
 
     [Required]
     [StringLength(35)]
     public required string LastName { get; set; }
 
     [StringLength(10)]
-    public string ExtensionName { get; set; } = string.Empty;
+    public string? ExtensionName { get; set; }
 
     [Required]
     [EmailAddress]
@@ -47,7 +47,7 @@ public class User
 
     [Column(TypeName = "datetime2")]
     [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-    public DateTime UpdatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
     // Dependents
     public ICollection<Event> Events { get; } = new List<Event>();
