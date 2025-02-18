@@ -20,6 +20,7 @@ public class AuthController : Controller
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(string email, string password)
     {
         var user = await _authService.ValidateUserAsync(email, password);
@@ -62,12 +63,6 @@ public class AuthController : Controller
     {
         HttpContext.Session.Clear(); // Remove session data
         return RedirectToAction("Login");
-    }
-
-    [HttpPost("login/organizer")]
-    public ActionResult GoToDashboard()
-    {
-        return RedirectToAction("Dashboard", "Organizer");
     }
 }
 

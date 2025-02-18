@@ -11,5 +11,18 @@ namespace Schedify.Controllers.Organizer
             return View();
         }
 
+        [Route("organizer/events")]
+        [HttpGet]
+        public ActionResult Events()
+        {
+            return View();
+        }
+
+        [Route("organizer/resources")]
+        [HttpGet]
+        public ActionResult Resources()
+        {
+            return View();
+        }
     }
 }
