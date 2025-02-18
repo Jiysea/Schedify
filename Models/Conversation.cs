@@ -8,9 +8,9 @@ namespace Schedify.Models;
 public class Conversation
 {
     [Key]
-    public int Id { get; set; }
+    public Guid Id { get; set; } = new Guid();
 
-    public int EventId { get; set; }
+    public Guid EventId { get; set; }
     public Event Event { get; set; } = null!;
 
     [Required]

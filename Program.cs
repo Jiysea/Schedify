@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Schedify.Data;
+using Schedify.Models;
 using Schedify.Repositories;
 using Services;
 
@@ -10,6 +12,15 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Add Identity
+builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
+ {
+     options.Password.RequiredLength = 12;
+     options.User.RequireUniqueEmail = true;
+ }
+).AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultTokenProviders();
 
 // Register Repositories and Services
 builder.Services.AddScoped<IUserRepository, UserRepository>();

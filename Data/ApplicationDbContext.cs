@@ -2,16 +2,17 @@
 
 
 
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Schedify.Models;
 
 namespace Schedify.Data;
 
-public class ApplicationDbContext : DbContext
+public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
 {
     public ApplicationDbContext(DbContextOptions options) : base(options) { }
 
-    public DbSet<User> Users { get; set; }
     public DbSet<Event> Events { get; set; }
     public DbSet<EventBooking> EventBookings { get; set; }
     public DbSet<ActivityLog> ActivityLogs { get; set; }

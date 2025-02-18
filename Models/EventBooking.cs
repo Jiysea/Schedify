@@ -8,12 +8,12 @@ namespace Schedify.Models;
 public class EventBooking
 {
     [Key]
-    public int Id { get; set; }
+    public Guid Id { get; set; } = new Guid();
 
-    public int UserId { get; set; }
+    public Guid UserId { get; set; }
     public User User { get; set; } = null!;
 
-    public int EventId { get; set; }
+    public Guid EventId { get; set; }
     public Event Event { get; set; } = null!;
 
     [Required]

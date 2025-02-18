@@ -8,12 +8,12 @@ namespace Schedify.Models;
 public class ConversationUser
 {
     [Key]
-    public int Id { get; set; }
+    public Guid Id { get; set; } = new Guid();
 
-    public int UserId { get; set; }
+    public Guid UserId { get; set; }
     public User User { get; set; } = null!;
 
-    public int ConversationId { get; set; }
+    public Guid ConversationId { get; set; }
     public Conversation Conversation { get; set; } = null!;
 
     [Column(TypeName = "datetime2")]
