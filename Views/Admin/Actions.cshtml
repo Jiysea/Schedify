@@ -1,0 +1,117 @@
+@{
+    ViewData["Title"] = "Actions";
+}
+
+<partial name="~/Views/Admin/Partials/_SidebarPartial.cshtml" />
+
+<div x-data="{addResourceModal: false, editResourceModal: false}" class="min-h-screen bg-charcoal-950 ms-[250px]">
+    <header>
+        @* Sub Header (Resources, Search, Browse, By Event) *@
+        <div class="flex flex-col items-center w-full p-4 border-b-2 gap-1 border-charcoal-900">
+
+            <div class="flex items-center justify-between w-full gap-3">
+                <div class="flex items-center gap-3">
+                    <span class="flex items-center justify-center bg-coffee-600 text-coffee-50 p-1 size-8 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                            viewBox="0 0 256 256">
+                            <path
+                                d="M223.68,66.15,135.68,18a15.88,15.88,0,0,0-15.36,0l-88,48.17a16,16,0,0,0-8.32,14v95.64a16,16,0,0,0,8.32,14l88,48.17a15.88,15.88,0,0,0,15.36,0l88-48.17a16,16,0,0,0,8.32-14V80.18A16,16,0,0,0,223.68,66.15ZM128,32l80.34,44-29.77,16.3-80.35-44ZM128,120,47.66,76l33.9-18.56,80.34,44ZM40,90l80,43.78v85.79L40,175.82Zm176,85.78h0l-80,43.79V133.82l32-17.51V152a8,8,0,0,0,16,0V107.55L216,90v85.77Z">
+                            </path>
+                        </svg>
+                    </span>
+                    <h2 class="font-semibold text-2xl text-charcoal-50">All Resources</h2>
+                </div>
+
+                @* Search Bar *@
+                <div class="flex items-center gap-3">
+                    <span class="relative">
+                        <input type="text" autocomplete="off"
+                            class="peer duration-200 ease-in-out appearance-none w-56 text-sm outline-none ps-8 pe-3 py-1 rounded-md border-2 focus:ring-0 bg-charcoal-900 border-charcoal-800 focus:border-charcoal-700 text-charcoal-500 focus:text-charcoal-500 selection:text-charcoal-50 selection:bg-charcoal-700 placeholder-charcoal-500"
+                            id="search-bar" placeholder="Search">
+                        <svg class="absolute top-1/2 -translate-y-1/2 start-2 size-5 pointer-events-none peer-placeholder-shown:text-charcoal-500 peer-focus:text-charcoal-500"
+                            xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                            viewBox="0 0 256 256">
+                            <path
+                                d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z">
+                            </path>
+                        </svg>
+                    </span>
+                </div>
+
+                <div class="flex flex-1 items-center justify-end">
+
+                    <button type="button" x-on:click="addResourceModal = !addResourceModal;"
+                        class="duration-200 ease-in-out flex items-center justify-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium bg-pumpkin-700 hover:bg-pumpkin-800 active:bg-pumpkin-900 text-pumpkin-50">
+                        <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                            fill="currentColor" viewBox="0 0 256 256">
+                            <path
+                                d="M223.68,66.15,135.68,18a15.88,15.88,0,0,0-15.36,0l-88,48.17a16,16,0,0,0-8.32,14v95.64a16,16,0,0,0,8.32,14l88,48.17a15.88,15.88,0,0,0,15.36,0l88-48.17a16,16,0,0,0,8.32-14V80.18A16,16,0,0,0,223.68,66.15ZM128,32l80.34,44-29.77,16.3-80.35-44ZM128,120,47.66,76l33.9-18.56,80.34,44ZM40,90l80,43.78v85.79L40,175.82Zm176,85.78h0l-80,43.79V133.82l32-17.51V152a8,8,0,0,0,16,0V107.55L216,90v85.77Z">
+                            </path>
+                        </svg>
+                        Add Resource
+                    </button>
+
+                    @* Add Resource Modal *@
+                    <partial name="~/Views/Admin/Partials/_AddResourceModal.cshtml" />
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="p-4 flex items-center justify-center">
+        <div
+            class="relative overflow-auto h-[85vh] px-6 bg-charcoal-900 text-charcoal-100 rounded-lg text-sm w-full scrollbar-thin scrollbar-track-charcoal-900 scrollbar-thumb-charcoal-700">
+            <table class="relative w-full text-sm text-left whitespace-nowrap">
+                <thead class="sticky top-0 uppercase z-20 bg-charcoal-900 border-b border-charcoal-800">
+                    <tr>
+                        <th scope="col" class="py-3 text-start">
+                            #
+                        </th>
+                        <th scope="col" class="py-3 text-start">
+                            Name
+                        </th>
+                        <th scope="col" class="py-3 text-start">
+                            Quantity
+                        </th>
+                        <th scope="col" class="py-3 text-start">
+                            Type
+                        </th>
+                        <th scope="col" class="py-3 text-start">
+
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="">
+                    @for (int i = 0; i < 30; i++)
+                    {
+                        <tr class="">
+                            <td class="py-3">
+                                @(i + 1)
+                            </td>
+                            <td class="py-3">
+                                Anton Reception
+                            </td>
+                            <td class="py-3">
+                                1
+                            </td>
+                            <td class="py-3">
+                                Venue
+                            </td>
+                            <td class="flex items-center justify-start gap-2 py-3">
+                                <button type="button" x-on:click="editResourceModal = !editResourceModal"
+                                    class="text-center p-2 duration-200 ease-in-out rounded-md bg-coffee-700 hover:bg-coffee-800 active:bg-coffee-900 text-coffee-50">
+                                    <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                                        fill="currentColor" viewBox="0 0 256 256">
+                                        <path
+                                            d="M227.32,73.37,182.63,28.69a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H216a8,8,0,0,0,0-16H115.32l112-112A16,16,0,0,0,227.32,73.37ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.69,147.32,64l24-24L216,84.69Z">
+                                        </path>
+                                    </svg>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>

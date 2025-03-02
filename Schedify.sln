@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35806.99 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Schedify", "Schedify.csproj", "{D5668089-B141-411A-86C9-169167CC71CC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D5668089-B141-411A-86C9-169167CC71CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5668089-B141-411A-86C9-169167CC71CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5668089-B141-411A-86C9-169167CC71CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5668089-B141-411A-86C9-169167CC71CC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9EDC3423-FCC7-49D5-960F-1A75F87A4524}
+	EndGlobalSection
+EndGlobal

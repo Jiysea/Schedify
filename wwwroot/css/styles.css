@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+[x-cloak] {
+    display: none !important;
+}
+
+.htmx-indicator {
+    display: none;
+}
+.htmx-request .htmx-indicator {
+    display: inline;
+}
+.htmx-request.htmx-indicator {
+    display: inline;
+}
+
+@layer base {
+    @font-face {
+        font-display: swap;
+        font-family: "Poppins";
+        font-style: normal;
+        font-weight: 100;
+        src: url("../fonts/Poppins-Thin.ttf") format("truetype");
+    }
+
+    @font-face {
+        font-display: swap;
+        font-family: "Poppins";
+        font-style: normal;
+        font-weight: 200;
+        src: url("../fonts/Poppins-ExtraLight.ttf") format("truetype");
+    }
+
+    @font-face {
+        font-display: swap;
+        font-family: "Poppins";
+        font-style: normal;
+        font-weight: 300;
+        src: url("../fonts/Poppins-Light.ttf") format("truetype");
+    }
+
+    @font-face {
+        font-display: swap;
+        font-family: "Poppins";
+        font-style: normal;
+        font-weight: 400;
+        src: url("../fonts/Poppins-Regular.ttf") format("truetype");
+    }
+
+    @font-face {
+        font-display: swap;
+        font-family: "Poppins";
+        font-style: normal;
+        font-weight: 500;
+        src: url("../fonts/Poppins-Medium.ttf") format("truetype");
+    }
+
+    @font-face {
+        font-display: swap;
+        font-family: "Poppins";
+        font-style: normal;
+        font-weight: 600;
+        src: url("../fonts/Poppins-SemiBold.ttf") format("truetype");
+    }
+
+    @font-face {
+        font-display: swap;
+        font-family: "Poppins";
+        font-style: normal;
+        font-weight: 700;
+        src: url("../fonts/Poppins-Bold.ttf") format("truetype");
+    }
+
+    @font-face {
+        font-display: swap;
+        font-family: "Poppins";
+        font-style: normal;
+        font-weight: 800;
+        src: url("../fonts/Poppins-ExtraBold.ttf") format("truetype");
+    }
+
+    @font-face {
+        font-display: swap;
+        font-family: "Poppins";
+        font-style: normal;
+        font-weight: 900;
+        src: url("../fonts/Poppins-Black.ttf") format("truetype");
+    }
+}
+
+@layer components {
+    .button-charcoal {
+        @apply bg-charcoal-700 hover:bg-charcoal-800 active:bg-charcoal-900 text-charcoal-50 duration-200 ease-in-out outline-none flex items-center justify-center gap-2 text-sm font-semibold rounded-md;
+    }
+
+    .button-coffee {
+        @apply bg-coffee-700 hover:bg-coffee-800 active:bg-coffee-900 text-coffee-50 duration-200 ease-in-out outline-none flex items-center justify-center gap-2 text-sm font-semibold rounded-md;
+    }
+
+    .button-carribean {
+        @apply bg-carribean-700 hover:bg-carribean-800 active:bg-carribean-900 text-carribean-50 duration-200 ease-in-out outline-none flex items-center justify-center gap-2 text-sm font-semibold rounded-md;
+    }
+
+    .button-pumpkin {
+        @apply bg-pumpkin-700 hover:bg-pumpkin-800 active:bg-pumpkin-900 text-pumpkin-50 duration-200 ease-in-out outline-none flex items-center justify-center gap-2 text-sm font-semibold rounded-md;
+    }
+
+    .input-coffee {
+        @apply selection:bg-coffee-700 selection:text-coffee-100 bg-coffee-200 border-coffee-500 focus:ring-coffee-500 focus:border-coffee-600 text-coffee-950 placeholder-coffee-600 block text-sm border rounded-md outline-none w-full duration-200 ease-in-out;
+    }
+}

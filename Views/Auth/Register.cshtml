@@ -1,0 +1,290 @@
+@model RegisterViewModel;
+
+@{
+    ViewData["Title"] = "Register an Account";
+}
+
+<div class="p-5 bg-coffee-950 flex min-h-screen flex-col items-center justify-center">
+
+    @* White Box *@
+    <div class="bg-coffee-50 grid rounded-2xl shadow-xl max-w-2xl">
+
+        <div class="flex flex-col w-full items-center justify-center px-8 py-5">
+
+            @* Application Name and Catchphrase *@
+            <div class="flex flex-col items-center justify-center gap-3 mt-2 mb-5">
+                <div class="flex items-center justify-center w-[60%]">
+                    <img class="w-full drop-shadow" src="~/images/logo_landscape.png" alt="Schedify Logo">
+                </div>
+            </div>
+
+            <form hx-post="/auth/register" hx-swap="none" method="post" class="flex flex-col w-full gap-10 px-4">
+                @Html.AntiForgeryToken()
+
+                <div class="flex flex-col items-center justify-center gap-2">
+                    <span class="flex font-bold text-coffee-600 text-3xl">
+                        Sign Up
+                    </span>
+
+                    <p class="text-center text-coffee-500 text-sm">
+                        Want to attend some of the exciting events in Davao City? <br>
+                        Or do you want to be someone who organizes events? Register now.
+                    </p>
+                </div>
+
+                <div
+                    class="relative flex flex-col items-center justify-center gap-2 border border-coffee-300 rounded-lg p-6">
+                    <span
+                        class="select-none flex items-center gap-2 absolute start-4 -top-3 px-2 font-medium text-sm text-pumpkin-600 bg-coffee-50">
+                        <svg class="size-6" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                            fill="currentColor" viewBox="0 0 256 256">
+                            <path
+                                d="M214.61,198.62a32,32,0,1,0-45.23,0,40,40,0,0,0-17.11,23.32,8,8,0,0,0,5.67,9.79A8.15,8.15,0,0,0,160,232a8,8,0,0,0,7.73-5.95C170.56,215.42,180.54,208,192,208s21.44,7.42,24.27,18.05a8,8,0,1,0,15.46-4.11A40,40,0,0,0,214.61,198.62ZM192,160a16,16,0,1,1-16,16A16,16,0,0,1,192,160Zm24-88H131.31L104,44.69A15.86,15.86,0,0,0,92.69,40H40A16,16,0,0,0,24,56V200.61A15.4,15.4,0,0,0,39.38,216h81.18a8,8,0,0,0,0-16H40V88H216v32a8,8,0,0,0,16,0V88A16,16,0,0,0,216,72ZM92.69,56l16,16H40V56Z">
+                            </path>
+                        </svg>
+                        Type of User
+                    </span>
+                    <span class="flex items-center justify-center gap-2 relative w-full">
+                        <svg class="absolute end-4 pointer-events-none size-4 text-coffee-700"
+                            xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                            viewBox="0 0 256 256">
+                            <path
+                                d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z">
+                            </path>
+                        </svg>
+                        <select id="role" asp-for="Role"
+                            class="appearance-none cursor-pointer input-coffee px-3 py-2 focus:ring-2 focus:ring-offset-2">
+                            <option selected value=1>Attendee</option>
+                            <option value=2>Organizer</option>
+                        </select>
+                    </span>
+
+                    <div id="validation-Role">
+                        <span asp-validation-for="Role"></span>
+                    </div>
+                </div>
+
+                <div class="relative grid grid-cols-2 gap-4 border border-coffee-300 rounded-lg p-6">
+                    <span
+                        class="select-none flex items-center gap-2 absolute start-4 -top-3 px-2 font-medium text-sm text-pumpkin-600 bg-coffee-50">
+                        <svg class="size-6" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                            fill="currentColor" viewBox="0 0 256 256">
+                            <path
+                                d="M200,112a8,8,0,0,1-8,8H152a8,8,0,0,1,0-16h40A8,8,0,0,1,200,112Zm-8,24H152a8,8,0,0,0,0,16h40a8,8,0,0,0,0-16Zm40-80V200a16,16,0,0,1-16,16H40a16,16,0,0,1-16-16V56A16,16,0,0,1,40,40H216A16,16,0,0,1,232,56ZM216,200V56H40V200H216Zm-80.26-34a8,8,0,1,1-15.5,4c-2.63-10.26-13.06-18-24.25-18s-21.61,7.74-24.25,18a8,8,0,1,1-15.5-4,39.84,39.84,0,0,1,17.19-23.34,32,32,0,1,1,45.12,0A39.76,39.76,0,0,1,135.75,166ZM96,136a16,16,0,1,0-16-16A16,16,0,0,0,96,136Z">
+                            </path>
+                        </svg>
+                        Personal Information
+                    </span>
+
+                    <div class="relative">
+                        <label class="relative select-none font-medium text-xs text-coffee-500">
+                            First Name
+
+                            <span class="absolute -top-1 ms-1 text-lg text-red-700">
+                                *
+                            </span>
+                        </label>
+                        <input type="text" autocomplete="off" id="firstname" asp-for="FirstName"
+                            class="input-coffee px-3 py-2 focus:ring-2 focus:ring-offset-2"
+                            placeholder="Type your first name">
+
+                        <div id="validation-FirstName">
+                            <span asp-validation-for="FirstName"></span>
+                        </div>
+                    </div>
+
+                    <div class="relative">
+                        <label for="middlename" class="select-none font-medium text-xs text-coffee-500">
+                            Middle Name
+                        </label>
+                        <input type="text" autocomplete="off" id="middlename" asp-for="MiddleName"
+                            class="input-coffee px-3 py-2 focus:ring-2 focus:ring-offset-2" placeholder="(optional)">
+
+                        <div id="validation-MiddleName">
+                            <span asp-validation-for="MiddleName"></span>
+                        </div>
+                    </div>
+
+                    <div class="relative">
+                        <label for="lastname" class="relative select-none font-medium text-xs text-coffee-500">
+                            Last Name
+                            <span class="absolute -top-1 ms-1 text-lg text-red-700">
+                                *
+                            </span>
+                        </label>
+                        <input type="text" autocomplete="off" id="lastname" asp-for="LastName"
+                            class="input-coffee px-3 py-2 focus:ring-2 focus:ring-offset-2"
+                            placeholder="Type your last name">
+
+                        <div id="validation-LastName">
+                            <span asp-validation-for="LastName"></span>
+                        </div>
+                    </div>
+
+                    <div class="relative">
+                        <label for="extensionname" class="select-none font-medium text-xs text-coffee-500">
+                            Extension Name
+                        </label>
+                        <input type="text" autocomplete="off" id="extensionname" asp-for="ExtensionName"
+                            class="input-coffee px-3 py-2 focus:ring-2 focus:ring-offset-2" placeholder="(optional)">
+
+                        <div id="validation-ExtensionName">
+                            <span asp-validation-for="ExtensionName"></span>
+                        </div>
+                    </div>
+
+
+                    <div class="relative">
+                        <label for="birthdate" class="relative select-none font-medium text-xs text-coffee-500">
+                            Birthdate
+                            <span class="absolute -top-1 ms-1 text-lg text-red-700">
+                                *
+                            </span>
+                        </label>
+                        <span class="flex items-center justify-between relative">
+                            <svg class="absolute end-2 size-5 pointer-events-none text-coffee-700"
+                                xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                                viewBox="0 0 256 256">
+                                <path
+                                    d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Z">
+                                </path>
+                            </svg>
+                            <input type="text" autocomplete="off" asp-for="Birthdate"
+                                class="input-coffee px-3 py-2 focus:ring-2 focus:ring-offset-2" id="birthdate"
+                                id="birthdate" placeholder="Select a date">
+                        </span>
+                        <div id="validation-Birthdate">
+                            <span asp-validation-for="Birthdate"></span>
+                        </div>
+                    </div>
+
+                    <div class="relative">
+                        <label for="birthdate" class="relative select-none font-medium text-xs text-coffee-500">
+                            Contact Number
+                            <span class="absolute -top-1 ms-1 text-lg text-red-700">
+                                *
+                            </span>
+                        </label>
+                        <input type="text" autocomplete="off" id="phonenumber" asp-for="PhoneNumber"
+                            class="input-coffee px-3 py-2 focus:ring-2 focus:ring-offset-2" placeholder="+639">
+
+                        <div id="validation-PhoneNumber">
+                            <span asp-validation-for="PhoneNumber"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relative grid grid-cols-1 gap-8 border border-coffee-300 rounded-lg p-6">
+                    <span
+                        class="select-none flex items-center gap-2 absolute start-4 -top-3 px-2 font-medium text-sm text-pumpkin-600 bg-coffee-50">
+                        <svg class="size-6" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                            fill="currentColor" viewBox="0 0 256 256">
+                            <path
+                                d="M224,40V76a8,8,0,0,1-16,0V48H180a8,8,0,0,1,0-16h36A8,8,0,0,1,224,40Zm-8,132a8,8,0,0,0-8,8v28H180a8,8,0,0,0,0,16h36a8,8,0,0,0,8-8V180A8,8,0,0,0,216,172ZM76,208H48V180a8,8,0,0,0-16,0v36a8,8,0,0,0,8,8H76a8,8,0,0,0,0-16ZM40,84a8,8,0,0,0,8-8V48H76a8,8,0,0,0,0-16H40a8,8,0,0,0-8,8V76A8,8,0,0,0,40,84Zm136,92a8,8,0,0,1-6.41-3.19,52,52,0,0,0-83.2,0,8,8,0,1,1-12.8-9.62A67.94,67.94,0,0,1,101,141.51a40,40,0,1,1,53.94,0,67.94,67.94,0,0,1,27.43,21.68A8,8,0,0,1,176,176Zm-48-40a24,24,0,1,0-24-24A24,24,0,0,0,128,136Z">
+                            </path>
+                        </svg>
+                        User Credentials
+                    </span>
+
+                    <div class="relative">
+                        <span class="gap-2 relative flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                class="start-0 ms-2 size-5 text-coffee-500 absolute">
+                                <path fill-rule="evenodd"
+                                    d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            <input type="email" autocomplete="off" id="email" asp-for="Email"
+                                class="input-coffee ps-8 pe-3 py-2 focus:ring-2 focus:ring-offset-2"
+                                placeholder="Email">
+                        </span>
+
+                        <div id="validation-Email">
+                            <span asp-validation-for="Email"></span>
+                        </div>
+                    </div>
+
+                    <div class="relative">
+                        <span class="gap-2 relative flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                class="start-0 ms-2 size-5 text-coffee-500 absolute">
+                                <path fill-rule="evenodd"
+                                    d="M12 1.5a5.25 5.25 0 0 0-5.25 5.25v3a3 3 0 0 0-3 3v6.75a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3v-6.75a3 3 0 0 0-3-3v-3c0-2.9-2.35-5.25-5.25-5.25Zm3.75 8.25v-3a3.75 3.75 0 1 0-7.5 0v3h7.5Z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            <input type="password" autocomplete="off" id="password" asp-for="Password"
+                                class="input-coffee ps-8 pe-3 py-2 focus:ring-2 focus:ring-offset-2"
+                                placeholder="Password">
+                        </span>
+
+                        <div id="validation-Password">
+                            <span asp-validation-for="Password"></span>
+                        </div>
+                    </div>
+
+                    <div class="relative">
+                        <span class="gap-2 relative flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                class="start-0 ms-2 size-5 text-coffee-500 absolute">
+                                <path fill-rule="evenodd"
+                                    d="M12 1.5a5.25 5.25 0 0 0-5.25 5.25v3a3 3 0 0 0-3 3v6.75a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3v-6.75a3 3 0 0 0-3-3v-3c0-2.9-2.35-5.25-5.25-5.25Zm3.75 8.25v-3a3.75 3.75 0 1 0-7.5 0v3h7.5Z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            <input type="password" autocomplete="off" id="confirmpassword" asp-for="ConfirmPassword"
+                                class="input-coffee ps-8 pe-3 py-2 focus:ring-2 focus:ring-offset-2"
+                                placeholder="Confirm Password">
+                        </span>
+
+                        <div id="validation-ConfirmPassword">
+                            <span asp-validation-for="ConfirmPassword"></span>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <button type="submit" hx-disabled-elt="this"
+                    class="flex items-center justify-center gap-2 py-1.5 font-semibold rounded-md text-coffee-50 bg-coffee-600 hover:bg-coffee-700 active:bg-coffee-900">
+                    <span class="htmx-indicator">
+                        <svg class="size-6 animate-spin" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"
+                            preserveAspectRatio="xMidYMid" xmlns:xlink="http://www.w3.org/1999/xlink">
+                            <g>
+                                <circle stroke-dasharray="164.93361431346415 56.97787143782138" r="35" stroke-width="10"
+                                    stroke="currentColor" fill="none" cy="50" cx="50" transform="matrix(1,0,0,1,0,0)">
+                                </circle>
+                                <g></g>
+                            </g>
+                        </svg>
+                    </span>
+                    Register
+
+                </button>
+
+            </form>
+
+            <span class="flex items-center justify-center gap-2 w-full mx-2 mt-4 text-sm">
+                <span class="text-coffee-700">
+                    Already registered?
+                </span>
+                <a href="/login"
+                    class="text-pumpkin-500 hover:text-pumpkin-600 active:text-pumpkin-700 font-semibold underline underline-offset-4">
+                    Go to Login
+                </a>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            flatpickr("#birthdate", {
+                dateFormat: "m-d-Y",
+                maxDate: "today",
+            });
+        });
+
+    </script>
+}

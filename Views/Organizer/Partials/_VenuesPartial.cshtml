@@ -1,0 +1,19 @@
+@{
+    // Determine if the request is an HTMX request.
+    bool isHxRequest = ViewContext.HttpContext.Request.Headers["HX-Request"] == "true";
+}
+
+@if (isHxRequest)
+{
+    <nav hx-swap-oob="true" id="resources-nav">
+        <partial name="~/Views/Organizer/Partials/_ResourceNav.cshtml" model="@("Venues")" />
+    </nav>
+}
+
+<div class="flex flex-col gap-3 size-full px-6 py-4 ">
+
+    @* Cards Content *@
+    <main class="flex h-full">
+        <partial name="~/Views/Organizer/Partials/_SampleVenuesPartial.cshtml" />
+    </main>
+</div>

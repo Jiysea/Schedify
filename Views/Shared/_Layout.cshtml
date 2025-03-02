@@ -1,0 +1,20 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" class="scrollbar-thin scrollbar-track-coffee-900 scrollbar-thumb-coffee-600">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <script type="importmap"></script>
+    <link rel="stylesheet" href="~/css/output.css" />
+</head>
+
+<body class="font-poppins antialiased">
+    @RenderBody()
+    <script src="~/lib/htmx/htmx.min.js"></script>
+    <script src="~/dist/bundle.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>

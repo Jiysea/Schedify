@@ -1,0 +1,53 @@
+<div class="grid grid-cols-4 grid-rows-2 gap-6">
+    @for (int i = 0; i < 8; i++)
+    {
+        <div class="flex flex-col border-2 rounded-lg border-zinc-300 bg-white">
+            <span class="">
+                <img class="object-cover h-24 w-72 rounded-t-md" src="~/images/v1.jpg" alt="Venue spot">
+            </span>
+            <div class="flex flex-col gap-2 text-xs text-zinc-500 p-2">
+                <h1 class="font-semibold text-lg text-coffee-900">Anton Reception</h1>
+                <p class="flex items-center gap-2">
+                    <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                        viewBox="0 0 256 256">
+                        <path
+                            d="M112,80a16,16,0,1,1,16,16A16,16,0,0,1,112,80ZM64,80a64,64,0,0,1,128,0c0,59.95-57.58,93.54-60,94.95a8,8,0,0,1-7.94,0C121.58,173.54,64,140,64,80Zm16,0c0,42.2,35.84,70.21,48,78.5,12.15-8.28,48-36.3,48-78.5a48,48,0,0,0-96,0Zm122.77,67.63a8,8,0,0,0-5.54,15C213.74,168.74,224,176.92,224,184c0,13.36-36.52,32-96,32s-96-18.64-96-32c0-7.08,10.26-15.26,26.77-21.36a8,8,0,0,0-5.54-15C29.22,156.49,16,169.41,16,184c0,31.18,57.71,48,112,48s112-16.82,112-48C240,169.41,226.78,156.49,202.77,147.63Z">
+                        </path>
+                    </svg>
+                    51 Kircsh Bldg., Matina Aplaya
+                </p>
+                <span class="flex items-center justify-between gap-2">
+                    <p class="flex items-center gap-2">
+                        <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                            viewBox="0 0 256 256">
+                            <path
+                                d="M237.66,141.66l-32,32a8,8,0,0,1-11.32-11.32L212.69,144H123.31l-56,56H96a8,8,0,0,1,0,16H48a8,8,0,0,1-8-8V160a8,8,0,0,1,16,0v28.69l56-56V43.31L93.66,61.66A8,8,0,0,1,82.34,50.34l32-32a8,8,0,0,1,11.32,0l32,32a8,8,0,0,1-11.32,11.32L128,43.31V128h84.69l-18.35-18.34a8,8,0,0,1,11.32-11.32l32,32A8,8,0,0,1,237.66,141.66Z">
+                            </path>
+                        </svg>
+                        120m&sup2;
+                    </p>
+                    <p class="flex items-center gap-2">
+                        <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                            viewBox="0 0 256 256">
+                            <path
+                                d="M117.25,157.92a60,60,0,1,0-66.5,0A95.83,95.83,0,0,0,3.53,195.63a8,8,0,1,0,13.4,8.74,80,80,0,0,1,134.14,0,8,8,0,0,0,13.4-8.74A95.83,95.83,0,0,0,117.25,157.92ZM40,108a44,44,0,1,1,44,44A44.05,44.05,0,0,1,40,108Zm210.14,98.7a8,8,0,0,1-11.07-2.33A79.83,79.83,0,0,0,172,168a8,8,0,0,1,0-16,44,44,0,1,0-16.34-84.87,8,8,0,1,1-5.94-14.85,60,60,0,0,1,55.53,105.64,95.83,95.83,0,0,1,47.22,37.71A8,8,0,0,1,250.14,206.7Z">
+                            </path>
+                        </svg>
+                        100 people
+                    </p>
+                </span>
+
+                <span class="flex items-center justify-center gap-3 px-4 text-xs">
+                    <button
+                        class="duration-200 ease-in-out w-36 flex items-center justify-center px-3 py-1.5 rounded-md border-2 border-coffee-600 hover:border-transparent hover:bg-coffee-700 active:bg-coffee-900 text-coffee-600 hover:text-coffee-50 active:text-coffee-50">
+                        View
+                    </button>
+                    <button
+                        class="duration-200 ease-in-out w-36 flex items-center justify-center px-3 py-1.5 rounded-md border-2 border-transparent text-coffee-50 bg-coffee-600 hover:bg-coffee-700 active:bg-coffee-900">
+                        Add
+                    </button>
+                </span>
+            </div>
+        </div>
+    }
+</div>

@@ -1,0 +1,26 @@
+@inject SignInManager<User> SignInManager;
+
+
+<nav class="flex justify-between items-center p-2">
+
+    @if (!SignInManager.IsSignedIn(User))
+    {
+        <div class="flex items-center justify-start">
+            @* Logo Here *@
+        </div>
+
+        <div class="flex items-center justify-end">
+            <ul class="flex items-center justify-between gap-4">
+                <li class="flex items-center justify-center">
+                    <a href="/login" class="text-center px-3 py-1.5 font-medium border-2 rounded-md text-coffee-700 border-coffee-700"
+                       >Sign In</a>
+                </li>
+                <li class="flex items-center justify-center">
+                    <a href="/register" class="text-center px-3 py-1.5 font-medium border-2 border-transparent rounded-md text-coffee-50 bg-coffee-700"
+                        >Register</a>
+                </li>
+            </ul>
+        </div>
+
+    }
+</nav>

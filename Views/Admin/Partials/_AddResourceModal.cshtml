@@ -1,0 +1,49 @@
+@model AddResourceViewModel
+
+<div x-cloak x-show="addResourceModal"
+    class="fixed inset-0 flex justify-center items-start bg-black/50 backdrop-blur-sm overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-charcoal-700 z-50">
+
+    @* Box *@
+    <div class="bg-charcoal-900 rounded-lg shadow-lg">
+
+        @* Top Header *@
+        <header class="flex items-center justify-between text-lg font-medium py-3 px-4">
+            <h1 class="text-charcoal-50">Add New Resource</h1>
+            <button x-on:click="addResourceModal = false"
+                class="flex items-center justify-center size-8 p-1 rounded-md text-charcoal-50 hover:bg-charcoal-800 active:bg-charcoal-700 hover:text-coffee-50 active:text-coffee-50 duration-200 ease-in-out">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                    viewBox="0 0 256 256">
+                    <path
+                        d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z">
+                    </path>
+                </svg>
+            </button>
+        </header>
+
+        <hr class="w-full border-charcoal-800">
+
+        @* Body *@
+        <main class="grid grid-cols-3 gap-3 px-6 py-3">
+            <div class="relative">
+                <label for="resourcename" class="text-xs text-charcoal-300">Resource Name</label>
+                <input type="text" id="resourcename" asp-for="ResourceName" placeholder="Type name here" />
+            </div>
+
+            <div class="relative">
+                <label for="description" class="text-xs text-charcoal-300">Description</label>
+                <textarea id="description" class="w-full" rows="3" asp-for="Description"
+                    placeholder="Describe anything about this resource.">
+
+                </textarea>
+            </div>
+        </main>
+
+        @* Footer *@
+        <div class="mt-4 flex items-center justify-center gap-2 w-full">
+            <button x-on:click="addResourceModal = false"
+                class="duration-200 ease-in-out text-sm px-4 py-2 text-coffee-50 bg-coffee-700 hover:bg-coffee-800 active:bg-coffee-900 rounded-md">
+                Save
+            </button>
+        </div>
+    </div>
+</div>
