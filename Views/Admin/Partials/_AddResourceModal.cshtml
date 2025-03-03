@@ -1,7 +1,7 @@
 @model AddResourceViewModel
 
 <div x-cloak x-show="addResourceModal"
-    class="fixed inset-0 flex justify-center items-start bg-black/50 backdrop-blur-sm overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-charcoal-700 z-50">
+    class="fixed inset-0 flex justify-center items-start bg-black/50 backdrop-blur-sm overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-charcoal-700 z-50 p-4">
 
     @* Box *@
     <div class="bg-charcoal-900 rounded-lg shadow-lg">
@@ -24,17 +24,35 @@
 
         @* Body *@
         <main class="grid grid-cols-3 gap-3 px-6 py-3">
-            <div class="relative">
+            <div class="flex flex-col relative">
                 <label for="resourcename" class="text-xs text-charcoal-300">Resource Name</label>
-                <input type="text" id="resourcename" asp-for="ResourceName" placeholder="Type name here" />
+                <input type="text" class="input-charcoal-dark p-2" id="resourcename" asp-for="ResourceName"
+                    placeholder="Type name here" />
             </div>
 
-            <div class="relative">
+            <div class="flex flex-col relative">
                 <label for="description" class="text-xs text-charcoal-300">Description</label>
-                <textarea id="description" class="w-full" rows="3" asp-for="Description"
+                <textarea id="description" class="input-charcoal-dark p-2" rows="3" asp-for="Description"
                     placeholder="Describe anything about this resource.">
 
                 </textarea>
+            </div>
+
+            <div class="flex flex-col relative">
+                <label for="cost" class="text-xs text-charcoal-300">Cost</label>
+                <input type="text" class="input-charcoal-dark p-2" id="cost" asp-for="Cost"
+                    placeholder="Type cost here" />
+            </div>
+
+            <div class="flex flex-col relative">
+                <label for="type" class="text-xs text-charcoal-300">Type of Resource</label>
+                <select class="input-charcoal-dark p-2" id="type" asp-for="Type" hx-get=""
+                    asp-items="@(new SelectList(Model.ResourceTypes))">
+                </select>
+            </div>
+
+            <div id="" class="">
+
             </div>
         </main>
 

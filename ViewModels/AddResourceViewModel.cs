@@ -5,22 +5,25 @@ namespace Schedify.ViewModels;
 public class AddResourceViewModel
 {
     [Required(ErrorMessage = "This field is required.")]
-    public required string ResourceName { get; set; }
+    public string ResourceName { get; set; } = null!;
 
     [Required(ErrorMessage = "This field is required.")]
     [StringLength(300)]
     [DefaultValue("No description")]
-    public required string Description { get; set; }
+    public string Description { get; set; } = null!;
 
+    [Required]
     public ResourceType Type { get; set; }
 
     [Required(ErrorMessage = "This field is required.")]
     [DataType(DataType.Currency)]
     [Range(typeof(decimal), "0.01", "79228162514264337593543950335")]
-    public required decimal Cost { get; set; }
+    public decimal Cost { get; set; }
 
-    public required string CostType { get; set; }
+    public string CostType { get; set; } = null!;
 
     [Required(ErrorMessage = "This field is required.")]
-    public required int Quantity { get; set; }
+    public int Quantity { get; set; }
+
+    public IEnumerable<ResourceType> ResourceTypes { get; set; } = Enum.GetValues<ResourceType>();
 }

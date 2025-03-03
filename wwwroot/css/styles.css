@@ -110,4 +110,12 @@
     .input-coffee {
         @apply selection:bg-coffee-700 selection:text-coffee-100 bg-coffee-200 border-coffee-500 focus:ring-coffee-500 focus:border-coffee-600 text-coffee-950 placeholder-coffee-600 block text-sm border rounded-md outline-none w-full duration-200 ease-in-out;
     }
+
+    .input-charcoal {
+        @apply selection:bg-charcoal-700 selection:text-charcoal-100 bg-charcoal-200 border-charcoal-500 focus:ring-charcoal-500 focus:border-charcoal-600 text-charcoal-950 placeholder-charcoal-600 block text-sm border rounded-md outline-none w-full duration-200 ease-in-out;
+    }
+
+    .input-charcoal-dark {
+        @apply selection:bg-charcoal-100 selection:text-charcoal-700 bg-charcoal-800 border-charcoal-700 focus:ring-charcoal-500 focus:border-charcoal-600 text-charcoal-50 placeholder-charcoal-500 block text-sm border rounded-md outline-none w-full duration-200 ease-in-out;
+    }
 }

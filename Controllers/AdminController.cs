@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Schedify.Models;
+using Schedify.ViewModels;
 
 namespace Schedify.Controllers;
 
@@ -22,14 +23,24 @@ public class AdminController : Controller
     // }
 
     [Route("admin/dashboard")]
-    public ActionResult Dashboard() => View();
+    public ActionResult Dashboard()
+    {
+
+        return View();
+    }
 
     [Route("admin/actions")]
-    public ActionResult Actions() => View();
+    public ActionResult Actions()
+    {
+
+        return View(new AddResourceViewModel());
+    }
 
     [Route("admin/activity-logs")]
     public ActionResult ActivityLogs() => View();
 
     [Route("admin/profile")]
     public ActionResult Profile() => View();
+
+
 }
