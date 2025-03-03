@@ -11,7 +11,7 @@ using Schedify.ViewModels;
 namespace Schedify.Controllers;
 
 
-[Authorize(Roles = "Admin")]
+// [Authorize(Roles = "Admin")]
 public class AdminController : Controller
 {
 
@@ -25,14 +25,12 @@ public class AdminController : Controller
     [Route("admin/dashboard")]
     public ActionResult Dashboard()
     {
-
         return View();
     }
 
     [Route("admin/actions")]
     public ActionResult Actions()
     {
-
         return View(new AddResourceViewModel());
     }
 
