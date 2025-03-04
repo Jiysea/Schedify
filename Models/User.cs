@@ -36,7 +36,6 @@ public class User : IdentityUser<Guid>
     // Dependents
     public ICollection<Image> Images { get; } = new List<Image>();
     public ICollection<Event> Events { get; } = new List<Event>();
-    public ICollection<Resource> Resources { get; } = new List<Resource>();
     public ICollection<ActivityLog> ActivityLogs { get; } = new List<ActivityLog>();
     public ICollection<BillingAddress> BillingAddresses { get; } = new List<BillingAddress>();
     public ICollection<ConversationUser> ConversationUsers { get; } = new List<ConversationUser>();

@@ -23,22 +23,50 @@
         <hr class="w-full border-charcoal-800">
 
         @* Body *@
-        <main class="flex flex-col gap-10 px-6 py-10">
+        <main x-data="{ showQuantity: false }" class="flex flex-col gap-10 px-6 py-10">
 
             @* Type of Resource *@
-            <div class="relative p-5 border-2 rounded-xl border-charcoal-700">
+            <div class="relative grid grid-cols-2 gap-3 p-5 border-2 rounded-xl border-charcoal-700">
                 <h2 class="absolute flex items-center gap-1 start-4 -top-3 text-sm font-light text-pumpkin-400   bg-charcoal-900 px-2">
                     <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256"><path d="M223.68,66.15,135.68,18a15.88,15.88,0,0,0-15.36,0l-88,48.17a16,16,0,0,0-8.32,14v95.64a16,16,0,0,0,8.32,14l88,48.17a15.88,15.88,0,0,0,15.36,0l88-48.17a16,16,0,0,0,8.32-14V80.18A16,16,0,0,0,223.68,66.15ZM128,32l80.34,44-29.77,16.3-80.35-44ZM128,120,47.66,76l33.9-18.56,80.34,44ZM40,90l80,43.78v85.79L40,175.82Zm176,85.78h0l-80,43.79V133.82l32-17.51V152a8,8,0,0,0,16,0V107.55L216,90v85.77Z"></path></svg>
-                    Type of Resource
+                    Resource Information
                 </h2>
                 
-                <div class="flex flex-col gap-1 relative">
-                    
+                @* Type of Resource *@
+                <div class="flex flex-col col-span-2 gap-1 relative">
+                    <label for="type" class="text-xs text-charcoal-300">Type of Resource</label>
                     <select class="input-charcoal-dark p-2" id="type" asp-for="Type" hx-get="/admin/resource-extra"
                         hx-target="#resource-extra" hx-trigger="change"
                         hx-vals='js:{"selectedOption": event.target.value}'
+                        x-on:change="
+                            showQuantity = ($el.value != 'Venue');
+                            if(showQuantity) {
+                                document.getElementById('quantity').value = '';
+                            }
+                            "
                         asp-items="@(new SelectList(Model.ResourceTypes))">
                     </select>
+                </div>
+
+                @* Provider Name *@
+                <div class="flex flex-col col-span-2 gap-1 relative">
+                    <label for="name" class="text-xs text-charcoal-300">Provider Name</label>
+                    <input type="text" autofocus class="input-charcoal-dark p-2" id="providername" asp-for="ProviderName"
+                        placeholder="Type name here" />
+                </div>
+
+                @* Provider Phone Number *@
+                <div class="flex flex-col gap-1 relative">
+                    <label for="name" class="text-xs text-charcoal-300">Provider Phone Number</label>
+                    <input type="text" maxlength="11" autofocus class="input-charcoal-dark p-2" id="providerphonenumber" asp-for="ProviderPhoneNumber"
+                        placeholder="ex. 09123456789" />
+                </div>
+
+                @* Provider Email *@
+                <div class="flex flex-col gap-1 relative">
+                    <label for="name" class="text-xs text-charcoal-300">Provider Email</label>
+                    <input type="email" autofocus class="input-charcoal-dark p-2" id="provideremail" asp-for="ProviderEmail"
+                        placeholder="Type email here" />
                 </div>
             </div>
 
@@ -58,12 +86,15 @@
                 @* Cost *@
                 <div class="flex flex-col gap-1 relative">
                     <label for="cost" class="text-xs text-charcoal-300">Cost</label>
-                    <input type="text" class="input-charcoal-dark p-2" id="cost" asp-for="Cost"
+                    <input type="text" x-mask:dynamic="$money($input)" class="input-charcoal-dark p-2" id="cost" asp-for="Cost"
                         placeholder="Type cost here" />
                 </div>
 
                 @* Cost Type *@
-                <div class="flex flex-col gap-1 relative">
+                <div class="flex flex-col gap-1 relative"
+                    :class="{
+                        'col-span-2': (!showQuantity),
+                    }">
                     <label for="costtype" class="text-xs text-charcoal-300">Type of Cost</label>
                     <select class="input-charcoal-dark p-2" id="costtype" asp-for="CostType" hx-get="/admin/cost-types" hx-trigger="load, change from:#type" hx-vals='js:{"selectedOption": document.getElementById("type").value}' hx-target="#costtype">
                         
@@ -71,9 +102,10 @@
                 </div>
 
                 @* Quantity *@
-                <div class="flex flex-col gap-1 relative">
+                <div x-show="showQuantity" class="flex flex-col gap-1 relative">
                     <label for="quantity" class="text-xs text-charcoal-300">Quantity</label>
-                    <input type="number" inputmode="numeric" class="input-charcoal-dark p-2" id="quantity" asp-for="Quantity"
+                    <input type="number"
+                     inputmode="numeric" class="input-charcoal-dark p-2" name="quantity" id="quantity" asp-for="Quantity"
                         placeholder="Type quantity here" />
                 </div>
 
@@ -88,7 +120,7 @@
             </div>
 
             <div id="resource-extra" class="relative grid grid-cols-5 gap-3 p-5 border-2 rounded-xl border-charcoal-700">
-                @await Html.PartialAsync("~/Views/Admin/Partials/_ResourceExtraPartial.cshtml", new VenueViewModel { Type = Model.Type })
+                @await Html.PartialAsync("~/Views/Admin/Partials/_ResourceExtraPartial.cshtml", new AddResourceViewModel { Type = Model.Type })
             </div>
         </main>
 

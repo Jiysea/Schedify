@@ -576,6 +576,19 @@ namespace Schedify.Migrations
                     b.Property<string>("PriceItems")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ProviderEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProviderName")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("ProviderPhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Province")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -607,8 +620,6 @@ namespace Schedify.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Resources");
                 });
@@ -919,17 +930,6 @@ namespace Schedify.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Schedify.Models.Resource", b =>
-                {
-                    b.HasOne("Schedify.Models.User", "User")
-                        .WithMany("Resources")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Schedify.Models.Conversation", b =>
                 {
                     b.Navigation("ConversationUsers");
@@ -970,8 +970,6 @@ namespace Schedify.Migrations
                     b.Navigation("Images");
 
                     b.Navigation("Messages");
-
-                    b.Navigation("Resources");
                 });
 #pragma warning restore 612, 618
         }

@@ -57,46 +57,46 @@
         </div>
     </header>
 
-    <main class="p-4 flex items-center justify-center">
+    <main class="flex items-center justify-center">
         <div
-            class="relative overflow-auto h-[85vh] px-6 bg-charcoal-900 text-charcoal-100 rounded-lg text-sm w-full scrollbar-thin scrollbar-track-charcoal-900 scrollbar-thumb-charcoal-700">
-            <table class="relative w-full text-sm text-left whitespace-nowrap">
-                <thead class="sticky top-0 uppercase z-20 bg-charcoal-900 border-b border-charcoal-800">
+            class=" overflow-auto h-[85vh] text-charcoal-100 rounded-lg text-sm w-full scrollbar-thin scrollbar-track-charcoal-900 scrollbar-thumb-charcoal-700">
+            <table class="border-separate w-full text-sm text-left whitespace-nowrap">
+                <thead class="sticky top-0 left-0 uppercase z-20 bg-charcoal-950" >
                     <tr>
-                        <th scope="col" class="py-3 text-start">
+                        <th class="py-3 ps-6 text-start border-b-2 border-charcoal-900">
                             #
                         </th>
-                        <th scope="col" class="py-3 text-start">
+                        <th class="py-3 text-start border-b-2 border-charcoal-900">
                             Name
                         </th>
-                        <th scope="col" class="py-3 text-start">
+                        <th class="py-3 text-start border-b-2 border-charcoal-900">
                             Quantity
                         </th>
-                        <th scope="col" class="py-3 text-start">
+                        <th class="py-3 text-start border-b-2 border-charcoal-900">
                             Type
                         </th>
-                        <th scope="col" class="py-3 text-start">
+                        <th class="py-3 text-start border-b-2 border-charcoal-900">
 
                         </th>
                     </tr>
                 </thead>
-                <tbody class="">
-                    @for (int i = 0; i < 30; i++)
+                <tbody>
+                    @for (int i = 0; i < 15; i++)
                     {
-                        <tr class="">
-                            <td class="py-3">
+                        <tr class=" divide-x divide-y divide-charcoal-900">
+                            <th scope="row" class="py-3 ps-6 shrink">
                                 @(i + 1)
-                            </td>
-                            <td class="py-3">
+                            </th>
+                            <td class="p-3">
                                 Anton Reception
                             </td>
-                            <td class="py-3">
+                            <td class="p-3">
                                 1
                             </td>
-                            <td class="py-3">
+                            <td class="p-3">
                                 Venue
                             </td>
-                            <td class="flex items-center justify-start gap-2 py-3">
+                            <td class="flex items-center justify-start gap-2 p-3">
                                 <button type="button" x-on:click="editResourceModal = !editResourceModal"
                                     class="text-center p-2 duration-200 ease-in-out rounded-md bg-coffee-700 hover:bg-coffee-800 active:bg-coffee-900 text-coffee-50">
                                     <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32"

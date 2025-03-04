@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Identity;
 using Schedify.Models;
 using Schedify.ViewModels;
 using Schedify.Data;
-using Schedify.Binders;
 
 namespace Schedify.Controllers;
 
@@ -44,16 +43,16 @@ public class AdminController : Controller
 
     [Route("admin/resource-extra")]
     [HttpGet]
-    public IActionResult ResourceExtra(ResourceType selectedOption = ResourceType.Venue)
+    public IActionResult ResourceExtra(ResourceType selectedOption)
     {
         AddResourceViewModel viewModel = selectedOption switch
         {
-            ResourceType.Venue => new VenueViewModel { Type = ResourceType.Venue },
-            ResourceType.Equipment => new EquipmentViewModel { Type = ResourceType.Equipment },
-            ResourceType.Furniture => new FurnitureViewModel { Type = ResourceType.Furniture },
-            ResourceType.Catering => new CateringViewModel { Type = ResourceType.Catering },
-            ResourceType.Personnel => new PersonnelViewModel { Type = ResourceType.Personnel },
-            _ => new VenueViewModel { Type = ResourceType.Venue } // Default
+            ResourceType.Venue => new AddResourceViewModel { Type = ResourceType.Venue },
+            ResourceType.Equipment => new AddResourceViewModel { Type = ResourceType.Equipment },
+            ResourceType.Furniture => new AddResourceViewModel { Type = ResourceType.Furniture },
+            ResourceType.Catering => new AddResourceViewModel { Type = ResourceType.Catering },
+            ResourceType.Personnel => new AddResourceViewModel { Type = ResourceType.Personnel },
+            _ => new AddResourceViewModel { Type = ResourceType.Venue } // Default
         };
 
         return PartialView("~/Views/Admin/Partials/_ResourceExtraPartial.cshtml", viewModel);
@@ -75,42 +74,29 @@ public class AdminController : Controller
     [HttpPost]
     public IActionResult CreateResource([FromForm] AddResourceViewModel model)
     {
-        return Json(model);
-        // Console.WriteLine(model);
-        // // if (!ModelState.IsValid)
-        // // {
-        // //     return Json(model);
-        // // }
-
-        // switch (model) // Assuming you have a property indicating the type
+        // if (!ModelState.IsValid)
         // {
-        //     case VenueViewModel venueModel:
-        //         var venue = new ResourceVenue
-        //         {
-        //             Capacity = venueModel.Capacity,
-        //             Size = venueModel.Size,
-        //             AddressLine1 = venueModel.AddressLine1,
-        //             AddressLine2 = venueModel.AddressLine2,
-        //             CityMunicipality = "Davao City",
-        //             Province = "Davao del Sur",
-        //         };
-        //         // _context.ResourceVenues.Add(venue);
-        //         break;
-
-        //     case EquipmentViewModel equipmentModel:
-        //         var equipment = new ResourceEquipment
-        //         {
-        //             Brand = equipmentModel.Brand,
-        //             Specifications = equipmentModel.SpecificationString,
-        //         };
-        //         // _context.ResourceEquipments.Add(equipment);
-        //         break;
-
+        //     return Json(model);
         // }
-        // // Save to the database
-        // // _context.SaveChanges();
+
+        // var resource = new Resource
+        // {
+        //     Name = model.Name,
+        //     Description = model.Description,
+        //     Cost = model.CostAsDecimal,
+        //     CostType = model.CostType,
+        //     Capacity = model.Capacity,
+        //     Quantity = model.Quantity,
+        //     Size = model.Size,
+        //     AddressLine1 = model.AddressLine1,
+        //     AddressLine2 = model.AddressLine2,
+        //     CityMunicipality = "Davao City",
+        //     Province = "Davao del Sur",
+        // };
+        // Save to the database
+        // _context.SaveChanges();
 
 
-        // return Json(model);
+        return Json(model);
     }
 }

@@ -1008,6 +1008,10 @@ video {
   visibility: collapse;
 }
 
+.static {
+  position: static;
+}
+
 .fixed {
   position: fixed;
 }
@@ -1058,6 +1062,10 @@ video {
 
 .end-4 {
   inset-inline-end: 1rem;
+}
+
+.left-0 {
+  left: 0px;
 }
 
 .left-1 {
@@ -1183,6 +1191,10 @@ video {
 
 .mt-4 {
   margin-top: 1rem;
+}
+
+.mt-0 {
+  margin-top: 0px;
 }
 
 .block {
@@ -1334,6 +1346,10 @@ video {
   height: 100%;
 }
 
+.h-40 {
+  height: 10rem;
+}
+
 .max-h-\[65vh\] {
   max-height: 65vh;
 }
@@ -1342,12 +1358,20 @@ video {
   max-height: 75vh;
 }
 
+.max-h-40 {
+  max-height: 10rem;
+}
+
 .min-h-\[65vh\] {
   min-height: 65vh;
 }
 
 .min-h-screen {
   min-height: 100vh;
+}
+
+.min-h-40 {
+  min-height: 10rem;
 }
 
 .w-1 {
@@ -1410,11 +1434,27 @@ video {
   max-width: 42rem;
 }
 
+.max-w-3xl {
+  max-width: 48rem;
+}
+
+.max-w-\[791px\] {
+  max-width: 791px;
+}
+
+.max-w-full {
+  max-width: 100%;
+}
+
 .flex-1 {
   flex: 1 1 0%;
 }
 
 .flex-shrink {
+  flex-shrink: 1;
+}
+
+.shrink {
   flex-shrink: 1;
 }
 
@@ -1424,6 +1464,10 @@ video {
 
 .border-collapse {
   border-collapse: collapse;
+}
+
+.border-separate {
+  border-collapse: separate;
 }
 
 .-translate-y-1 {
@@ -1499,8 +1543,16 @@ video {
   grid-template-rows: repeat(2, minmax(0, 1fr));
 }
 
+.flex-row {
+  flex-direction: row;
+}
+
 .flex-col {
   flex-direction: column;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
 }
 
 .items-start {
@@ -1581,15 +1633,45 @@ video {
   margin-bottom: calc(1rem * var(--tw-space-y-reverse));
 }
 
+.divide-x > :not([hidden]) ~ :not([hidden]) {
+  --tw-divide-x-reverse: 0;
+  border-right-width: calc(1px * var(--tw-divide-x-reverse));
+  border-left-width: calc(1px * calc(1 - var(--tw-divide-x-reverse)));
+}
+
 .divide-x-2 > :not([hidden]) ~ :not([hidden]) {
   --tw-divide-x-reverse: 0;
   border-right-width: calc(2px * var(--tw-divide-x-reverse));
   border-left-width: calc(2px * calc(1 - var(--tw-divide-x-reverse)));
 }
 
+.divide-y > :not([hidden]) ~ :not([hidden]) {
+  --tw-divide-y-reverse: 0;
+  border-top-width: calc(1px * calc(1 - var(--tw-divide-y-reverse)));
+  border-bottom-width: calc(1px * var(--tw-divide-y-reverse));
+}
+
+.divide-charcoal-900 > :not([hidden]) ~ :not([hidden]) {
+  --tw-divide-opacity: 1;
+  border-color: rgb(43 40 38 / var(--tw-divide-opacity, 1));
+}
+
 .divide-zinc-300 > :not([hidden]) ~ :not([hidden]) {
   --tw-divide-opacity: 1;
   border-color: rgb(212 212 216 / var(--tw-divide-opacity, 1));
+}
+
+.divide-charcoal-500 > :not([hidden]) ~ :not([hidden]) {
+  --tw-divide-opacity: 1;
+  border-color: rgb(140 130 125 / var(--tw-divide-opacity, 1));
+}
+
+.self-auto {
+  align-self: auto;
+}
+
+.self-start {
+  align-self: flex-start;
 }
 
 .overflow-auto {
@@ -1606,6 +1688,14 @@ video {
 
 .whitespace-nowrap {
   white-space: nowrap;
+}
+
+.break-words {
+  overflow-wrap: break-word;
+}
+
+.break-all {
+  word-break: break-all;
 }
 
 .rounded {
@@ -1875,6 +1965,11 @@ video {
   background-color: rgb(216 180 254 / var(--tw-bg-opacity, 1));
 }
 
+.bg-red-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(239 68 68 / var(--tw-bg-opacity, 1));
+}
+
 .bg-white {
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
@@ -2110,6 +2205,10 @@ video {
 
 .ps-2 {
   padding-inline-start: 0.5rem;
+}
+
+.ps-6 {
+  padding-inline-start: 1.5rem;
 }
 
 .ps-8 {
@@ -2500,6 +2599,10 @@ video {
 
 .outline {
   outline-style: solid;
+}
+
+.outline-2 {
+  outline-width: 2px;
 }
 
 .ring-2 {
@@ -2957,11 +3060,6 @@ textarea {
   background-color: rgb(53 34 29 / var(--tw-bg-opacity, 1));
 }
 
-.hover\:bg-coffee-950:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(27 17 14 / var(--tw-bg-opacity, 1));
-}
-
 .hover\:bg-pumpkin-700:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(184 70 0 / var(--tw-bg-opacity, 1));
@@ -3161,4 +3259,22 @@ textarea {
 .active\:text-pumpkin-700:active {
   --tw-text-opacity: 1;
   color: rgb(184 70 0 / var(--tw-text-opacity, 1));
+}
+
+@media (min-width: 768px) {
+  .md\:mt-0 {
+    margin-top: 0px;
+  }
+
+  .md\:flex-row {
+    flex-direction: row;
+  }
+
+  .md\:items-center {
+    align-items: center;
+  }
+
+  .md\:self-auto {
+    align-self: auto;
+  }
 }

@@ -14,6 +14,16 @@ public class Resource
     public Guid UserId { get; set; }
 
     [Required]
+    [StringLength(250)]
+    public required string ProviderName { get; set; }
+
+    [Required]
+    public required string ProviderPhoneNumber { get; set; }
+    
+    [Required]
+    public required string ProviderEmail { get; set; }
+
+    [Required]
     [StringLength(100)]
     public required string Name { get; set; }
 
@@ -84,7 +94,6 @@ public class Resource
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
     // Dependents
-    public User User { get; set; } = null!;
     public ICollection<EventResource> EventResources { get; } = new List<EventResource>();
     public ICollection<Image> Images { get; } = new List<Image>();
 }
