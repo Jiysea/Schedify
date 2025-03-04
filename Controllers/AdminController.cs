@@ -76,41 +76,41 @@ public class AdminController : Controller
     public IActionResult CreateResource([FromForm] AddResourceViewModel model)
     {
         return Json(model);
-        Console.WriteLine(model);
-        // if (!ModelState.IsValid)
+        // Console.WriteLine(model);
+        // // if (!ModelState.IsValid)
+        // // {
+        // //     return Json(model);
+        // // }
+
+        // switch (model) // Assuming you have a property indicating the type
         // {
-        //     return Json(model);
+        //     case VenueViewModel venueModel:
+        //         var venue = new ResourceVenue
+        //         {
+        //             Capacity = venueModel.Capacity,
+        //             Size = venueModel.Size,
+        //             AddressLine1 = venueModel.AddressLine1,
+        //             AddressLine2 = venueModel.AddressLine2,
+        //             CityMunicipality = "Davao City",
+        //             Province = "Davao del Sur",
+        //         };
+        //         // _context.ResourceVenues.Add(venue);
+        //         break;
+
+        //     case EquipmentViewModel equipmentModel:
+        //         var equipment = new ResourceEquipment
+        //         {
+        //             Brand = equipmentModel.Brand,
+        //             Specifications = equipmentModel.SpecificationString,
+        //         };
+        //         // _context.ResourceEquipments.Add(equipment);
+        //         break;
+
         // }
-
-        switch (model) // Assuming you have a property indicating the type
-        {
-            case VenueViewModel venueModel:
-                var venue = new ResourceVenue
-                {
-                    Capacity = venueModel.Capacity,
-                    Size = venueModel.Size,
-                    AddressLine1 = venueModel.AddressLine1,
-                    AddressLine2 = venueModel.AddressLine2,
-                    CityMunicipality = "Davao City",
-                    Province = "Davao del Sur",
-                };
-                // _context.ResourceVenues.Add(venue);
-                break;
-
-            case EquipmentViewModel equipmentModel:
-                var equipment = new ResourceEquipment
-                {
-                    Brand = equipmentModel.Brand,
-                    Specifications = equipmentModel.SpecificationString,
-                };
-                // _context.ResourceEquipments.Add(equipment);
-                break;
-
-        }
-        // Save to the database
-        // _context.SaveChanges();
+        // // Save to the database
+        // // _context.SaveChanges();
 
 
-        return Json(model);
+        // return Json(model);
     }
 }

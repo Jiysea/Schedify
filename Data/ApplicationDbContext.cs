@@ -24,11 +24,6 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
     public DbSet<Feedback> Feedbacks { get; set; }
     public DbSet<Message> Messages { get; set; }
     public DbSet<Resource> Resources { get; set; }
-    public DbSet<ResourceCatering> ResourceCaterings { get; set; }
-    public DbSet<ResourceEquipment> ResourceEquipments { get; set; }
-    public DbSet<ResourceFurniture> ResourceFurnitures { get; set; }
-    public DbSet<ResourcePersonnel> ResourcePersonnels { get; set; }
-    public DbSet<ResourceVenue> ResourceVenues { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

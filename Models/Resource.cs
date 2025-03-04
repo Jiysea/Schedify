@@ -37,6 +37,44 @@ public class Resource
     [Required]
     public required int Quantity { get; set; }
 
+    public int Capacity { get; set; }
+
+    public string? Size { get; set; }
+
+    [StringLength(150)]
+    public string? AddressLine1 { get; set; }
+
+    [StringLength(150)]
+    public string? AddressLine2 { get; set; }
+
+    [StringLength(50)]
+    public string? CityMunicipality { get; set; }
+
+    [StringLength(50)]
+    public string? Province { get; set; }
+
+    [DefaultValue("No Brand")]
+    public string? Brand { get; set; }
+
+    public string? Specifications { get; set; } // comma-separated key-value pairs
+
+    public string? Material { get; set; }
+
+    public string? Dimensions { get; set; }
+
+    public string? MenuItems { get; set; }
+
+    public string? PriceItems { get; set; }
+
+    public string? Position { get; set; }
+
+    [StringLength(30)]
+    public string? Shift { get; set; }
+
+    [StringLength(30)]
+    [DefaultValue("None")]
+    public string? Experience { get; set; }
+
     [Column(TypeName = "datetime2")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -49,9 +87,4 @@ public class Resource
     public User User { get; set; } = null!;
     public ICollection<EventResource> EventResources { get; } = new List<EventResource>();
     public ICollection<Image> Images { get; } = new List<Image>();
-    public ResourceVenue ResourceVenue { get; set; } = null!;
-    public ResourcePersonnel ResourcePersonnel { get; set; } = null!;
-    public ResourceCatering ResourceCatering { get; set; } = null!;
-    public ResourceEquipment ResourceEquipment { get; set; } = null!;
-    public ResourceFurniture ResourceFurniture { get; set; } = null!;
 }
