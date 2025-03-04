@@ -11,23 +11,23 @@ public class ResourceVenue
     public Resource Resource { get; set; } = null!;
 
     [Required]
-    public required int Capacity { get; set; }
+    public int Capacity { get; set; }
 
     [Required]
-    public required string Size { get; set; }
+    public string Size { get; set; } = null!;
 
     [Required]
     [StringLength(150)]
-    public required string AddressLine1 { get; set; }
+    public string AddressLine1 { get; set; } = null!;
 
     [StringLength(150)]
     public string? AddressLine2 { get; set; }
 
     [Required]
     [StringLength(50)]
-    public required string CityMunicipality { get; set; }
+    public string CityMunicipality { get; set; } = null!;
 
     [Required]
     [StringLength(50)]
-    public required string Province { get; set; }
+    public string Province { get; set; } = null!;
 }

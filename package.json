@@ -12,6 +12,10 @@
     "watch": "webpack --watch"
   },
   "dependencies": {
+    "@alpinejs/anchor": "^3.14.8",
+    "@alpinejs/focus": "^3.14.8",
+    "@alpinejs/intersect": "^3.14.8",
+    "@alpinejs/mask": "^3.14.8",
     "alpinejs": "^3.14.8",
     "chart.js": "^4.4.8",
     "flatpickr": "^4.6.13",

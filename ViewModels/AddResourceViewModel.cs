@@ -5,14 +5,13 @@ namespace Schedify.ViewModels;
 public class AddResourceViewModel
 {
     [Required(ErrorMessage = "This field is required.")]
-    public string ResourceName { get; set; } = null!;
+    public string Name { get; set; } = null!;
 
     [Required(ErrorMessage = "This field is required.")]
     [StringLength(300)]
     [DefaultValue("No description")]
     public string Description { get; set; } = null!;
 
-    [Required]
     public ResourceType Type { get; set; }
 
     [Required(ErrorMessage = "This field is required.")]

@@ -11,16 +11,16 @@ public class ResourcePersonnel
     public Guid ResourceId { get; set; }
 
     [Required]
-    public required string Position { get; set; }
+    public string Position { get; set; } = null!;
 
     [Required]
     [StringLength(30)]
-    public required string Shift { get; set; }
+    public string Shift { get; set; } = null!;
 
     [Required]
     [StringLength(30)]
     [DefaultValue("None")]
-    public required string Experience { get; set; }
+    public string Experience { get; set; } = null!;
 
     // Dependents
     public Resource Resource { get; set; } = null!;

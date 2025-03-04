@@ -10,10 +10,10 @@ public class ResourceCatering
     public Guid ResourceId { get; set; }
 
     [Required]
-    public required string MenuItems { get; set; } // Comma-separated items
+    public string MenuItems { get; set; } = null!; // Comma-separated items
 
     [Required]
-    public required string PriceItems { get; set; } // Comma-separated values
+    public string PriceItems { get; set; } = null!; // Comma-separated values
 
     // Dependents
     public Resource Resource { get; set; } = null!;

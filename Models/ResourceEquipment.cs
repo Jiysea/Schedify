@@ -12,10 +12,10 @@ public class ResourceEquipment
 
     [Required]
     [DefaultValue("No Brand")]
-    public required string Brand { get; set; }
+    public string Brand { get; set; } = null!;
 
     [Required]
-    public required string Specifications { get; set; } // comma-separated key-value pairs
+    public string Specifications { get; set; } = null!; // comma-separated key-value pairs
 
     // Dependents
     public Resource Resource { get; set; } = null!;

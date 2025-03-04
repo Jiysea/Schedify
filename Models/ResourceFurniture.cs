@@ -11,10 +11,10 @@ public class ResourceFurniture
     public Guid ResourceId { get; set; }
 
     [Required]
-    public required string Material { get; set; }
+    public string Material { get; set; } = null!;
 
     [Required]
-    public required string Dimensions { get; set; } // comma-separated key-value pairs (height: 0, weight: 0)
+    public string Dimensions { get; set; } = null!; // comma-separated key-value pairs (height: 0, weight: 0)
 
     // Dependents
     public Resource Resource { get; set; } = null!;
