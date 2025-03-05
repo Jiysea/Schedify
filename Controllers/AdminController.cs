@@ -10,11 +10,12 @@ using Schedify.ViewModels;
 using Schedify.Data;
 using Schedify.Services;
 using System.Text.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace Schedify.Controllers;
 
 
-// [Authorize(Roles = "Admin")]
+[Authorize(Roles = "Admin")]
 public class AdminController : Controller
 {
 
@@ -80,6 +81,21 @@ public class AdminController : Controller
     [HttpPost]
     public async Task<IActionResult> CreateResource(AddResourceViewModel model)
     {
+        if (string.IsNullOrWhiteSpace(model.Brand))
+        {
+            ModelState.AddModelError(nameof(model.Brand), "This field is required.");
+        }
+
+        if (model.Capacity <= 0 && model.Type == ResourceType.Venue)
+        {
+            ModelState.AddModelError(nameof(model.Capacity), "Value must be at least 1.");
+        }
+
+        if (model.Specifications == null || model.Specifications.Count == 0)
+        {
+            ModelState.AddModelError(nameof(model.Specifications), "Specifications cannot be empty.");
+        }
+
         if (!ModelState.IsValid)
         {
             return PartialView("_ValidationMessages", ModelState);
@@ -95,7 +111,7 @@ public class AdminController : Controller
         switch (model.Type)
         {
             case ResourceType.Venue:
-                var resource = new Resource
+                var venueResource = new Resource
                 {
                     UserId = user.Id,
                     ProviderName = model.ProviderName,
@@ -115,7 +131,27 @@ public class AdminController : Controller
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
                 };
-                // _context.Resources.Add(resource);
+                _context.Resources.Add(venueResource);
+                break;
+            case ResourceType.Equipment:
+                string specificationsJson = JsonSerializer.Serialize(model.Specifications);
+                var equipmentResource = new Resource
+                {
+                    UserId = user.Id,
+                    ProviderName = model.ProviderName,
+                    ProviderPhoneNumber = model.ProviderPhoneNumber,
+                    ProviderEmail = model.ProviderEmail,
+                    Name = model.Name,
+                    Description = model.Description,
+                    Cost = model.CostAsDecimal,
+                    Quantity = 1,
+                    CostType = model.CostType,
+                    Brand = model.Brand,
+                    Specifications = specificationsJson,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                _context.Resources.Add(equipmentResource);
                 break;
         }
         // var resource = new Resource
@@ -134,7 +170,7 @@ public class AdminController : Controller
         // };
 
         // Save to the database
-        // _context.SaveChanges();
+        _context.SaveChanges();
 
         return Content(string.Empty);
     }

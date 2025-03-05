@@ -1370,12 +1370,12 @@ video {
   min-height: 65vh;
 }
 
-.min-h-screen {
-  min-height: 100vh;
-}
-
 .min-h-\[70px\] {
   min-height: 70px;
+}
+
+.min-h-screen {
+  min-height: 100vh;
 }
 
 .w-1 {
@@ -1444,10 +1444,6 @@ video {
 
 .max-w-4xl {
   max-width: 56rem;
-}
-
-.max-w-\[791px\] {
-  max-width: 791px;
 }
 
 .max-w-full {
@@ -3278,14 +3274,6 @@ textarea {
 @media (min-width: 768px) {
   .md\:mt-0 {
     margin-top: 0px;
-  }
-
-  .md\:flex-row {
-    flex-direction: row;
-  }
-
-  .md\:items-center {
-    align-items: center;
   }
 
   .md\:self-auto {

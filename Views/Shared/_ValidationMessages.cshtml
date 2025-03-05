@@ -2,8 +2,6 @@
 
 @foreach (var entry in Model)
 {
-	Console.WriteLine(entry.Value.Errors.Count);
-
 	<div id="validation-@entry.Key" hx-swap-oob="true" class="absolute start-0 top-full text-xs font-normal text-red-500 ">
 		@if (entry.Value.Errors.Count > 0) // Correct way to check for errors
 		{
@@ -13,5 +11,4 @@
 			@* Empty-Lonely_Sadness *@
 		}
 	</div>
-
 }

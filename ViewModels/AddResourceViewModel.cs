@@ -14,7 +14,7 @@ public class AddResourceViewModel : IValidatableObject
     public string ProviderPhoneNumber { get; set; } = null!;
 
     [Required(ErrorMessage = "This field is required.")]
-    [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", 
+    [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
     ErrorMessage = "Value is not a valid email address.")]
     public string ProviderEmail { get; set; } = null!;
 
@@ -57,7 +57,7 @@ public class AddResourceViewModel : IValidatableObject
     [DefaultValue("No Brand")]
     public string? Brand { get; set; }
 
-    public Dictionary<string, string> Specifications { get; set; } = new();
+    public Dictionary<string, string> Specifications { get; set; } = [];
 
     public string? Material { get; set; }
 
@@ -84,8 +84,21 @@ public class AddResourceViewModel : IValidatableObject
         {
             yield return new ValidationResult(
                 "Value must be at least 1.",
-                [nameof(Capacity)]
+                new [] {nameof(Capacity)}
             );
+        }
+
+        if (Brand == string.Empty || Brand == null)
+        {
+            yield return new ValidationResult(
+                "This field is required.",
+                new [] {nameof(Brand)}
+            );
+        }
+
+        if (Specifications == null || Specifications.Count == 0)
+        {
+            yield return new ValidationResult("Specifications cannot be empty.", new [] {nameof(Specifications)});
         }
     }
 
