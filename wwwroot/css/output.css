@@ -1177,6 +1177,10 @@ video {
   margin-inline-start: 250px;
 }
 
+.mt-0 {
+  margin-top: 0px;
+}
+
 .mt-1 {
   margin-top: 0.25rem;
 }
@@ -1191,10 +1195,6 @@ video {
 
 .mt-4 {
   margin-top: 1rem;
-}
-
-.mt-0 {
-  margin-top: 0px;
 }
 
 .block {
@@ -1326,6 +1326,10 @@ video {
   height: 0.75rem;
 }
 
+.h-40 {
+  height: 10rem;
+}
+
 .h-5 {
   height: 1.25rem;
 }
@@ -1346,8 +1350,8 @@ video {
   height: 100%;
 }
 
-.h-40 {
-  height: 10rem;
+.max-h-40 {
+  max-height: 10rem;
 }
 
 .max-h-\[65vh\] {
@@ -1358,8 +1362,8 @@ video {
   max-height: 75vh;
 }
 
-.max-h-40 {
-  max-height: 10rem;
+.min-h-40 {
+  min-height: 10rem;
 }
 
 .min-h-\[65vh\] {
@@ -1368,10 +1372,6 @@ video {
 
 .min-h-screen {
   min-height: 100vh;
-}
-
-.min-h-40 {
-  min-height: 10rem;
 }
 
 .w-1 {
@@ -1651,6 +1651,11 @@ video {
   border-bottom-width: calc(1px * var(--tw-divide-y-reverse));
 }
 
+.divide-charcoal-500 > :not([hidden]) ~ :not([hidden]) {
+  --tw-divide-opacity: 1;
+  border-color: rgb(140 130 125 / var(--tw-divide-opacity, 1));
+}
+
 .divide-charcoal-900 > :not([hidden]) ~ :not([hidden]) {
   --tw-divide-opacity: 1;
   border-color: rgb(43 40 38 / var(--tw-divide-opacity, 1));
@@ -1659,11 +1664,6 @@ video {
 .divide-zinc-300 > :not([hidden]) ~ :not([hidden]) {
   --tw-divide-opacity: 1;
   border-color: rgb(212 212 216 / var(--tw-divide-opacity, 1));
-}
-
-.divide-charcoal-500 > :not([hidden]) ~ :not([hidden]) {
-  --tw-divide-opacity: 1;
-  border-color: rgb(140 130 125 / var(--tw-divide-opacity, 1));
 }
 
 .self-auto {

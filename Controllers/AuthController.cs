@@ -33,7 +33,7 @@ public class AuthController : Controller
     {
         if (!ModelState.IsValid)
         {
-            return PartialView("~/Views/Auth/Partials/_ValidationMessages.cshtml", ModelState);
+            return PartialView("_ValidationMessages", ModelState);
         }
 
         var user = await _userManager.FindByEmailAsync(model.Email);
@@ -41,14 +41,14 @@ public class AuthController : Controller
         if (user == null)
         {
             ModelState.AddModelError("Email", "User not found.");
-            return PartialView("~/Views/Auth/Partials/_ValidationMessages.cshtml", ModelState);
+            return PartialView("_ValidationMessages", ModelState);
         }
         var result = await _signInManager.PasswordSignInAsync(user, model.Password, false, false);
 
         if (!result.Succeeded)
         {
             ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-            return PartialView("~/Views/Auth/Partials/_ValidationMessages.cshtml", ModelState);
+            return PartialView("_ValidationMessages", ModelState);
         }
 
         var roles = await _userManager.GetRolesAsync(user);
@@ -76,7 +76,7 @@ public class AuthController : Controller
     {
         if (!ModelState.IsValid)
         {
-            return PartialView("~/Views/Auth/Partials/_ValidationMessages.cshtml", ModelState);
+            return PartialView("_ValidationMessages", ModelState);
         }
 
         User user = new User
@@ -99,7 +99,7 @@ public class AuthController : Controller
             {
                 ModelState.AddModelError("Password", error.Description); // Store password-related errors
             }
-            return PartialView("~/Views/Auth/Partials/_ValidationMessages.cshtml", ModelState);
+            return PartialView("_ValidationMessages", ModelState);
         }
 
         // Assign role to the user
@@ -128,7 +128,7 @@ public class AuthController : Controller
             {
                 ModelState.AddModelError("Role", error.Description); // Store role-related errors
             }
-            return PartialView("~/Views/Auth/Partials/_ValidationMessages.cshtml", ModelState);
+            return PartialView("_ValidationMessages", ModelState);
         }
 
         Response.Headers.Append("HX-Redirect", Url.Action("Login", "Auth"));

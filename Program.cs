@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Schedify.Data;
 using Schedify.Models;
+using Schedify.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +31,8 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LoginPath = "/login";
 });
 
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<UserService>();
 
 var app = builder.Build();
 
@@ -67,7 +70,7 @@ async Task CreateAdmin(UserManager<User> userManager, RoleManager<IdentityRole<G
             PhoneNumber = "09123456789",
         };
 
-        var result = await userManager.CreateAsync(user, "Password123!"); // Change password
+        var result = await userManager.CreateAsync(user, "Password123"); // Change password
 
         if (result.Succeeded)
         {

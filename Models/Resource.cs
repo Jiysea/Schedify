@@ -45,8 +45,10 @@ public class Resource
     public required string CostType { get; set; }
 
     [Required]
+    [Range(1, int.MaxValue, ErrorMessage = "Value must be at least 1.")]
     public required int Quantity { get; set; }
 
+    [Range(1, int.MaxValue, ErrorMessage = "Value must be at least 1.")]
     public int Capacity { get; set; }
 
     public string? Size { get; set; }

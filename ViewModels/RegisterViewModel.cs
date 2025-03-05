@@ -10,16 +10,20 @@ public class RegisterViewModel
 {
     [Required(ErrorMessage = "This field is required.")]
     [Display(Name = "First Name")]
+    [RegularExpression(@"^[a-zA-Z]*$", ErrorMessage = "Value should have no numbers and symbols.")]
     public required string FirstName { get; set; }
 
     [Display(Name = "Middle Name")]
+    [RegularExpression(@"^[a-zA-Z]*$", ErrorMessage = "Value should have no numbers and symbols.")]
     public string? MiddleName { get; set; }
 
     [Required(ErrorMessage = "This field is required.")]
     [Display(Name = "Last Name")]
+    [RegularExpression(@"^[a-zA-Z]*$", ErrorMessage = "Value should have no numbers and symbols.")]
     public required string LastName { get; set; }
 
     [Display(Name = "Extension Name")]
+    [RegularExpression(@"^[a-zA-Z]*$", ErrorMessage = "Value should have no numbers and symbols.")]
     public string? ExtensionName { get; set; }
 
     [Required(ErrorMessage = "This field is required.")]
@@ -36,13 +40,13 @@ public class RegisterViewModel
     public required string Email { get; set; }
 
     [Required(ErrorMessage = "This field is required.")]
-    [StringLength(50, MinimumLength = 12, ErrorMessage = "The {0} must be at {2} and at max {1} characters")]
+    [StringLength(50, MinimumLength = 10, ErrorMessage = "Password should be at least 10 characters.")]
     [DataType(DataType.Password)]
     [Compare("ConfirmPassword", ErrorMessage = "Password does not match.")]
     public required string Password { get; set; }
 
     [Required(ErrorMessage = "This field is required.")]
-    [StringLength(50, MinimumLength = 12)]
+    [StringLength(50, MinimumLength = 10, ErrorMessage = "Password should be at least 10 characters.")]
     [DataType(DataType.Password)]
     [Display(Name = "Confirm Password")]
     public required string ConfirmPassword { get; set; }

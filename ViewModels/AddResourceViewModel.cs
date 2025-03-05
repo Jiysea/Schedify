@@ -44,8 +44,10 @@ public class AddResourceViewModel
     }
     public string CostType { get; set; } = null!;
 
-    public int Quantity { get; set; }
+    [Range(1, int.MaxValue, ErrorMessage = "Value must be at least 1.")]
+    public int Quantity { get; set; } = 1;
 
+    [Range(1, int.MaxValue, ErrorMessage = "Value must be at least 1.")]
     public int Capacity { get; set; }
 
     public string? Size { get; set; }

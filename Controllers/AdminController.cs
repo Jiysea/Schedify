@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Schedify.Models;
 using Schedify.ViewModels;
 using Schedify.Data;
+using Schedify.Services;
 
 namespace Schedify.Controllers;
 
@@ -17,10 +18,12 @@ public class AdminController : Controller
 {
 
     private readonly ApplicationDbContext _context;
+    private readonly UserService _userService;
 
-    public AdminController(ApplicationDbContext context)
+    public AdminController(ApplicationDbContext context, UserService userService)
     {
         _context = context;
+        _userService = userService;
     }
 
     [Route("admin/dashboard")]
@@ -29,8 +32,8 @@ public class AdminController : Controller
         return View();
     }
 
-    [Route("admin/actions")]
-    public ActionResult Actions()
+    [Route("admin/resources")]
+    public ActionResult Resources()
     {
         return View(new AddResourceViewModel());
     }
@@ -72,12 +75,15 @@ public class AdminController : Controller
 
     [Route("admin/create-resource")]
     [HttpPost]
-    public IActionResult CreateResource([FromForm] AddResourceViewModel model)
+    public async Task<IActionResult> CreateResource([FromForm] AddResourceViewModel model)
     {
-        // if (!ModelState.IsValid)
-        // {
-        //     return Json(model);
-        // }
+
+        var user = await _userService.GetUserAsync();
+        Console.WriteLine($"{user?.Id}");
+        if (!ModelState.IsValid)
+        {
+            return PartialView("_ValidationMessages", ModelState);
+        }
 
         // var resource = new Resource
         // {
