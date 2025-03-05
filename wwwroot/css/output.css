@@ -1438,6 +1438,10 @@ video {
   max-width: 48rem;
 }
 
+.max-w-4xl {
+  max-width: 56rem;
+}
+
 .max-w-\[791px\] {
   max-width: 791px;
 }
@@ -3276,5 +3280,11 @@ textarea {
 
   .md\:self-auto {
     align-self: auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lg\:min-w-\[896px\] {
+    min-width: 896px;
   }
 }

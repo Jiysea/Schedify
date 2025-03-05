@@ -41,7 +41,7 @@ public class Resource
     [Column(TypeName = "decimal(18, 2)")]
     public required decimal Cost { get; set; }
 
-    [Required]
+    [Required(ErrorMessage = "This field is required.")]
     public required string CostType { get; set; }
 
     [Required]

@@ -1,9 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
 using System.Globalization;
+using Schedify.Models;
 namespace Schedify.ViewModels;
 
-public class AddResourceViewModel
+public class AddResourceViewModel : IValidatableObject
 {
     [Required(ErrorMessage = "This field is required.")]
     [StringLength(250)]
@@ -42,6 +43,8 @@ public class AddResourceViewModel
             return 0; // Or throw an error if necessary
         }
     }
+
+    
     public string CostType { get; set; } = null!;
 
     [Range(1, int.MaxValue, ErrorMessage = "Value must be at least 1.")]
@@ -87,4 +90,15 @@ public class AddResourceViewModel
     public string? Experience { get; set; }
 
     public IEnumerable<ResourceType> ResourceTypes { get; set; } = Enum.GetValues<ResourceType>();
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if(Type == ResourceType.Venue && Capacity <= 0)
+        {
+            yield return new ValidationResult(
+                "Value must be at least 1.",
+                [nameof (Capacity)]
+            );
+        }
+    }
 }

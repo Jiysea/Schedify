@@ -24,7 +24,6 @@
 
         @* Body *@
         <main x-data="{ showQuantity: false }" class="flex flex-col gap-10 px-6 py-10">
-
             @* Type of Resource *@
             <div class="relative grid grid-cols-2 gap-3 p-5 border-2 rounded-xl border-charcoal-700">
                 <h2 class="absolute flex items-center gap-1 start-4 -top-3 text-sm font-light text-pumpkin-400   bg-charcoal-900 px-2">
@@ -41,7 +40,7 @@
                         x-on:change="
                             showQuantity = ($el.value != 'Venue');
                             if(showQuantity) {
-                                document.getElementById('quantity').value = '';
+                                document.getElementById('quantity').value = 1;
                             }
                             "
                         asp-items="@(new SelectList(Model.ResourceTypes))">
@@ -53,6 +52,9 @@
                     <label for="name" class="text-xs text-charcoal-300">Provider Name</label>
                     <input type="text" autofocus class="input-charcoal-dark p-2" id="providername" asp-for="ProviderName"
                         placeholder="Type name here" />
+                    
+                    <div id="validation-ProviderName">
+                    </div>
                 </div>
 
                 @* Provider Phone Number *@
@@ -60,6 +62,8 @@
                     <label for="name" class="text-xs text-charcoal-300">Provider Phone Number</label>
                     <input type="text" maxlength="11" autofocus class="input-charcoal-dark p-2" id="providerphonenumber" asp-for="ProviderPhoneNumber"
                         placeholder="ex. 09123456789" />
+                    <div id="validation-ProviderPhoneNumber">
+                    </div>
                 </div>
 
                 @* Provider Email *@
@@ -67,6 +71,8 @@
                     <label for="name" class="text-xs text-charcoal-300">Provider Email</label>
                     <input type="email" autofocus class="input-charcoal-dark p-2" id="provideremail" asp-for="ProviderEmail"
                         placeholder="Type email here" />
+                    <div id="validation-ProviderEmail">
+                    </div>
                 </div>
             </div>
 
@@ -81,6 +87,8 @@
                     <label for="name" class="text-xs text-charcoal-300">Resource Name</label>
                     <input type="text" autofocus class="input-charcoal-dark p-2" id="name" asp-for="Name"
                         placeholder="Type name here" />
+                    <div id="validation-Name">
+                    </div>
                 </div>
 
                 @* Cost *@
@@ -88,6 +96,8 @@
                     <label for="cost" class="text-xs text-charcoal-300">Cost</label>
                     <input type="text" x-mask:dynamic="$money($input)" class="input-charcoal-dark p-2" id="cost" asp-for="Cost"
                         placeholder="Type cost here" />
+                    <div id="validation-Cost">
+                    </div>
                 </div>
 
                 @* Cost Type *@
@@ -97,16 +107,19 @@
                     }">
                     <label for="costtype" class="text-xs text-charcoal-300">Type of Cost</label>
                     <select class="input-charcoal-dark p-2" id="costtype" asp-for="CostType" hx-get="/admin/cost-types" hx-trigger="load, change from:#type" hx-vals='js:{"selectedOption": document.getElementById("type").value}' hx-target="#costtype">
-                        
                     </select>
+                    <div id="validation-CostType">
+                    </div>
                 </div>
 
                 @* Quantity *@
                 <div x-show="showQuantity" class="flex flex-col gap-1 relative">
                     <label for="quantity" class="text-xs text-charcoal-300">Quantity</label>
                     <input type="number"
-                     inputmode="numeric" class="input-charcoal-dark p-2" name="quantity" id="quantity" asp-for="Quantity"
+                     inputmode="numeric" class="input-charcoal-dark p-2" name="quantity" value="1" id="quantity" asp-for="Quantity"
                         placeholder="Type quantity here" />
+                    <div id="validation-Quantity">
+                    </div>
                 </div>
 
                 @* Descriptions *@
@@ -116,6 +129,8 @@
                         style="resize: none;"
                         placeholder="Describe anything about this resource.">
                     </textarea>
+                    <div id="validation-Description">
+                    </div>
                 </div>
             </div>
 
@@ -128,6 +143,7 @@
         <div class="mt-4 flex items-center justify-center gap-2 w-full py-3 px-4">
             <button type="button"
                 hx-post="/admin/create-resource"
+                hx-swap="none"
                 class="duration-200 ease-in-out text-sm px-4 py-2 text-coffee-50 bg-coffee-700 hover:bg-coffee-800 active:bg-coffee-900 rounded-md">
                 Save
             </button>

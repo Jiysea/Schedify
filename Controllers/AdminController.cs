@@ -78,13 +78,44 @@ public class AdminController : Controller
     public async Task<IActionResult> CreateResource([FromForm] AddResourceViewModel model)
     {
 
-        var user = await _userService.GetUserAsync();
-        Console.WriteLine($"{user?.Id}");
         if (!ModelState.IsValid)
         {
             return PartialView("_ValidationMessages", ModelState);
         }
 
+        var user = await _userService.GetUserAsync();
+
+        if (user == null)
+        {
+            throw new InvalidOperationException("User must be authenticated.");
+        }
+
+        switch (model.Type)
+        {
+            case ResourceType.Venue:
+                var resource = new Resource
+                {
+                    UserId = user.Id,
+                    ProviderName = model.ProviderName,
+                    ProviderPhoneNumber = model.ProviderPhoneNumber,
+                    ProviderEmail = model.ProviderEmail,
+                    Name = model.Name,
+                    Description = model.Description,
+                    Cost = model.CostAsDecimal,
+                    Quantity = 1,
+                    CostType = model.CostType,
+                    Capacity = model.Capacity,
+                    Size = model.Size,
+                    AddressLine1 = model.AddressLine1,
+                    AddressLine2 = model.AddressLine2,
+                    CityMunicipality = "Davao City",
+                    Province = "Davao del Sur",
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                _context.Resources.Add(resource);
+                break;
+        }
         // var resource = new Resource
         // {
         //     Name = model.Name,
@@ -99,8 +130,9 @@ public class AdminController : Controller
         //     CityMunicipality = "Davao City",
         //     Province = "Davao del Sur",
         // };
+        
         // Save to the database
-        // _context.SaveChanges();
+        _context.SaveChanges();
 
 
         return Json(model);

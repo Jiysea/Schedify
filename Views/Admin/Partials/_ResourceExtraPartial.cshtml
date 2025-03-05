@@ -18,6 +18,8 @@
         <label for="addressline1" class="text-xs text-charcoal-300">Address Line 1</label>
         <input type="text" class="input-charcoal-dark p-2" id="addressline1" asp-for="@Model.AddressLine1"
             placeholder="Type address here" />
+        <div id="validation-AddressLine1">
+        </div>
     </div>
 
     @* Address Line 2 *@
@@ -25,6 +27,8 @@
         <label for="addressline2" class="text-xs text-charcoal-300">Address Line 2</label>
         <input type="text" class="input-charcoal-dark p-2" id="addressline2" asp-for="@Model.AddressLine2"
             placeholder="Type address here" />
+        <div id="validation-AddressLine2">
+        </div>
     </div>
 
     @* City/Municipality *@
@@ -44,12 +48,16 @@
         <label for="capacity" class="text-xs text-charcoal-300">Capacity</label>
         <input type="number" inputmode="numeric" class="input-charcoal-dark p-2" id="capacity" asp-for="@Model.Capacity"
             placeholder="Enter capacity here" />
+            <div id="validation-Capacity">
+        </div>
     </div>
 
     @* Size *@
     <div class="flex flex-col col-span-3 gap-1 w-full relative">
         <label for="size" class="text-xs text-charcoal-300">Size</label>
         <input type="text" class="input-charcoal-dark p-2" id="size" asp-for="@Model.Size" placeholder="Type size here" />
+        <div id="validation-Size">
+        </div>
     </div>
 }
 
