@@ -1374,6 +1374,10 @@ video {
   min-height: 100vh;
 }
 
+.min-h-\[70px\] {
+  min-height: 70px;
+}
+
 .w-1 {
   width: 0.25rem;
 }
@@ -1688,6 +1692,12 @@ video {
 
 .overflow-y-auto {
   overflow-y: auto;
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .whitespace-nowrap {

@@ -12,8 +12,10 @@ public class AddResourceViewModel : IValidatableObject
 
     [Required(ErrorMessage = "This field is required.")]
     public string ProviderPhoneNumber { get; set; } = null!;
-    
+
     [Required(ErrorMessage = "This field is required.")]
+    [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", 
+    ErrorMessage = "Value is not a valid email address.")]
     public string ProviderEmail { get; set; } = null!;
 
     [Required(ErrorMessage = "This field is required.")]
@@ -29,22 +31,7 @@ public class AddResourceViewModel : IValidatableObject
     [Required(ErrorMessage = "This field is required.")]
     public string Cost { get; set; } = null!;
 
-    [DataType(DataType.Currency)]
-    [Range(typeof(decimal), "0.01", "79228162514264337593543950335")]
-    public decimal CostAsDecimal 
-    {
-        get
-        {
-            if (decimal.TryParse(Cost, NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, 
-                CultureInfo.InvariantCulture, out decimal parsedValue))
-            {
-                return parsedValue;
-            }
-            return 0; // Or throw an error if necessary
-        }
-    }
-
-    
+    [Required(ErrorMessage = "This field is required.")]
     public string CostType { get; set; } = null!;
 
     [Range(1, int.MaxValue, ErrorMessage = "Value must be at least 1.")]
@@ -69,7 +56,7 @@ public class AddResourceViewModel : IValidatableObject
 
     [DefaultValue("No Brand")]
     public string? Brand { get; set; }
-    
+
     public Dictionary<string, string> Specifications { get; set; } = new();
 
     public string? Material { get; set; }
@@ -93,12 +80,27 @@ public class AddResourceViewModel : IValidatableObject
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        if(Type == ResourceType.Venue && Capacity <= 0)
+        if (Type == ResourceType.Venue && Capacity <= 0)
         {
             yield return new ValidationResult(
                 "Value must be at least 1.",
-                [nameof (Capacity)]
+                [nameof(Capacity)]
             );
+        }
+    }
+
+    [DataType(DataType.Currency)]
+    [Range(typeof(decimal), "0.01", "79228162514264337593543950335")]
+    public decimal CostAsDecimal
+    {
+        get
+        {
+            if (decimal.TryParse(Cost, NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands,
+                CultureInfo.InvariantCulture, out decimal parsedValue))
+            {
+                return parsedValue;
+            }
+            return 0; // Or throw an error if necessary
         }
     }
 }

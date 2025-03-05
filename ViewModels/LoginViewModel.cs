@@ -9,7 +9,8 @@ namespace Schedify.ViewModels;
 public class LoginViewModel
 {
     [Required(ErrorMessage = "This field is required.")]
-    [EmailAddress]
+    [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", 
+    ErrorMessage = "Value is not a valid email address.")]
     public required string Email { get; set; }
 
     [Required(ErrorMessage = "This field is required.")]

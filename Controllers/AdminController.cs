@@ -9,11 +9,12 @@ using Schedify.Models;
 using Schedify.ViewModels;
 using Schedify.Data;
 using Schedify.Services;
+using System.Text.Json;
 
 namespace Schedify.Controllers;
 
 
-[Authorize(Roles = "Admin")]
+// [Authorize(Roles = "Admin")]
 public class AdminController : Controller
 {
 
@@ -40,6 +41,8 @@ public class AdminController : Controller
 
     [Route("admin/activity-logs")]
     public ActionResult ActivityLogs() => View();
+
+    public ActionResult Test() => View();
 
     [Route("admin/profile")]
     public ActionResult Profile() => View();
@@ -75,9 +78,8 @@ public class AdminController : Controller
 
     [Route("admin/create-resource")]
     [HttpPost]
-    public async Task<IActionResult> CreateResource([FromForm] AddResourceViewModel model)
+    public async Task<IActionResult> CreateResource(AddResourceViewModel model)
     {
-
         if (!ModelState.IsValid)
         {
             return PartialView("_ValidationMessages", ModelState);
@@ -113,7 +115,7 @@ public class AdminController : Controller
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
                 };
-                _context.Resources.Add(resource);
+                // _context.Resources.Add(resource);
                 break;
         }
         // var resource = new Resource
@@ -130,11 +132,11 @@ public class AdminController : Controller
         //     CityMunicipality = "Davao City",
         //     Province = "Davao del Sur",
         // };
-        
+
         // Save to the database
-        _context.SaveChanges();
+        // _context.SaveChanges();
 
-
-        return Json(model);
+        return Content(string.Empty);
     }
+
 }

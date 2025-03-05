@@ -2,10 +2,16 @@
 
 @foreach (var entry in Model)
 {
-	if (entry.Value.Errors.Count > 0) // Correct way to check for errors
-	{
-		<div id="validation-@entry.Key" hx-swap-oob="true" class="absolute start-0 top-full text-xs font-normal text-red-500 ">
-			@entry.Value.Errors[0].ErrorMessage
-		</div>
-	}
+	Console.WriteLine(entry.Value.Errors.Count);
+
+	<div id="validation-@entry.Key" hx-swap-oob="true" class="absolute start-0 top-full text-xs font-normal text-red-500 ">
+		@if (entry.Value.Errors.Count > 0) // Correct way to check for errors
+		{
+		@entry.Value.Errors[0].ErrorMessage
+		}
+		else if (entry.Value.Errors.Count == 0) {
+			@* Empty-Lonely_Sadness *@
+		}
+	</div>
+
 }

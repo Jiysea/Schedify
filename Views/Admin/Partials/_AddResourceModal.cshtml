@@ -4,149 +4,175 @@
     class="fixed inset-0 flex justify-center items-start bg-black/50 backdrop-blur-sm overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-charcoal-700 z-50 p-4">
 
     @* Box *@
-    <div x-data x-trap="addResourceModal" class="bg-charcoal-900 rounded-lg shadow-lg" @@keydown.escape="addResourceModal = false;" @@click.outside="addResourceModal = false;">
+    <div x-data x-trap="addResourceModal" class="bg-charcoal-900 rounded-lg shadow-lg"
+        @@keydown.escape = "addResourceModal = false;" @@click.outside = "addResourceModal = false;" >
 
-        @* Top Header *@
-        <header class="flex items-center justify-between text-lg font-medium py-3 px-4">
-            <h1 class="text-charcoal-50">Add New Resource</h1>
-            <button x-on:click="addResourceModal = false"
-                class="flex items-center justify-center size-8 p-1 rounded-md text-charcoal-50 hover:bg-charcoal-800 active:bg-charcoal-700 hover:text-coffee-50 active:text-coffee-50 duration-200 ease-in-out">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
-                    viewBox="0 0 256 256">
-                    <path
-                        d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z">
-                    </path>
-                </svg>
-            </button>
-        </header>
+                                @* Top Header *@
+                                <header class="flex items-center justify-between text-lg font-medium py-3 px-4">
+                                    <h1 class="text-charcoal-50">Add New Resource</h1>
+                                    <button x-on:click="addResourceModal = false"
+                                        class="flex items-center justify-center size-8 p-1 rounded-md text-charcoal-50 hover:bg-charcoal-800 active:bg-charcoal-700 hover:text-coffee-50 active:text-coffee-50 duration-200 ease-in-out">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                                            viewBox="0 0 256 256">
+                                            <path
+                                                d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z">
+                                            </path>
+                                        </svg>
+                                    </button>
+                                </header>
 
-        <hr class="w-full border-charcoal-800">
+                                <hr class="w-full border-charcoal-800">
 
-        @* Body *@
-        <main x-data="{ showQuantity: false }" class="flex flex-col gap-10 px-6 py-10">
-            @* Type of Resource *@
-            <div class="relative grid grid-cols-2 gap-3 p-5 border-2 rounded-xl border-charcoal-700">
-                <h2 class="absolute flex items-center gap-1 start-4 -top-3 text-sm font-light text-pumpkin-400   bg-charcoal-900 px-2">
-                    <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256"><path d="M223.68,66.15,135.68,18a15.88,15.88,0,0,0-15.36,0l-88,48.17a16,16,0,0,0-8.32,14v95.64a16,16,0,0,0,8.32,14l88,48.17a15.88,15.88,0,0,0,15.36,0l88-48.17a16,16,0,0,0,8.32-14V80.18A16,16,0,0,0,223.68,66.15ZM128,32l80.34,44-29.77,16.3-80.35-44ZM128,120,47.66,76l33.9-18.56,80.34,44ZM40,90l80,43.78v85.79L40,175.82Zm176,85.78h0l-80,43.79V133.82l32-17.51V152a8,8,0,0,0,16,0V107.55L216,90v85.77Z"></path></svg>
-                    Resource Information
-                </h2>
-                
-                @* Type of Resource *@
-                <div class="flex flex-col col-span-2 gap-1 relative">
-                    <label for="type" class="text-xs text-charcoal-300">Type of Resource</label>
-                    <select class="input-charcoal-dark p-2" id="type" asp-for="Type" hx-get="/admin/resource-extra"
-                        hx-target="#resource-extra" hx-trigger="change"
-                        hx-vals='js:{"selectedOption": event.target.value}'
-                        x-on:change="
-                            showQuantity = ($el.value != 'Venue');
-                            if(showQuantity) {
-                                document.getElementById('quantity').value = 1;
-                            }
-                            "
-                        asp-items="@(new SelectList(Model.ResourceTypes))">
-                    </select>
-                </div>
+                                <main class="">
+                                    <form action="post" hx-post="/admin/create-resource" hx-swap="innerHTML" hx-target="#wtf">
+                                        @* Body *@
+                                        <div x-data="{ showQuantity: false }" class="flex flex-col gap-10 px-6 py-10">
 
-                @* Provider Name *@
-                <div class="flex flex-col col-span-2 gap-1 relative">
-                    <label for="name" class="text-xs text-charcoal-300">Provider Name</label>
-                    <input type="text" autofocus class="input-charcoal-dark p-2" id="providername" asp-for="ProviderName"
-                        placeholder="Type name here" />
-                    
-                    <div id="validation-ProviderName">
+                                            @* Type of Resource *@
+                                            <div class="relative grid grid-cols-2 gap-3 p-5 border-2 rounded-xl border-charcoal-700">
+                                                <h2
+                                                    class="absolute flex items-center gap-1 start-4 -top-3 text-sm font-light text-pumpkin-400   bg-charcoal-900 px-2">
+                                                    <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                                                        fill="currentColor" viewBox="0 0 256 256">
+                                                        <path
+                                                            d="M223.68,66.15,135.68,18a15.88,15.88,0,0,0-15.36,0l-88,48.17a16,16,0,0,0-8.32,14v95.64a16,16,0,0,0,8.32,14l88,48.17a15.88,15.88,0,0,0,15.36,0l88-48.17a16,16,0,0,0,8.32-14V80.18A16,16,0,0,0,223.68,66.15ZM128,32l80.34,44-29.77,16.3-80.35-44ZM128,120,47.66,76l33.9-18.56,80.34,44ZM40,90l80,43.78v85.79L40,175.82Zm176,85.78h0l-80,43.79V133.82l32-17.51V152a8,8,0,0,0,16,0V107.55L216,90v85.77Z">
+                                                        </path>
+                                                    </svg>
+                                                    Resource Information
+                                                </h2>
+
+                                                @* Type of Resource *@
+                                                <div class="flex flex-col col-span-2 gap-1 relative">
+                                                    <label for="type" class="text-xs text-charcoal-300">Type of Resource</label>
+                                                    <select class="input-charcoal-dark p-2" id="type" asp-for="Type"
+                                                        hx-get="/admin/resource-extra" hx-target="#resource-extra" hx-swap="innerHTML"
+                                                        hx-trigger="change" hx-vals='js:{"selectedOption": event.target.value}' x-on:change="
+                                                    showQuantity = ($el.value != 'Venue');
+                                                    if(showQuantity) {
+                                                        document.getElementById('quantity').value = 1;
+                                                    }
+                                                    " asp-items="@(new SelectList(Model.ResourceTypes))">
+                                                    </select>
+                                                </div>
+
+                                                @* Provider Name *@
+                                                <div class="flex flex-col col-span-2 gap-1 relative">
+                                                    <label for="name" class="text-xs text-charcoal-300">Provider Name</label>
+                                                    <input type="text" autofocus class="input-charcoal-dark p-2" id="providername"
+                                                        asp-for="ProviderName" placeholder="Type name here" />
+
+                                                    <div id="validation-ProviderName">
+                                                    </div>
+                                                </div>
+
+                                                @* Provider Phone Number *@
+                                                <div class="flex flex-col gap-1 relative">
+                                                    <label for="name" class="text-xs text-charcoal-300">Provider Phone Number</label>
+                                                    <input type="text" maxlength="11" autofocus class="input-charcoal-dark p-2"
+                                                        id="providerphonenumber" asp-for="ProviderPhoneNumber" placeholder="ex. 09123456789" />
+                                                    <div id="validation-ProviderPhoneNumber">
+                                                    </div>
+                                                </div>
+
+                                                @* Provider Email *@
+                                                <div class="flex flex-col gap-1 relative">
+                                                    <label for="name" class="text-xs text-charcoal-300">Provider Email</label>
+                                                    <input type="text" autofocus class="input-charcoal-dark p-2" id="provideremail"
+                                                        asp-for="ProviderEmail" placeholder="Type email here" />
+                                                    <div id="validation-ProviderEmail">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="relative grid grid-cols-5 gap-3 p-5 border-2 rounded-xl border-charcoal-700">
+                                                <span
+                                                    class="absolute flex items-center gap-1 start-4 -top-3 text-sm font-light text-pumpkin-400     bg-charcoal-900 px-2">
+                                                    <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                                                        fill="currentColor" viewBox="0 0 256 256">
+                                                        <path
+                                                            d="M213.66,66.34l-40-40A8,8,0,0,0,168,24H88A16,16,0,0,0,72,40V56H56A16,16,0,0,0,40,72V216a16,16,0,0,0,16,16H168a16,16,0,0,0,16-16V200h16a16,16,0,0,0,16-16V72A8,8,0,0,0,213.66,66.34ZM168,216H56V72h76.69L168,107.31v84.53c0,.06,0,.11,0,.16s0,.1,0,.16V216Zm32-32H184V104a8,8,0,0,0-2.34-5.66l-40-40A8,8,0,0,0,136,56H88V40h76.69L200,75.31Zm-56-32a8,8,0,0,1-8,8H88a8,8,0,0,1,0-16h48A8,8,0,0,1,144,152Zm0,32a8,8,0,0,1-8,8H88a8,8,0,0,1,0-16h48A8,8,0,0,1,144,184Z">
+                                                        </path>
+                                                    </svg>
+                                                    General Information
+                                                </span>
+
+                                                @* Resource Name *@
+                                                <div class="flex flex-col col-span-2 gap-1 relative">
+                                                    <label for="name" class="text-xs text-charcoal-300">Resource Name</label>
+                                                    <input type="text" autofocus class="input-charcoal-dark p-2" id="name" asp-for="Name"
+                                                        placeholder="Type name here" />
+                                                    <div id="validation-Name">
+                                                    </div>
+                                                </div>
+
+                                                @* Cost *@
+                                                <div class="flex flex-col gap-1 relative">
+                                                    <label for="cost" class="text-xs text-charcoal-300">Cost</label>
+                                                    <input type="text" x-mask:dynamic="$money($input)" class="input-charcoal-dark p-2" id="cost"
+                                                        asp-for="Cost" placeholder="Type cost here" />
+                                                    <div id="validation-Cost">
+                                                    </div>
+                                                </div>
+
+                                                @* Cost Type *@
+                                                <div class="flex flex-col gap-1 relative" :class="{
+                                                'col-span-2': (!showQuantity),
+                                            }">
+                                                    <label for="costtype" class="text-xs text-charcoal-300">Type of Cost</label>
+                                                    <select class="input-charcoal-dark p-2" id="costtype" name="CostType" asp-for="CostType"
+                                                        hx-get="/admin/cost-types" hx-trigger="load, change from:#type"
+                                                        hx-vals='js:{"selectedOption": document.getElementById("type").value}'
+                                                        hx-target="#costtype">
+                                                        @await Html.PartialAsync("~/Views/Admin/Partials/_CostTypeOptionsPartial.cshtml",
+                                                        Model.Type)
+                            </select>
+                            <div id="validation-CostType">
+
+                            </div>
+                        </div>
+
+                        @* Quantity *@
+                        <div x-show="showQuantity" class="flex flex-col gap-1 relative">
+                            <label for="quantity" class="text-xs text-charcoal-300">Quantity</label>
+                            <input type="number" inputmode="numeric" class="input-charcoal-dark p-2" name="quantity"
+                                value="1" id="quantity" asp-for="Quantity" placeholder="Type quantity here" />
+                            <div id="validation-Quantity">
+                            </div>
+                        </div>
+
+                        @* Descriptions *@
+                        <div class="col-span-full flex flex-col gap-1 relative w-full">
+                            <label for="description" class="text-xs text-charcoal-300">Description</label>
+                            <textarea id="description" class="input-charcoal-dark p-2" maxlength="300" rows="3"
+                                asp-for="Description" style="resize: none;"
+                                placeholder="Describe anything about this resource.">
+                            </textarea>
+                            <div id="validation-Description">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="resource-extra"
+                        class="relative grid grid-cols-5 gap-3 p-5 border-2 rounded-xl border-charcoal-700">
+                        @await Html.PartialAsync("~/Views/Admin/Partials/_ResourceExtraPartial.cshtml", new
+                                                AddResourceViewModel { Type = Model.Type })
+                    </div>
+
+
+                    <div id="wtf" class="col-span-full flex items-center flex-wrap">
+
                     </div>
                 </div>
 
-                @* Provider Phone Number *@
-                <div class="flex flex-col gap-1 relative">
-                    <label for="name" class="text-xs text-charcoal-300">Provider Phone Number</label>
-                    <input type="text" maxlength="11" autofocus class="input-charcoal-dark p-2" id="providerphonenumber" asp-for="ProviderPhoneNumber"
-                        placeholder="ex. 09123456789" />
-                    <div id="validation-ProviderPhoneNumber">
-                    </div>
+                @* Footer *@
+                <div class="mt-4 flex items-center justify-center gap-2 w-full py-3 px-4">
+                    <button type="submit"
+                        class="duration-200 ease-in-out text-sm px-4 py-2 text-coffee-50 bg-coffee-700 hover:bg-coffee-800 active:bg-coffee-900 rounded-md">
+                        Save
+                    </button>
                 </div>
+            </form>
 
-                @* Provider Email *@
-                <div class="flex flex-col gap-1 relative">
-                    <label for="name" class="text-xs text-charcoal-300">Provider Email</label>
-                    <input type="email" autofocus class="input-charcoal-dark p-2" id="provideremail" asp-for="ProviderEmail"
-                        placeholder="Type email here" />
-                    <div id="validation-ProviderEmail">
-                    </div>
-                </div>
-            </div>
-
-            <div class="relative grid grid-cols-5 gap-3 p-5 border-2 rounded-xl border-charcoal-700">
-                <span class="absolute flex items-center gap-1 start-4 -top-3 text-sm font-light text-pumpkin-400     bg-charcoal-900 px-2">
-                    <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256"><path d="M213.66,66.34l-40-40A8,8,0,0,0,168,24H88A16,16,0,0,0,72,40V56H56A16,16,0,0,0,40,72V216a16,16,0,0,0,16,16H168a16,16,0,0,0,16-16V200h16a16,16,0,0,0,16-16V72A8,8,0,0,0,213.66,66.34ZM168,216H56V72h76.69L168,107.31v84.53c0,.06,0,.11,0,.16s0,.1,0,.16V216Zm32-32H184V104a8,8,0,0,0-2.34-5.66l-40-40A8,8,0,0,0,136,56H88V40h76.69L200,75.31Zm-56-32a8,8,0,0,1-8,8H88a8,8,0,0,1,0-16h48A8,8,0,0,1,144,152Zm0,32a8,8,0,0,1-8,8H88a8,8,0,0,1,0-16h48A8,8,0,0,1,144,184Z"></path></svg>
-                    General Information
-                </span>
-
-                @* Resource Name *@
-                <div class="flex flex-col col-span-2 gap-1 relative">
-                    <label for="name" class="text-xs text-charcoal-300">Resource Name</label>
-                    <input type="text" autofocus class="input-charcoal-dark p-2" id="name" asp-for="Name"
-                        placeholder="Type name here" />
-                    <div id="validation-Name">
-                    </div>
-                </div>
-
-                @* Cost *@
-                <div class="flex flex-col gap-1 relative">
-                    <label for="cost" class="text-xs text-charcoal-300">Cost</label>
-                    <input type="text" x-mask:dynamic="$money($input)" class="input-charcoal-dark p-2" id="cost" asp-for="Cost"
-                        placeholder="Type cost here" />
-                    <div id="validation-Cost">
-                    </div>
-                </div>
-
-                @* Cost Type *@
-                <div class="flex flex-col gap-1 relative"
-                    :class="{
-                        'col-span-2': (!showQuantity),
-                    }">
-                    <label for="costtype" class="text-xs text-charcoal-300">Type of Cost</label>
-                    <select class="input-charcoal-dark p-2" id="costtype" asp-for="CostType" hx-get="/admin/cost-types" hx-trigger="load, change from:#type" hx-vals='js:{"selectedOption": document.getElementById("type").value}' hx-target="#costtype">
-                    </select>
-                    <div id="validation-CostType">
-                    </div>
-                </div>
-
-                @* Quantity *@
-                <div x-show="showQuantity" class="flex flex-col gap-1 relative">
-                    <label for="quantity" class="text-xs text-charcoal-300">Quantity</label>
-                    <input type="number"
-                     inputmode="numeric" class="input-charcoal-dark p-2" name="quantity" value="1" id="quantity" asp-for="Quantity"
-                        placeholder="Type quantity here" />
-                    <div id="validation-Quantity">
-                    </div>
-                </div>
-
-                @* Descriptions *@
-                <div class="col-span-full flex flex-col gap-1 relative w-full">
-                    <label for="description" class="text-xs text-charcoal-300">Description</label>
-                    <textarea id="description" class="input-charcoal-dark p-2" maxlength="300" rows="3" asp-for="Description"
-                        style="resize: none;"
-                        placeholder="Describe anything about this resource.">
-                    </textarea>
-                    <div id="validation-Description">
-                    </div>
-                </div>
-            </div>
-
-            <div id="resource-extra" class="relative grid grid-cols-5 gap-3 p-5 border-2 rounded-xl border-charcoal-700">
-                @await Html.PartialAsync("~/Views/Admin/Partials/_ResourceExtraPartial.cshtml", new AddResourceViewModel { Type = Model.Type })
-            </div>
         </main>
-
-        @* Footer *@
-        <div class="mt-4 flex items-center justify-center gap-2 w-full py-3 px-4">
-            <button type="button"
-                hx-post="/admin/create-resource"
-                hx-swap="none"
-                class="duration-200 ease-in-out text-sm px-4 py-2 text-coffee-50 bg-coffee-700 hover:bg-coffee-800 active:bg-coffee-900 rounded-md">
-                Save
-            </button>
-        </div>
     </div>
 </div>

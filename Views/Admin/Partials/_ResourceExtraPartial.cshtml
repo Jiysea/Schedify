@@ -3,6 +3,8 @@
 
 @if (Model.Type == ResourceType.Venue)
 {
+    Console.WriteLine(Model.Type);
+
     <span class="absolute flex items-center gap-1 start-4 -top-3 text-sm font-light text-pumpkin-400 bg-charcoal-900 px-2">
         <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
             viewBox="0 0 256 256">
@@ -63,6 +65,7 @@
 
 else if (Model.Type == ResourceType.Equipment)
 {
+    Console.WriteLine(Model.Type);
     <span class="absolute flex items-center gap-1 start-4 -top-3 text-sm font-light text-pumpkin-400 bg-charcoal-900 px-2">
         <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
                 viewBox="0 0 256 256">
@@ -74,14 +77,14 @@ else if (Model.Type == ResourceType.Equipment)
     </span>
 
     @* Brand *@
-    <div class="flex flex-col gap-1 relative">
+    <div class="flex flex-col col-span-full gap-1 relative">
         <label for="brand" class="text-xs text-charcoal-300">Brand</label>
         <input type="text" class="input-charcoal-dark p-2" id="brand" asp-for="@Model.Brand"
             placeholder="Type brand here" />
     </div>
 
     @* Specifications *@
-    <div class="flex flex-col col-span-4 gap-2 w-full relative" x-data="{ 
+    <div class="flex flex-col col-span-full gap-2 w-full relative" x-data="{ 
                                         specs: @Json.Serialize(@Model.Specifications),
                                         newKey: '',
                                         newValue: '',
@@ -109,11 +112,11 @@ else if (Model.Type == ResourceType.Equipment)
 
         <!-- Toaster-style Key-Value Display -->
         <div
-            class="flex flex-wrap items-center justify-center gap-3 mt-2 overflow-auto  max-h-40 max-w-[791px] border border-charcoal-700 rounded-md p-4 scrollbar-thin scrollbar-track-charcoal-900 scrollbar-thumb-charcoal-700">
+            class="flex flex-wrap items-center justify-center gap-3 mt-2 overflow-auto min-h-[70px] max-h-40 border border-charcoal-700 rounded-md p-4 scrollbar-thin scrollbar-track-charcoal-900 scrollbar-thumb-charcoal-700">
             <template x-for="[key, value] in Object.entries(specs)" :key="key">
                 <div
-                    class="flex flex-col md:flex-row md:items-center justify-between text-sm text-charcoal-50 bg-charcoal-700 p-2 rounded-md w-full break-words">
-                    <span class="flex flex-col md:flex-row items-start md:items-center gap-2 max-w-full">
+                    class="flex items-center justify-between text-sm text-charcoal-50 bg-charcoal-700 p-2 rounded-md w-full break-words">
+                    <span class="flex items-center gap-2 max-w-full">
                         <span class="font-semibold break-all" x-text="key"></span>:
                         <span class="break-words" x-text="value"></span>
                     </span>
@@ -137,6 +140,7 @@ else if (Model.Type == ResourceType.Equipment)
 }
 else if (Model.Type == ResourceType.Furniture)
 {
+    Console.WriteLine(Model.Type);
     <span class="absolute flex items-center gap-1 start-4 -top-3 text-sm font-light text-pumpkin-400 bg-charcoal-900 px-2">
         <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
             viewBox="0 0 256 256">
