@@ -37,56 +37,56 @@ builder.Services.AddScoped<UserService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-// if (!app.Environment.IsDevelopment())
-// {
-//     app.UseExceptionHandler("/Home/Error");
-//     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-//     app.UseHsts();
-// }
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
+}
 
-// async Task CreateAdmin(UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager)
-// {
+async Task CreateAdmin(UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager)
+{
 
-//     if (!await roleManager.RoleExistsAsync("Admin"))
-//     {
-//         await roleManager.CreateAsync(new IdentityRole<Guid>("Admin"));
-//     }
+    if (!await roleManager.RoleExistsAsync("Admin"))
+    {
+        await roleManager.CreateAsync(new IdentityRole<Guid>("Admin"));
+    }
 
-//     // Create an admin user
-//     var adminEmail = "admin@gmail.com";
-//     var adminUser = await userManager.FindByEmailAsync(adminEmail);
+    // Create an admin user
+    var adminEmail = "admin@gmail.com";
+    var adminUser = await userManager.FindByEmailAsync(adminEmail);
 
-//     if (adminUser == null)
-//     {
-//         var user = new User
-//         {
-//             FirstName = "Admin",
-//             MiddleName = null,
-//             LastName = "Admin",
-//             ExtensionName = null,
-//             Birthdate = DateTime.UtcNow,
-//             Email = adminEmail,
-//             UserName = adminEmail,
-//             PhoneNumber = "09123456789",
-//         };
+    if (adminUser == null)
+    {
+        var user = new User
+        {
+            FirstName = "Admin",
+            MiddleName = null,
+            LastName = "Admin",
+            ExtensionName = null,
+            Birthdate = DateTime.UtcNow,
+            Email = adminEmail,
+            UserName = adminEmail,
+            PhoneNumber = "09123456789",
+        };
 
-//         var result = await userManager.CreateAsync(user, "Password123"); // Change password
+        var result = await userManager.CreateAsync(user, "Password123"); // Change password
 
-//         if (result.Succeeded)
-//         {
-//             await userManager.AddToRoleAsync(user, "Admin");
-//         }
-//     }
-// }
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(user, "Admin");
+        }
+    }
+}
 
-// using (var scope = app.Services.CreateScope())
-// {
-//     var services = scope.ServiceProvider;
-//     var userManager = services.GetRequiredService<UserManager<User>>();
-//     var roleManager = services.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var userManager = services.GetRequiredService<UserManager<User>>();
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
 
-//     CreateAdmin(userManager, roleManager).Wait();
-// }
+    CreateAdmin(userManager, roleManager).Wait();
+}
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

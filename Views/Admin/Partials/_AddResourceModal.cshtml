@@ -5,7 +5,7 @@
 
     @* Box *@
     <div x-data x-trap="addResourceModal" class="bg-charcoal-900 rounded-lg shadow-lg"
-        @@keydown.escape = "addResourceModal = false;" @@click.outside = "addResourceModal = false;" >
+        @@keydown.escape = "addResourceModal = false;" >
 
                                 @* Top Header *@
                                 <header class="flex items-center justify-between text-lg font-medium py-3 px-4">
@@ -24,7 +24,7 @@
                                 <hr class="w-full border-charcoal-800">
 
                                 <main class="">
-                                    <form action="post" hx-post="/admin/create-resource" hx-swap="innerHTML" hx-target="#wtf">
+                                    <form action="post" hx-post="/admin/create-resource" hx-swap="none">
                                         @* Body *@
                                         <div x-data="{ showQuantity: false }" class="flex flex-col gap-10 px-6 py-10">
 
@@ -156,11 +156,6 @@
                         class="relative grid grid-cols-5 gap-3 p-5 border-2 rounded-xl border-charcoal-700">
                         @await Html.PartialAsync("~/Views/Admin/Partials/_ResourceExtraPartial.cshtml", new
                                                 AddResourceViewModel { Type = Model.Type })
-                    </div>
-
-
-                    <div id="wtf" class="col-span-full flex items-center flex-wrap">
-
                     </div>
                 </div>
 

@@ -13,7 +13,7 @@ using System.Text.Json;
 namespace Schedify.Controllers;
 
 
-// [Authorize(Roles = "Admin")]
+[Authorize(Roles = "Admin")]
 public class AdminController : Controller
 {
 
@@ -141,14 +141,15 @@ public class AdminController : Controller
 
         if (model.Type == ResourceType.Personnel)
         {
+            Console.WriteLine(model.ShiftAsString);
             if (string.IsNullOrWhiteSpace(model.Position))
             {
                 ModelState.AddModelError(nameof(model.Position), "This field is required.");
             }
             
-            if (string.IsNullOrWhiteSpace(model.Shift))
+            if (string.IsNullOrWhiteSpace(model.ShiftAsString))
             {
-                ModelState.AddModelError(nameof(model.Shift), "This field is required.");
+                ModelState.AddModelError(nameof(model.ShiftAsString), "This field is required.");
             }
             
             if (string.IsNullOrWhiteSpace(model.Experience))
@@ -271,7 +272,7 @@ public class AdminController : Controller
                     CostType = model.CostType,
                     Quantity = 1,
                     Position = model.Position,
-                    Shift = model.Shift,
+                    Shift = model.ShiftAsString,
                     Experience = model.Experience,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow

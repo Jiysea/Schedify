@@ -222,17 +222,17 @@ else if (Model.Type == ResourceType.Personnel)
         </div>
     </div>
 
-    @* Shift *@
-    <div class="flex flex-col col-span-3 gap-1 relative">
-        <p for="shift" class="text-xs text-charcoal-300">Shift</p>
-        <span class="flex items-center gap-2">
-            <span class="flex flex-col">
-                <label for="shiftfromdate">From</label>
+    @* Preferred Shift *@
+    <div class="flex flex-col col-span-3 gap-1 relative w-full">
+        <p for="shift" class="text-xs text-charcoal-300">Preferred Shift</p>
+        <span class="flex items-center gap-2 w-full">
+            <span class="flex items-start gap-2 w-full">
+                <label for="shiftfromdate" class="text-charcoal-300 text-xs">From</label>
                 <input type="text" class="input-charcoal-dark p-2" id="shiftfromdate" asp-for="@Model.ShiftFromDate"
                     placeholder="Select a start time" />
             </span>
-            <span class="flex flex-col">
-                <label for="shifttodate">To</label>
+            <span class="flex items-start gap-2 w-full">
+                <label for="shifttodate" class="text-charcoal-300 text-xs">To</label>
                 <input type="text" class="input-charcoal-dark p-2" id="shifttodate" asp-for="@Model.ShiftToDate"
                     placeholder="Select an end time" />
             </span>
@@ -249,25 +249,21 @@ else if (Model.Type == ResourceType.Personnel)
         <div id="validation-Experience">
         </div>
     </div>
-}
 
-@section Scripts
-{
     <script>
-        document.addEventListener("htmx:afterSwap", () => {
-            console.log("Bruh");
+        document.addEventListener("htmx:afterSettle", () => {
                 flatpickr("#shiftfromdate", {
                     enableTime: true,
-                    dateFormat: "H:i",
+                    dateFormat: "h:i K",
+                    defaultDate: "00:00",
                     noCalendar: true,
-                    time_24hr: true,
                 });
 
                 flatpickr("#shifttodate", {
                     enableTime: true,
-                    dateFormat: "H:i",
+                    dateFormat: "h:i K",
+                    defaultDate: "00:00",
                     noCalendar: true,
-                    time_24hr: true,
                 });
         });
     </script>
