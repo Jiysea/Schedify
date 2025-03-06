@@ -4,18 +4,16 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Schedify.Models;
 using Schedify.ViewModels;
 using Schedify.Data;
 using Schedify.Services;
 using System.Text.Json;
-using System.ComponentModel.DataAnnotations;
 
 namespace Schedify.Controllers;
 
 
-[Authorize(Roles = "Admin")]
+// [Authorize(Roles = "Admin")]
 public class AdminController : Controller
 {
 

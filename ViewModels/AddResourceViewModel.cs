@@ -6,6 +6,11 @@ namespace Schedify.ViewModels;
 
 public class AddResourceViewModel
 {
+    public AddResourceViewModel()
+    {
+        Shift = ShiftFromDate.ToString("HH:mm") + ShiftToDate.ToString("HH:mm"); // Format as needed
+    }
+
     [Required(ErrorMessage = "This field is required.")]
     [StringLength(250)]
     public string ProviderName { get; set; } = null!;
@@ -70,6 +75,9 @@ public class AddResourceViewModel
 
     [StringLength(30)]
     public string? Shift { get; set; }
+
+    public DateTime ShiftFromDate {get; set;} = DateTime.UtcNow;
+    public DateTime ShiftToDate {get; set;} = DateTime.UtcNow;
 
     [StringLength(30)]
     [DefaultValue("None")]

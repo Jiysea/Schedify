@@ -224,9 +224,19 @@ else if (Model.Type == ResourceType.Personnel)
 
     @* Shift *@
     <div class="flex flex-col col-span-3 gap-1 relative">
-        <label for="shift" class="text-xs text-charcoal-300">Shift</label>
-        <input type="text" class="input-charcoal-dark p-2" id="shift" asp-for="@Model.Shift"
-            placeholder="Type shift here" />
+        <p for="shift" class="text-xs text-charcoal-300">Shift</p>
+        <span class="flex items-center gap-2">
+            <span class="flex flex-col">
+                <label for="shiftfromdate">From</label>
+                <input type="text" class="input-charcoal-dark p-2" id="shiftfromdate" asp-for="@Model.ShiftFromDate"
+                    placeholder="Select a start time" />
+            </span>
+            <span class="flex flex-col">
+                <label for="shifttodate">To</label>
+                <input type="text" class="input-charcoal-dark p-2" id="shifttodate" asp-for="@Model.ShiftToDate"
+                    placeholder="Select an end time" />
+            </span>
+        </span>
         <div id="validation-Shift">
         </div>
     </div>
@@ -239,4 +249,26 @@ else if (Model.Type == ResourceType.Personnel)
         <div id="validation-Experience">
         </div>
     </div>
+}
+
+@section Scripts
+{
+    <script>
+        document.addEventListener("htmx:afterSwap", () => {
+            console.log("Bruh");
+                flatpickr("#shiftfromdate", {
+                    enableTime: true,
+                    dateFormat: "H:i",
+                    noCalendar: true,
+                    time_24hr: true,
+                });
+
+                flatpickr("#shifttodate", {
+                    enableTime: true,
+                    dateFormat: "H:i",
+                    noCalendar: true,
+                    time_24hr: true,
+                });
+        });
+    </script>
 }
