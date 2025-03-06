@@ -4,7 +4,7 @@ using System.Globalization;
 using Schedify.Models;
 namespace Schedify.ViewModels;
 
-public class AddResourceViewModel : IValidatableObject
+public class AddResourceViewModel
 {
     [Required(ErrorMessage = "This field is required.")]
     [StringLength(250)]
@@ -37,7 +37,6 @@ public class AddResourceViewModel : IValidatableObject
     [Range(1, int.MaxValue, ErrorMessage = "Value must be at least 1.")]
     public int Quantity { get; set; } = 1;
 
-    [Range(1, int.MaxValue, ErrorMessage = "Value must be at least 1.")]
     public int Capacity { get; set; }
 
     public string? Size { get; set; }
@@ -77,30 +76,6 @@ public class AddResourceViewModel : IValidatableObject
     public string? Experience { get; set; }
 
     public IEnumerable<ResourceType> ResourceTypes { get; set; } = Enum.GetValues<ResourceType>();
-
-    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-    {
-        if (Type == ResourceType.Venue && Capacity <= 0)
-        {
-            yield return new ValidationResult(
-                "Value must be at least 1.",
-                new [] {nameof(Capacity)}
-            );
-        }
-
-        if (Brand == string.Empty || Brand == null)
-        {
-            yield return new ValidationResult(
-                "This field is required.",
-                new [] {nameof(Brand)}
-            );
-        }
-
-        if (Specifications == null || Specifications.Count == 0)
-        {
-            yield return new ValidationResult("Specifications cannot be empty.", new [] {nameof(Specifications)});
-        }
-    }
 
     [DataType(DataType.Currency)]
     [Range(typeof(decimal), "0.01", "79228162514264337593543950335")]

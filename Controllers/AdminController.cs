@@ -81,21 +81,85 @@ public class AdminController : Controller
     [HttpPost]
     public async Task<IActionResult> CreateResource(AddResourceViewModel model)
     {
-        if (string.IsNullOrWhiteSpace(model.Brand))
+
+        // Custom Validations
+        if (model.Type == ResourceType.Venue)
         {
-            ModelState.AddModelError(nameof(model.Brand), "This field is required.");
+            if (string.IsNullOrWhiteSpace(model.AddressLine1))
+            {
+                ModelState.AddModelError(nameof(model.AddressLine1), "This field is required.");
+            }
+
+            if (string.IsNullOrWhiteSpace(model.Size))
+            {
+                ModelState.AddModelError(nameof(model.Size), "This field is required.");
+            }
+
+            if (model.Capacity <= 0)
+            {
+                ModelState.AddModelError(nameof(model.Capacity), "Value must be at least 1.");
+            }
         }
 
-        if (model.Capacity <= 0 && model.Type == ResourceType.Venue)
+        if (model.Type == ResourceType.Equipment)
         {
-            ModelState.AddModelError(nameof(model.Capacity), "Value must be at least 1.");
+
+            if (string.IsNullOrWhiteSpace(model.Brand))
+            {
+                ModelState.AddModelError(nameof(model.Brand), "This field is required.");
+            }
+
+            if (model.Specifications == null || model.Specifications.Count == 0)
+            {
+                ModelState.AddModelError(nameof(model.Specifications), "Specifications cannot be empty.");
+            }
         }
 
-        if (model.Specifications == null || model.Specifications.Count == 0)
+        if (model.Type == ResourceType.Furniture)
         {
-            ModelState.AddModelError(nameof(model.Specifications), "Specifications cannot be empty.");
+            if (string.IsNullOrWhiteSpace(model.Material))
+            {
+                ModelState.AddModelError(nameof(model.Material), "This field is required.");
+            }
+
+            if (string.IsNullOrWhiteSpace(model.Dimensions))
+            {
+                ModelState.AddModelError(nameof(model.Dimensions), "This field is required.");
+            }
         }
 
+        if (model.Type == ResourceType.Catering)
+        {
+            if (string.IsNullOrWhiteSpace(model.MenuItems))
+            {
+                ModelState.AddModelError(nameof(model.MenuItems), "This field is required.");
+            }
+
+            if (string.IsNullOrWhiteSpace(model.PriceItems))
+            {
+                ModelState.AddModelError(nameof(model.PriceItems), "This field is required.");
+            }
+        }
+
+        if (model.Type == ResourceType.Personnel)
+        {
+            if (string.IsNullOrWhiteSpace(model.Position))
+            {
+                ModelState.AddModelError(nameof(model.Position), "This field is required.");
+            }
+            
+            if (string.IsNullOrWhiteSpace(model.Shift))
+            {
+                ModelState.AddModelError(nameof(model.Shift), "This field is required.");
+            }
+            
+            if (string.IsNullOrWhiteSpace(model.Experience))
+            {
+                ModelState.AddModelError(nameof(model.Experience), "This field is required.");
+            }
+        }
+
+        // Sending all validation errors to frontend
         if (!ModelState.IsValid)
         {
             return PartialView("_ValidationMessages", ModelState);
@@ -119,9 +183,10 @@ public class AdminController : Controller
                     ProviderEmail = model.ProviderEmail,
                     Name = model.Name,
                     Description = model.Description,
+                    Type = model.Type,
                     Cost = model.CostAsDecimal,
-                    Quantity = 1,
                     CostType = model.CostType,
+                    Quantity = 1,
                     Capacity = model.Capacity,
                     Size = model.Size,
                     AddressLine1 = model.AddressLine1,
@@ -143,9 +208,10 @@ public class AdminController : Controller
                     ProviderEmail = model.ProviderEmail,
                     Name = model.Name,
                     Description = model.Description,
+                    Type = model.Type,
                     Cost = model.CostAsDecimal,
-                    Quantity = 1,
                     CostType = model.CostType,
+                    Quantity = 1,
                     Brand = model.Brand,
                     Specifications = specificationsJson,
                     CreatedAt = DateTime.UtcNow,
@@ -153,21 +219,68 @@ public class AdminController : Controller
                 };
                 _context.Resources.Add(equipmentResource);
                 break;
+            case ResourceType.Furniture:
+                var furnitureResource = new Resource
+                {
+                    UserId = user.Id,
+                    ProviderName = model.ProviderName,
+                    ProviderPhoneNumber = model.ProviderPhoneNumber,
+                    ProviderEmail = model.ProviderEmail,
+                    Name = model.Name,
+                    Description = model.Description,
+                    Type = model.Type,
+                    Cost = model.CostAsDecimal,
+                    CostType = model.CostType,
+                    Quantity = 1,
+                    Material = model.Material,
+                    Dimensions = model.Dimensions,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                _context.Resources.Add(furnitureResource);
+                break;
+            case ResourceType.Catering:
+                var cateringResource = new Resource
+                {
+                    UserId = user.Id,
+                    ProviderName = model.ProviderName,
+                    ProviderPhoneNumber = model.ProviderPhoneNumber,
+                    ProviderEmail = model.ProviderEmail,
+                    Name = model.Name,
+                    Description = model.Description,
+                    Type = model.Type,
+                    Cost = model.CostAsDecimal,
+                    CostType = model.CostType,
+                    Quantity = 1,
+                    MenuItems = model.MenuItems,
+                    PriceItems = model.PriceItems,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                _context.Resources.Add(cateringResource);
+                break;
+            case ResourceType.Personnel:
+                var personnelResource = new Resource
+                {
+                    UserId = user.Id,
+                    ProviderName = model.ProviderName,
+                    ProviderPhoneNumber = model.ProviderPhoneNumber,
+                    ProviderEmail = model.ProviderEmail,
+                    Name = model.Name,
+                    Description = model.Description,
+                    Type = model.Type,
+                    Cost = model.CostAsDecimal,
+                    CostType = model.CostType,
+                    Quantity = 1,
+                    Position = model.Position,
+                    Shift = model.Shift,
+                    Experience = model.Experience,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                _context.Resources.Add(personnelResource);
+                break;
         }
-        // var resource = new Resource
-        // {
-        //     Name = model.Name,
-        //     Description = model.Description,
-        //     Cost = model.CostAsDecimal,
-        //     CostType = model.CostType,
-        //     Capacity = model.Capacity,
-        //     Quantity = model.Quantity,
-        //     Size = model.Size,
-        //     AddressLine1 = model.AddressLine1,
-        //     AddressLine2 = model.AddressLine2,
-        //     CityMunicipality = "Davao City",
-        //     Province = "Davao del Sur",
-        // };
 
         // Save to the database
         _context.SaveChanges();

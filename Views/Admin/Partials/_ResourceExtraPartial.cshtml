@@ -85,10 +85,10 @@ else if (Model.Type == ResourceType.Equipment)
 
     @* Specifications *@
     <div class="flex flex-col col-span-full gap-2 w-full relative" x-data="{ 
-                                                specs: @Json.Serialize(@Model.Specifications),
-                                                newKey: '',
-                                                newValue: '',
-                                            }">
+            specs: @Json.Serialize(@Model.Specifications),
+            newKey: '',
+            newValue: '',
+        }">
 
         <!-- Input Fields for Key & Value -->
         <div class="flex flex-col gap-1 relative">
@@ -133,7 +133,6 @@ else if (Model.Type == ResourceType.Equipment)
                 </template>
             </div>
 
-
             <div id="validation-Specifications">
             </div>
         </div>
@@ -160,14 +159,18 @@ else if (Model.Type == ResourceType.Furniture)
     <div class="flex flex-col col-span-3 gap-1 relative">
         <label for="material" class="text-xs text-charcoal-300">Material</label>
         <input type="text" class="input-charcoal-dark p-2" id="material" asp-for="@Model.Material"
-            placeholder="Type material here" />
+            placeholder="ex. Dining Table, Window Frame, etc." />
+        <div id="validation-Material">
+        </div>
     </div>
 
     @* Dimensions *@
     <div class="flex flex-col col-span-2 gap-1 relative">
         <label for="dimensions" class="text-xs text-charcoal-300">Dimensions</label>
         <input type="text" class="input-charcoal-dark p-2" id="dimensions" asp-for="@Model.Dimensions"
-            placeholder="Type dimensions here" />
+            placeholder="ex. 6ft x 3ft x 30in, 1920x1080px, etc." />
+        <div id="validation-Dimensions">
+        </div>
     </div>
 }
 
@@ -215,19 +218,25 @@ else if (Model.Type == ResourceType.Personnel)
         <label for="position" class="text-xs text-charcoal-300">Position</label>
         <input type="text" class="input-charcoal-dark p-2" id="position" asp-for="@Model.Position"
             placeholder="Type position here" />
+        <div id="validation-Position">
+        </div>
     </div>
 
     @* Shift *@
-    <div class="flex flex-col col-span-2 gap-1 relative">
+    <div class="flex flex-col col-span-3 gap-1 relative">
         <label for="shift" class="text-xs text-charcoal-300">Shift</label>
         <input type="text" class="input-charcoal-dark p-2" id="shift" asp-for="@Model.Shift"
             placeholder="Type shift here" />
+        <div id="validation-Shift">
+        </div>
     </div>
 
     @* Experience *@
-    <div class="flex flex-col col-span-2 gap-1 relative">
+    <div class="flex flex-col col-span-full gap-1 relative">
         <label for="experience" class="text-xs text-charcoal-300">Experience</label>
         <input type="text" class="input-charcoal-dark p-2" id="experience" asp-for="@Model.Experience"
             placeholder="Type experience here" />
+        <div id="validation-Experience">
+        </div>
     </div>
 }
