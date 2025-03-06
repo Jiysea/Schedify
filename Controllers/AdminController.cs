@@ -19,11 +19,15 @@ public class AdminController : Controller
 
     private readonly ApplicationDbContext _context;
     private readonly UserService _userService;
+    private readonly ResourceService _resourceService;
+    private readonly IWebHostEnvironment _environment;
 
-    public AdminController(ApplicationDbContext context, UserService userService)
+    public AdminController(ApplicationDbContext context, UserService userService, ResourceService resourceService, IWebHostEnvironment environment)
     {
         _context = context;
         _userService = userService;
+        _resourceService = resourceService;
+        _environment = environment;
     }
 
     [Route("admin/dashboard")]
@@ -35,7 +39,13 @@ public class AdminController : Controller
     [Route("admin/resources")]
     public ActionResult Resources()
     {
-        return View(new AddResourceViewModel());
+        var viewModel = new AddResourceViewModel
+        {
+            Resources = _resourceService.GetResources(),
+            ResourceImages = _resourceService.GetResourceImages()
+        };
+
+        return View(viewModel);
     }
 
     [Route("admin/activity-logs")]
@@ -81,6 +91,12 @@ public class AdminController : Controller
     {
 
         // Custom Validations
+
+        if (model.ImageFile == null)
+        {
+            ModelState.AddModelError(nameof(model.ImageFile), "An image is required.");
+        }
+
         if (model.Type == ResourceType.Venue)
         {
             if (string.IsNullOrWhiteSpace(model.AddressLine1))
@@ -146,12 +162,12 @@ public class AdminController : Controller
             {
                 ModelState.AddModelError(nameof(model.Position), "This field is required.");
             }
-            
+
             if (string.IsNullOrWhiteSpace(model.ShiftAsString))
             {
                 ModelState.AddModelError(nameof(model.ShiftAsString), "This field is required.");
             }
-            
+
             if (string.IsNullOrWhiteSpace(model.Experience))
             {
                 ModelState.AddModelError(nameof(model.Experience), "This field is required.");
@@ -171,120 +187,177 @@ public class AdminController : Controller
             throw new InvalidOperationException("User must be authenticated.");
         }
 
-        switch (model.Type)
+        var resource = new Resource
         {
-            case ResourceType.Venue:
-                var venueResource = new Resource
-                {
-                    UserId = user.Id,
-                    ProviderName = model.ProviderName,
-                    ProviderPhoneNumber = model.ProviderPhoneNumber,
-                    ProviderEmail = model.ProviderEmail,
-                    Name = model.Name,
-                    Description = model.Description,
-                    Type = model.Type,
-                    Cost = model.CostAsDecimal,
-                    CostType = model.CostType,
-                    Quantity = 1,
-                    Capacity = model.Capacity,
-                    Size = model.Size,
-                    AddressLine1 = model.AddressLine1,
-                    AddressLine2 = model.AddressLine2,
-                    CityMunicipality = "Davao City",
-                    Province = "Davao del Sur",
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
-                };
-                _context.Resources.Add(venueResource);
-                break;
-            case ResourceType.Equipment:
-                string specificationsJson = JsonSerializer.Serialize(model.Specifications);
-                var equipmentResource = new Resource
-                {
-                    UserId = user.Id,
-                    ProviderName = model.ProviderName,
-                    ProviderPhoneNumber = model.ProviderPhoneNumber,
-                    ProviderEmail = model.ProviderEmail,
-                    Name = model.Name,
-                    Description = model.Description,
-                    Type = model.Type,
-                    Cost = model.CostAsDecimal,
-                    CostType = model.CostType,
-                    Quantity = 1,
-                    Brand = model.Brand,
-                    Specifications = specificationsJson,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
-                };
-                _context.Resources.Add(equipmentResource);
-                break;
-            case ResourceType.Furniture:
-                var furnitureResource = new Resource
-                {
-                    UserId = user.Id,
-                    ProviderName = model.ProviderName,
-                    ProviderPhoneNumber = model.ProviderPhoneNumber,
-                    ProviderEmail = model.ProviderEmail,
-                    Name = model.Name,
-                    Description = model.Description,
-                    Type = model.Type,
-                    Cost = model.CostAsDecimal,
-                    CostType = model.CostType,
-                    Quantity = 1,
-                    Material = model.Material,
-                    Dimensions = model.Dimensions,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
-                };
-                _context.Resources.Add(furnitureResource);
-                break;
-            case ResourceType.Catering:
-                var cateringResource = new Resource
-                {
-                    UserId = user.Id,
-                    ProviderName = model.ProviderName,
-                    ProviderPhoneNumber = model.ProviderPhoneNumber,
-                    ProviderEmail = model.ProviderEmail,
-                    Name = model.Name,
-                    Description = model.Description,
-                    Type = model.Type,
-                    Cost = model.CostAsDecimal,
-                    CostType = model.CostType,
-                    Quantity = 1,
-                    MenuItems = model.MenuItems,
-                    PriceItems = model.PriceItems,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
-                };
-                _context.Resources.Add(cateringResource);
-                break;
-            case ResourceType.Personnel:
-                var personnelResource = new Resource
-                {
-                    UserId = user.Id,
-                    ProviderName = model.ProviderName,
-                    ProviderPhoneNumber = model.ProviderPhoneNumber,
-                    ProviderEmail = model.ProviderEmail,
-                    Name = model.Name,
-                    Description = model.Description,
-                    Type = model.Type,
-                    Cost = model.CostAsDecimal,
-                    CostType = model.CostType,
-                    Quantity = 1,
-                    Position = model.Position,
-                    Shift = model.ShiftAsString,
-                    Experience = model.Experience,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
-                };
-                _context.Resources.Add(personnelResource);
-                break;
+            UserId = user.Id,
+            ProviderName = null!,
+            ProviderPhoneNumber = null!,
+            ProviderEmail = null!,
+            Name = null!,
+            Description = null!,
+            Type = model.Type,
+            Cost = 0.00m,
+            CostType = null!,
+            Quantity = 0,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        using var transaction = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            switch (model.Type)
+            {
+                case ResourceType.Venue:
+                    resource = new Resource
+                    {
+                        UserId = user.Id,
+                        ProviderName = model.ProviderName,
+                        ProviderPhoneNumber = model.ProviderPhoneNumber,
+                        ProviderEmail = model.ProviderEmail,
+                        Name = model.Name,
+                        Description = model.Description,
+                        Type = model.Type,
+                        Cost = model.CostAsDecimal,
+                        CostType = model.CostType,
+                        Quantity = 1,
+                        Capacity = model.Capacity,
+                        Size = model.Size,
+                        AddressLine1 = model.AddressLine1,
+                        AddressLine2 = model.AddressLine2,
+                        CityMunicipality = "Davao City",
+                        Province = "Davao del Sur",
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    };
+                    _context.Resources.Add(resource);
+                    break;
+                case ResourceType.Equipment:
+                    string specificationsJson = JsonSerializer.Serialize(model.Specifications);
+                    resource = new Resource
+                    {
+                        UserId = user.Id,
+                        ProviderName = model.ProviderName,
+                        ProviderPhoneNumber = model.ProviderPhoneNumber,
+                        ProviderEmail = model.ProviderEmail,
+                        Name = model.Name,
+                        Description = model.Description,
+                        Type = model.Type,
+                        Cost = model.CostAsDecimal,
+                        CostType = model.CostType,
+                        Quantity = 1,
+                        Brand = model.Brand,
+                        Specifications = specificationsJson,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    };
+                    _context.Resources.Add(resource);
+                    break;
+                case ResourceType.Furniture:
+                    resource = new Resource
+                    {
+                        UserId = user.Id,
+                        ProviderName = model.ProviderName,
+                        ProviderPhoneNumber = model.ProviderPhoneNumber,
+                        ProviderEmail = model.ProviderEmail,
+                        Name = model.Name,
+                        Description = model.Description,
+                        Type = model.Type,
+                        Cost = model.CostAsDecimal,
+                        CostType = model.CostType,
+                        Quantity = 1,
+                        Material = model.Material,
+                        Dimensions = model.Dimensions,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    };
+                    _context.Resources.Add(resource);
+                    break;
+                case ResourceType.Catering:
+                    resource = new Resource
+                    {
+                        UserId = user.Id,
+                        ProviderName = model.ProviderName,
+                        ProviderPhoneNumber = model.ProviderPhoneNumber,
+                        ProviderEmail = model.ProviderEmail,
+                        Name = model.Name,
+                        Description = model.Description,
+                        Type = model.Type,
+                        Cost = model.CostAsDecimal,
+                        CostType = model.CostType,
+                        Quantity = 1,
+                        MenuItems = model.MenuItems,
+                        PriceItems = model.PriceItems,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    };
+                    _context.Resources.Add(resource);
+                    break;
+                case ResourceType.Personnel:
+                    resource = new Resource
+                    {
+                        UserId = user.Id,
+                        ProviderName = model.ProviderName,
+                        ProviderPhoneNumber = model.ProviderPhoneNumber,
+                        ProviderEmail = model.ProviderEmail,
+                        Name = model.Name,
+                        Description = model.Description,
+                        Type = model.Type,
+                        Cost = model.CostAsDecimal,
+                        CostType = model.CostType,
+                        Quantity = 1,
+                        Position = model.Position,
+                        Shift = model.ShiftAsString,
+                        Experience = model.Experience,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    };
+                    _context.Resources.Add(resource);
+                    break;
+            }
+
+            await _context.SaveChangesAsync();
+
+            string newFileName = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
+            newFileName += Path.GetExtension(model.ImageFile!.FileName);
+            string imageFullPath = _environment.WebRootPath + "/resources/" + newFileName;
+
+            // Ensure the directory exists
+            string directoryPath = Path.GetDirectoryName(imageFullPath)!;
+            if (!Directory.Exists(directoryPath))
+            {
+                Directory.CreateDirectory(directoryPath);
+            }
+
+            using (var stream = System.IO.File.Create(imageFullPath))
+            {
+                await model.ImageFile.CopyToAsync(stream);
+            }
+
+            Image image = new Image
+            {
+                ResourceId = resource.Id,
+                ImageFileName = newFileName
+            };
+
+            _context.Images.Add(image);
+
+            // Save to the database
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+            Response.Headers.Append("HX-Redirect", Url.Action("Resources", "Admin"));
+
+            return Content(string.Empty);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            await transaction.RollbackAsync();
+            ModelState.AddModelError("", "An error occurred while saving data.");
+            Response.Headers.Append("HX-Redirect", Url.Action("Resources", "Admin"));
+            return View("~/Views/Admin/Resources.cshtml", model);
         }
 
-        // Save to the database
-        _context.SaveChanges();
-
-        return Content(string.Empty);
     }
 
 }

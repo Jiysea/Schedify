@@ -1,0 +1,48 @@
+<div x-show="viewResourceModal" x-transition.opacity
+    class="fixed inset-0 flex justify-center items-start bg-black/50 backdrop-blur-sm overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-charcoal-700 z-50 p-4">
+
+    @* Box *@
+    <div x-data x-trap="viewResourceModal" class="bg-charcoal-900 rounded-lg shadow-lg"
+        @@keydown.escape = "viewResourceModal = false;" >
+
+        @* Top Header *@
+        <header class="flex items-center justify-between text-lg font-medium py-3 px-4">
+            <h1 class="text-charcoal-50">View Resource</h1>
+            <button x-on:click="viewResourceModal = false"
+                class="flex items-center justify-center size-8 p-1 rounded-md text-charcoal-50 hover:bg-charcoal-800 active:bg-charcoal-700 hover:text-coffee-50 active:text-coffee-50 duration-200 ease-in-out">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                    viewBox="0 0 256 256">
+                    <path
+                        d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z">
+                    </path>
+                </svg>
+            </button>
+        </header>
+
+        <hr class="w-full border-charcoal-800">
+
+        <main class="flex flex-col gap-10 px-6 py-10">
+            <div class="flex items-center justify-end w-full">
+                <button type="button" x-on:click=""
+                    class="text-center p-2 duration-200 ease-in-out rounded-md bg-coffee-700 hover:bg-coffee-800 active:bg-coffee-900 text-coffee-50">
+                    <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                        viewBox="0 0 256 256">
+                        <path
+                            d="M227.32,73.37,182.63,28.69a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H216a8,8,0,0,0,0-16H115.32l112-112A16,16,0,0,0,227.32,73.37ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.69,147.32,64l24-24L216,84.69Z">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+
+            @* Edit Form *@
+            <form action="post">
+
+
+                <button type="submit"
+                    class="px-4 py-2 rounded-md text-sm font-medium bg-coffee-700 hover:bg-coffee-800 active:bg-coffee-900 text-coffee-50">
+                    Add
+                </button>
+            </form>
+        </main>
+    </div>
+</div>

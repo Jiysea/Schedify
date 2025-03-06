@@ -7,11 +7,11 @@ public class Image
 {
     [Key]
     public Guid Id { get; set; } = new Guid();
-    public Guid UserId { get; set; }
-    public Guid ResourceId { get; set; }
-    public string Url { get; set; } = null!;
+    public Guid? UserId { get; set; }
+    public Guid? ResourceId { get; set; }
+    public string? ImageFileName { get; set; }
 
     // Dependents
-    public User? User { get; set; } = null!;
-    public Resource? Resource { get; set; } = null!;
+    public User? User { get; set; }
+    public Resource? Resource { get; set; }
 }

@@ -24,7 +24,7 @@
                                 <hr class="w-full border-charcoal-800">
 
                                 <main class="">
-                                    <form action="post" hx-post="/admin/create-resource" hx-swap="none">
+                                    <form action="post" hx-post="/admin/create-resource" hx-swap="none" enctype="multipart/form-data">
                                         @* Body *@
                                         <div x-data="{ showQuantity: false }" class="flex flex-col gap-10 px-6 py-10">
 
@@ -46,12 +46,14 @@
                                                     <label for="type" class="text-xs text-charcoal-300">Type of Resource</label>
                                                     <select class="input-charcoal-dark p-2" id="type" asp-for="Type"
                                                         hx-get="/admin/resource-extra" hx-target="#resource-extra" hx-swap="innerHTML"
-                                                        hx-trigger="change" hx-vals='js:{"selectedOption": event.target.value}' x-on:change="
-                                                    showQuantity = ($el.value != 'Venue');
-                                                    if(showQuantity) {
-                                                        document.getElementById('quantity').value = 1;
-                                                    }
-                                                    " asp-items="@(new SelectList(Model.ResourceTypes))">
+                                                        hx-trigger="change" hx-vals='js:{"selectedOption": event.target.value}'
+                                                        x-on:change="
+                                                                                                                                                                                                                            showQuantity = ($el.value != 'Venue');
+                                                                                                                                                                                                                            if(showQuantity) {
+                                                                                                                                                                                                                                document.getElementById('quantity').value = 1;
+                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                            "
+                                                        asp-items="@(new SelectList(Model.ResourceTypes))">
                                                     </select>
                                                 </div>
 
@@ -96,6 +98,35 @@
                                                     General Information
                                                 </span>
 
+                                                @* Resource Image *@
+                                                <div x-data="{ previewUrl: null }" class="flex flex-col col-span-full gap-1 relative w-full">
+                                                    <p class="text-xs text-charcoal-300">Resource Image</p>
+                                                    <label for="image"
+                                                        class="flex items-center justify-center relative text-xs bg-charcoal-800 rounded-lg min-h-40 max-h-40 text-charcoal-300 cursor-pointer">
+                                                        <input type="file" class="hidden absolute inset-0" id="image" asp-for="ImageFile"
+                                                            accept="image/*"
+                                                            x-on:change="previewUrl = URL.createObjectURL($event.target.files[0])" />
+                                                        <template x-if="previewUrl">
+                                                            <img :src="previewUrl" alt="Preview" class="h-36 object-cover rounded-md">
+                                                        </template>
+                                                        <template x-if="!previewUrl">
+                                                            <div class="flex flex-col items-center justify-center gap-1">
+                                                                <svg class="size-8" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                                                                    viewBox="0 0 256 256">
+                                                                    <path
+                                                                        d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0ZM93.66,77.66,120,51.31V144a8,8,0,0,0,16,0V51.31l26.34,26.35a8,8,0,0,0,11.32-11.32l-40-40a8,8,0,0,0-11.32,0l-40,40A8,8,0,0,0,93.66,77.66Z">
+                                                                    </path>
+                                                                </svg>
+                                                                <span>Click to upload an image</span>
+                                                                <span>Max size 5MB (png, jpg, jpeg)</span>
+                                                            </div>
+                                                        </template>
+                                                    </label>
+
+                                                    <div id="validation-ImageFile">
+                                                    </div>
+                                                </div>
+
                                                 @* Resource Name *@
                                                 <div class="flex flex-col col-span-2 gap-1 relative">
                                                     <label for="name" class="text-xs text-charcoal-300">Resource Name</label>
@@ -115,9 +146,10 @@
                                                 </div>
 
                                                 @* Cost Type *@
-                                                <div class="flex flex-col gap-1 relative" :class="{
-                                                'col-span-2': (!showQuantity),
-                                            }">
+                                                <div class="flex flex-col gap-1 relative"
+                                                    :class="{
+                                                                                                                                                                                                                        'col-span-2': (!showQuantity),
+                                                                                                                                                                                                                    }">
                                                     <label for="costtype" class="text-xs text-charcoal-300">Type of Cost</label>
                                                     <select class="input-charcoal-dark p-2" id="costtype" name="CostType" asp-for="CostType"
                                                         hx-get="/admin/cost-types" hx-trigger="load, change from:#type"

@@ -2,10 +2,15 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
 using System.Globalization;
 using Schedify.Models;
+using Schedify.Attributes;
+using Schedify.Data;
 namespace Schedify.ViewModels;
 
 public class AddResourceViewModel
 {
+    [AllowedExtensions([".jpg", ".jpeg", ".png"])]
+    [MaxFileSize(5)]
+    public IFormFile? ImageFile { get; set; }
 
     [Required(ErrorMessage = "This field is required.")]
     [StringLength(250)]
@@ -104,4 +109,10 @@ public class AddResourceViewModel
             return 0; // Or throw an error if necessary
         }
     }
+
+    // Add a list of resources
+    public List<Resource> Resources { get; set; } = new List<Resource>();
+
+    // Add the image
+    public Dictionary<Guid, string?> ResourceImages { get; set; } = new(); // Maps ResourceId → ImageFileName
 }

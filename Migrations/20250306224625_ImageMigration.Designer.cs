@@ -12,8 +12,8 @@ using Schedify.Data;
 namespace Schedify.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250304101001_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20250306224625_ImageMigration")]
+    partial class ImageMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -454,21 +454,24 @@ namespace Schedify.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ResourceId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Url")
-                        .IsRequired()
+                    b.Property<string>("ImageFileName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid?>("ResourceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ResourceId");
+                    b.HasIndex("ResourceId")
+                        .IsUnique()
+                        .HasFilter("[ResourceId] IS NOT NULL");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
 
                     b.ToTable("Images");
                 });
@@ -898,16 +901,13 @@ namespace Schedify.Migrations
             modelBuilder.Entity("Schedify.Models.Image", b =>
                 {
                     b.HasOne("Schedify.Models.Resource", "Resource")
-                        .WithMany("Images")
-                        .HasForeignKey("ResourceId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .WithOne("Image")
+                        .HasForeignKey("Schedify.Models.Image", "ResourceId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Schedify.Models.User", "User")
-                        .WithMany("Images")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithOne("Image")
+                        .HasForeignKey("Schedify.Models.Image", "UserId");
 
                     b.Navigation("Resource");
 
@@ -955,7 +955,7 @@ namespace Schedify.Migrations
                 {
                     b.Navigation("EventResources");
 
-                    b.Navigation("Images");
+                    b.Navigation("Image");
                 });
 
             modelBuilder.Entity("Schedify.Models.User", b =>
@@ -970,7 +970,7 @@ namespace Schedify.Migrations
 
                     b.Navigation("Feedbacks");
 
-                    b.Navigation("Images");
+                    b.Navigation("Image");
 
                     b.Navigation("Messages");
                 });

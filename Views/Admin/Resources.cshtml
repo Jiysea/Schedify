@@ -4,7 +4,7 @@
 
 <partial name="~/Views/Admin/Partials/_SidebarPartial.cshtml" />
 
-<div x-data="{addResourceModal: false, editResourceModal: false}" class="min-h-screen bg-charcoal-950 ms-[250px]">
+<div x-data="{addResourceModal: false, viewResourceModal: false}" class="min-h-screen bg-charcoal-950 ms-[250px]">
     <header>
         @* Sub Header (Resources, Search, Browse, By Event) *@
         <div class="flex flex-col items-center w-full p-4 border-b-2 gap-1 border-charcoal-900">
@@ -42,8 +42,8 @@
 
                     <button type="button" x-on:click="addResourceModal = !addResourceModal;"
                         class="duration-200 ease-in-out flex items-center justify-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium bg-pumpkin-700 hover:bg-pumpkin-800 active:bg-pumpkin-900 text-pumpkin-50">
-                        <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
-                            viewBox="0 0 256 256">
+                        <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                            fill="currentColor" viewBox="0 0 256 256">
                             <path
                                 d="M228,128a12,12,0,0,1-12,12H140v76a12,12,0,0,1-24,0V140H40a12,12,0,0,1,0-24h76V40a12,12,0,0,1,24,0v76h76A12,12,0,0,1,228,128Z">
                             </path>
@@ -58,51 +58,63 @@
     </header>
 
     <main class="flex items-center justify-center">
-        <div
-            class=" overflow-auto h-[85vh] text-charcoal-100 rounded-lg text-sm w-full scrollbar-thin scrollbar-track-charcoal-900 scrollbar-thumb-charcoal-700">
+        <div id="resources-table"
+            class=" overflow-auto h-[85dvh] max-h-[85%] text-charcoal-100 rounded-lg text-sm w-full scrollbar-thin scrollbar-track-charcoal-900 scrollbar-thumb-charcoal-700">
             <table class="border-separate w-full text-sm text-left whitespace-nowrap">
                 <thead class="sticky top-0 left-0 uppercase z-20 bg-charcoal-950">
                     <tr>
                         <th class="py-3 ps-6 text-start border-b-2 border-charcoal-900">
                             #
                         </th>
-                        <th class="py-3 text-start border-b-2 border-charcoal-900">
+                        <th class="p-3 text-start border-b-2 border-charcoal-900">
                             Name
                         </th>
-                        <th class="py-3 text-start border-b-2 border-charcoal-900">
+                        <th class="p-3 text-start border-b-2 border-charcoal-900">
                             Quantity
                         </th>
-                        <th class="py-3 text-start border-b-2 border-charcoal-900">
+                        <th class="p-3 text-start border-b-2 border-charcoal-900">
                             Type
                         </th>
-                        <th class="py-3 text-start border-b-2 border-charcoal-900">
+                        <th class="p-3 text-start border-b-2 border-charcoal-900">
 
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    @for (int i = 0; i < 15; i++)
+                    @for (int i = 0; i < Model.Resources.Count; i++)
                     {
-                        <tr class=" divide-x divide-y divide-charcoal-900">
+                        <tr class="">
                             <th scope="row" class="py-3 ps-6 shrink">
                                 @(i + 1)
                             </th>
-                            <td class="p-3">
-                                Anton Reception
+                            <td class="p-3 flex items-center gap-2">
+                                <span class="size-10 overflow-hidden">
+                                    @if (Model.ResourceImages.ContainsKey(Model.Resources[i].Id))
+                                    {
+                                        <img src="/resources/@Model.ResourceImages[Model.Resources[i].Id]" alt="No Image"
+                                            class="object-cover size-10 rounded-md">
+                                    }
+                                    else
+                                    {
+                                        <span>No Image</span>
+                                    }
+                                </span>
+                                @Model.Resources[i].Name
                             </td>
                             <td class="p-3">
-                                1
+                                @Model.Resources[i].Quantity
                             </td>
                             <td class="p-3">
-                                Venue
+                                @Model.Resources[i].Type
                             </td>
                             <td class="flex items-center justify-start gap-2 p-3">
-                                <button type="button" x-on:click="editResourceModal = !editResourceModal"
+                                <button type="button" x-on:click="viewResourceModal = !viewResourceModal"
                                     class="text-center p-2 duration-200 ease-in-out rounded-md bg-coffee-700 hover:bg-coffee-800 active:bg-coffee-900 text-coffee-50">
+
                                     <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
                                         fill="currentColor" viewBox="0 0 256 256">
                                         <path
-                                            d="M227.32,73.37,182.63,28.69a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H216a8,8,0,0,0,0-16H115.32l112-112A16,16,0,0,0,227.32,73.37ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.69,147.32,64l24-24L216,84.69Z">
+                                            d="M247.31,124.76c-.35-.79-8.82-19.58-27.65-38.41C194.57,61.26,162.88,48,128,48S61.43,61.26,36.34,86.35C17.51,105.18,9,124,8.69,124.76a8,8,0,0,0,0,6.5c.35.79,8.82,19.57,27.65,38.4C61.43,194.74,93.12,208,128,208s66.57-13.26,91.66-38.34c18.83-18.83,27.3-37.61,27.65-38.4A8,8,0,0,0,247.31,124.76ZM128,192c-30.78,0-57.67-11.19-79.93-33.25A133.47,133.47,0,0,1,25,128,133.33,133.33,0,0,1,48.07,97.25C70.33,75.19,97.22,64,128,64s57.67,11.19,79.93,33.25A133.46,133.46,0,0,1,231.05,128C223.84,141.46,192.43,192,128,192Zm0-112a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Z">
                                         </path>
                                     </svg>
                                 </button>
@@ -116,4 +128,6 @@
 
     @* Add Resource Modal *@
     <partial name="~/Views/Admin/Partials/_AddResourceModal.cshtml" />
+    @* View Resource Modal *@
+    <partial name="~/Views/Admin/Partials/_ViewResourceModal.cshtml" />
 </div>

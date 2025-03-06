@@ -33,6 +33,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<ResourceService>();
 
 var app = builder.Build();
 

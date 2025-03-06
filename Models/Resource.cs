@@ -97,5 +97,5 @@ public class Resource
 
     // Dependents
     public ICollection<EventResource> EventResources { get; } = new List<EventResource>();
-    public ICollection<Image> Images { get; } = new List<Image>();
+    public Image? Image { get; set; }
 }

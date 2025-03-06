@@ -68,9 +68,17 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
         // Configure Images -> Resources relationship to restrict cascading delete.
         modelBuilder.Entity<Image>()
             .HasOne(e => e.Resource)
-            .WithMany(e => e.Images)
-            .HasForeignKey(e => e.ResourceId)
+            .WithOne(e => e.Image)
+            .HasForeignKey<Image>(e => e.ResourceId)
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);
+
+        // Configure Images -> Resources relationship to restrict cascading delete.
+        modelBuilder.Entity<Image>()
+            .HasOne(e => e.User)
+            .WithOne(e => e.Image)
+            .HasForeignKey<Image>(e => e.UserId)
+            .IsRequired(false);
 
         // CreatedAt (ActivityLogs)
         modelBuilder.Entity<ActivityLog>()
