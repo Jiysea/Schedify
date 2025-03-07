@@ -39,13 +39,18 @@ public class AdminController : Controller
     [Route("admin/resources")]
     public ActionResult Resources()
     {
-        var viewModel = new AddResourceViewModel
+        var viewModel = new ResourceViewModel
         {
             Resources = _resourceService.GetResources(),
             ResourceImages = _resourceService.GetResourceImages()
         };
 
         return View(viewModel);
+    }
+
+    public IActionResult ViewResource(string Id)
+    {
+        return View();
     }
 
     [Route("admin/activity-logs")]
@@ -60,16 +65,15 @@ public class AdminController : Controller
     [HttpGet]
     public IActionResult ResourceExtra(ResourceType selectedOption)
     {
-        AddResourceViewModel viewModel = selectedOption switch
+        ResourceViewModel viewModel = selectedOption switch
         {
-            ResourceType.Venue => new AddResourceViewModel { Type = ResourceType.Venue },
-            ResourceType.Equipment => new AddResourceViewModel { Type = ResourceType.Equipment },
-            ResourceType.Furniture => new AddResourceViewModel { Type = ResourceType.Furniture },
-            ResourceType.Catering => new AddResourceViewModel { Type = ResourceType.Catering },
-            ResourceType.Personnel => new AddResourceViewModel { Type = ResourceType.Personnel },
-            _ => new AddResourceViewModel { Type = ResourceType.Venue } // Default
+            ResourceType.Venue => new ResourceViewModel { Type = ResourceType.Venue },
+            ResourceType.Equipment => new ResourceViewModel { Type = ResourceType.Equipment },
+            ResourceType.Furniture => new ResourceViewModel { Type = ResourceType.Furniture },
+            ResourceType.Catering => new ResourceViewModel { Type = ResourceType.Catering },
+            ResourceType.Personnel => new ResourceViewModel { Type = ResourceType.Personnel },
+            _ => new ResourceViewModel { Type = ResourceType.Venue } // Default
         };
-
         return PartialView("~/Views/Admin/Partials/_ResourceExtraPartial.cshtml", viewModel);
     }
 
@@ -87,7 +91,7 @@ public class AdminController : Controller
 
     [Route("admin/create-resource")]
     [HttpPost]
-    public async Task<IActionResult> CreateResource(AddResourceViewModel model)
+    public async Task<IActionResult> CreateResource(ResourceViewModel model)
     {
 
         // Custom Validations

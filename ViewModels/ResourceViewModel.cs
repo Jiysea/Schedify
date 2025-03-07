@@ -6,8 +6,12 @@ using Schedify.Attributes;
 using Schedify.Data;
 namespace Schedify.ViewModels;
 
-public class AddResourceViewModel
+public class ResourceViewModel
 {
+    public Guid? Id { get; set; }
+    public DateTime? CreatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
+
     [AllowedExtensions([".jpg", ".jpeg", ".png"])]
     [MaxFileSize(5)]
     public IFormFile? ImageFile { get; set; }
