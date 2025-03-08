@@ -43,7 +43,8 @@
                 </div>
 
                 <div class="flex flex-shrink">
-                    <button type="menu" x-on:click="viewEventModal = !viewEventModal"
+                    <button type="menu" x-on:click="viewEventModal = !viewEventModal" hx-get="/organizer/view-event/@evt.Id"
+                        hx-target="#eventViewContent" hx-swap="innerHTML"
                         class="duration-200 ease-in-out rounded-lg focus:outline-none text-center p-2 hover:bg-coffee-700 active:bg-coffee-900 text-zinc-500 hover:text-coffee-50 active:text-coffee-50">
                         <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
                             viewBox="0 0 256 256">
@@ -74,12 +75,11 @@
         {
             <div class="flex items-center w-full py-2 px-4 rounded-lg border-2 border-zinc-300 bg-white">
                 <div class="flex flex-col flex-grow gap-2">
-                    <span class="text-base font-medium text-coffee-900">Laraveil: Explore the anatomy of Web
+                    <span class="text-base font-medium text-coffee-900">
                         @evt.Name
                     </span>
 
                     <div class="flex items-center justify-start gap-2 text-xs">
-
                         @if (evt.Status == EventStatus.Open)
                         {
                             <span class="flex items-center justify-center gap-2 text-zinc-500 font-medium">
@@ -91,12 +91,12 @@
                                 </svg>
                                 @if ((evt.StartAt - DateTime.Today).Days == 0)
                                 {
-                                    <p>@((evt.StartAt - DateTime.Today).Days) Days Left</p>
+                                    TimeSpan ts = evt.StartAt - DateTime.Today;
+                                    <p>Starts In @ts</p>
                                 }
                                 else
                                 {
-                                    TimeSpan ts = evt.StartAt - DateTime.Today;
-                                    <p>Starts In @(ts)</p>
+                                    <p>@((evt.StartAt - DateTime.Today).Days) Days Left</p>
                                 }
                             </span>
                         }
@@ -139,7 +139,8 @@
                 </div>
 
                 <div class="flex flex-shrink">
-                    <button type="menu" x-on:click="viewEventModal = !viewEventModal"
+                    <button type="menu" x-on:click="viewEventModal = !viewEventModal" hx-get="/organizer/view-event/@evt.Id"
+                        hx-target="#eventViewContent" hx-swap="innerHTML"
                         class="duration-200 ease-in-out rounded-lg focus:outline-none text-center p-2 hover:bg-coffee-700 active:bg-coffee-900 text-zinc-500 hover:text-coffee-50 active:text-coffee-50">
                         <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
                             viewBox="0 0 256 256">
@@ -160,7 +161,7 @@
     <div class="flex flex-col gap-2">
         @* Header (Count) *@
         <div class="flex items-center gap-2 text-xs font-semibold">
-            <span class="text-zinc-500"> CONCLUDED </span>
+            <span class="text-zinc-500">CONCLUDED</span>
             <span class="rounded bg-zinc-300 text-zinc-700 px-1.5 py-0.5">
                 @Model.ConcludedEvents.Count
             </span>
@@ -217,7 +218,8 @@
                 </div>
 
                 <div class="flex flex-shrink">
-                    <button type="menu" x-on:click="viewEventModal = !viewEventModal"
+                    <button type="menu" x-on:click="viewEventModal = !viewEventModal" hx-get="/organizer/view-event/@evt.Id"
+                        hx-target="#eventViewContent" hx-swap="innerHTML"
                         class="duration-200 ease-in-out rounded-lg focus:outline-none text-center p-2 hover:bg-coffee-700 active:bg-coffee-900 text-zinc-500 hover:text-coffee-50 active:text-coffee-50">
                         <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
                             viewBox="0 0 256 256">

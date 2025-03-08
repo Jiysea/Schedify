@@ -9,7 +9,6 @@ namespace Schedify.Controllers;
 [Authorize(Roles = "Organizer")]
 public class OrganizerController : Controller
 {
-
     private readonly ApplicationDbContext _context;
     private readonly EventService _eventService;
     public OrganizerController(ApplicationDbContext context, EventService eventService)
@@ -53,6 +52,9 @@ public class OrganizerController : Controller
             foreach (var error in result.Error!)
             {
                 ModelState.AddModelError(error.Key, error.Value);
+                if(error.Key == "Authentication") {
+                    Response.Headers.Append("HX-Redirect", Url.Action("Login", "Auth"));
+                }
             }
 
             return PartialView("_ValidationMessages", ModelState);
@@ -61,6 +63,49 @@ public class OrganizerController : Controller
         Response.Headers.Append("HX-Redirect", Url.Action("Events", "Organizer"));
         return Content(string.Empty);
 
+    }
+
+    [Route("organizer/view-event/{id}")]
+    [HttpGet]
+    public async Task<IActionResult> ViewEvent(Guid id)
+    {
+        var _event = await _eventService.GetEventByIdAsync(id);
+
+        if (_event == null)
+        {
+            return NotFound();
+        }
+
+        return PartialView("~/Views/Organizer/Partials/_ViewEventPartial.cshtml", _event);
+    }
+
+    [Route("organizer/delete-event/{id}")]
+    [HttpDelete]
+    public async Task<IActionResult> DeleteResource(Guid id)
+    {
+        var success = await _eventService.DeleteEventAsync(id);
+        if (!success)
+        {
+            return NotFound(); // Return 404 if resource doesn't exist
+        }
+
+        Response.Headers.Append("HX-Redirect", Url.Action("Events", "Organizer")); // Redirect to resource list after deletion
+        return Content(string.Empty);
+    }
+
+    [Route("organizer/open-event/{id}")]
+    [HttpPatch]
+    public async Task<IActionResult> OpenEvent(Guid id)
+    {
+        var success = await _eventService.OpenEventByIdAsync(id);
+
+        if (!success)
+        {
+            return NotFound();
+        }
+
+        Response.Headers.Append("HX-Redirect", Url.Action("Events", "Organizer")); // Redirect to resource list after deletion
+        return Content(string.Empty);
     }
 
     [Route("organizer/resources")]

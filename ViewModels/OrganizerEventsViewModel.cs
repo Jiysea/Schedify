@@ -10,6 +10,7 @@ public class OrganizerEventsViewModel
     public List<Event> PublishedEvents { get; set; } = new List<Event>();
     public List<Event> ConcludedEvents { get; set; } = new List<Event>();
     public CreateEventViewModel CreateEventViewModel { get; set; } = new CreateEventViewModel();
+    public ViewEventViewModel ViewEventViewModel { get; set; } = new ViewEventViewModel();
 
     // Dictionary to store EventId and the number of attendees for that event
     public Dictionary<Guid, int> EventAttendeeCounts { get; set; } = new();

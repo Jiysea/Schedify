@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Schedify.Data;
 using Schedify.Models;
 using Schedify.ViewModels;
@@ -150,5 +151,55 @@ public class EventService
             await transaction.RollbackAsync();
             return (false, new Dictionary<string, string> { { "Exception", $"An error occurred: {ex.Message}" } }, null);
         }
+    }
+
+    public async Task<ViewEventViewModel?> GetEventByIdAsync(Guid Id)
+    {
+        var _event = await _context.Events
+            .Include(e => e.Conversation)
+            .FirstOrDefaultAsync(e => e.Id == Id);
+
+        if(_event == null) return null;
+
+        return new ViewEventViewModel()
+        {
+            Id = _event.Id,
+            Name = _event.Name,
+            Description = _event.Description,
+            StartAt = _event.StartAt,
+            EndAt = _event.EndAt,
+            Status = _event.Status,
+            EntryFee = _event.EntryFee.ToString("N2"),
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+    }
+
+    public async Task<bool> DeleteEventAsync(Guid Id)
+    {
+        var _event = await _context.Events
+            .Include(e => e.Conversation)
+            .FirstOrDefaultAsync(r => r.Id == Id);
+
+        if (_event == null) return false;
+
+        // Delete associated conversations first
+        _context.Conversations.Remove(_event.Conversation);
+
+        _context.Events.Remove(_event);
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> OpenEventByIdAsync(Guid Id)
+    {
+        var _event = await _context.Events
+            .FindAsync(Id);
+
+        if(_event == null) return false;
+
+        _event.Status = EventStatus.Open;
+        await _context.SaveChangesAsync();
+        return true;
     }
 }

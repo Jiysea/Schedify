@@ -48,7 +48,7 @@ public class Event
 
     // Dependents
     public ICollection<EventBooking> EventBookings { get; } = new List<EventBooking>();
-    public ICollection<Conversation> Conversations { get; } = new List<Conversation>();
+    public Conversation Conversation { get; set; } = null!;
     public ICollection<Feedback> Feedbacks { get; } = new List<Feedback>();
     public ICollection<EventResource> EventResources { get; } = new List<EventResource>();
 }

@@ -1,10 +1,14 @@
-<div x-cloak x-show="viewEventModal" class="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-    <div x-on:click.outside="viewEventModal = false" class="bg-white rounded-lg shadow-lg w-96 p-6">
-        <h2 class="text-xl font-semibold">Modal Title</h2>
-        <p class="mt-2 text-gray-600">This is a simple modal with Tailwind CSS.</p>
-        <div class="mt-4 flex justify-end space-x-2">
-            <button id="closeModal" class="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg">Close</button>
-            <button class="px-4 py-2 text-white bg-blue-600 rounded-lg">Confirm</button>
-        </div>
+@model ViewEventViewModel
+
+<div x-cloak x-show="viewEventModal" x-transition.opacity
+    class="fixed inset-0 flex justify-center items-start bg-black/50 backdrop-blur-sm overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-coffee-700 z-50 p-4">
+    @* White Box *@
+    <div id="eventViewContent" x-data x-trap="viewEventModal" @@keydown.escape="viewEventModal = false;"
+        class="bg-coffee-50 rounded-lg shadow-lg min-w-[32rem] max-w-[32rem]">
+        
+        
+         @* The Partials will be swapped here *@
+         @await Html.PartialAsync("~/Views/Organizer/Partials/_ViewEventPartial.cshtml", Model);
+
     </div>
 </div>

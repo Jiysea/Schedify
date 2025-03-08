@@ -51,8 +51,6 @@ public class AdminController : Controller
     [Route("admin/activity-logs")]
     public ActionResult ActivityLogs() => View();
 
-    public ActionResult Test() => View();
-
     [Route("admin/profile")]
     public ActionResult Profile() => View();
 

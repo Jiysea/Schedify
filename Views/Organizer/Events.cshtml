@@ -116,7 +116,7 @@
     </main>
 
     @* View Events *@
-    <partial name="~/Views/Organizer/Partials/ViewEventModal.cshtml" />
+    @await Html.PartialAsync("~/Views/Organizer/Partials/ViewEventModal.cshtml", Model.ViewEventViewModel)
 
     @* Create Events *@ 
     @await Html.PartialAsync("~/Views/Organizer/Partials/CreateEventModal.cshtml", Model.CreateEventViewModel)

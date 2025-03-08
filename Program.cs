@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Schedify.Data;
@@ -91,6 +92,64 @@ using (var scope = app.Services.CreateScope())
 
     CreateAdmin(userManager, roleManager).Wait();
 }
+
+app.Use(async (context, next) =>
+{
+    if (context.User.Identity?.IsAuthenticated ?? false) 
+    {
+        var user = context.User;
+        var path = context.Request.Path.Value?.ToLower();
+
+        if (!string.IsNullOrEmpty(path))
+        {
+            if (path.StartsWith("/admin") && !user.IsInRole("Admin"))
+            {
+                RedirectToUserHome(context, user);
+                return;
+            }
+            else if (path.StartsWith("/organizer") && !user.IsInRole("Organizer"))
+            {
+                RedirectToUserHome(context, user);
+                return;
+            }
+            else if (path.StartsWith("/attendee") && !user.IsInRole("Attendee"))
+            {
+                RedirectToUserHome(context, user);
+                return;
+            }
+            else if (path.StartsWith("/login"))
+            {
+                RedirectToUserHome(context, user);
+                return;
+            }
+            else if (path.StartsWith("/register"))
+            {
+                RedirectToUserHome(context, user);
+                return;
+            }
+        }
+    }
+
+    await next();
+});
+
+// Function to redirect user to their respective homepage
+void RedirectToUserHome(HttpContext context, ClaimsPrincipal user)
+{
+    if (user.IsInRole("Admin"))
+    {
+        context.Response.Redirect("/admin/dashboard");
+    }
+    else if (user.IsInRole("Organizer"))
+    {
+        context.Response.Redirect("/organizer/events");
+    }
+    else if (user.IsInRole("Attendee"))
+    {
+        context.Response.Redirect("/attendee/events");
+    }
+}
+
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
