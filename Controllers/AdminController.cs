@@ -48,11 +48,6 @@ public class AdminController : Controller
         return View(viewModel);
     }
 
-    public IActionResult ViewResource(string Id)
-    {
-        return View();
-    }
-
     [Route("admin/activity-logs")]
     public ActionResult ActivityLogs() => View();
 
@@ -93,275 +88,63 @@ public class AdminController : Controller
     [HttpPost]
     public async Task<IActionResult> CreateResource(ResourceViewModel model)
     {
+        var result = await _resourceService.CreateResourceAsync(model);
 
-        // Custom Validations
-
-        if (model.ImageFile == null)
+        if (!result.IsSuccess)
         {
-            ModelState.AddModelError(nameof(model.ImageFile), "An image is required.");
-        }
-
-        if (model.Type == ResourceType.Venue)
-        {
-            if (string.IsNullOrWhiteSpace(model.AddressLine1))
+            // Split error messages and add them to ModelState
+            foreach (var error in result.Error!)
             {
-                ModelState.AddModelError(nameof(model.AddressLine1), "This field is required.");
+                ModelState.AddModelError(error.Key, error.Value);
             }
 
-            if (string.IsNullOrWhiteSpace(model.Size))
-            {
-                ModelState.AddModelError(nameof(model.Size), "This field is required.");
-            }
-
-            if (model.Capacity <= 0)
-            {
-                ModelState.AddModelError(nameof(model.Capacity), "Value must be at least 1.");
-            }
-        }
-
-        if (model.Type == ResourceType.Equipment)
-        {
-
-            if (string.IsNullOrWhiteSpace(model.Brand))
-            {
-                ModelState.AddModelError(nameof(model.Brand), "This field is required.");
-            }
-
-            if (model.Specifications == null || model.Specifications.Count == 0)
-            {
-                ModelState.AddModelError(nameof(model.Specifications), "Specifications cannot be empty.");
-            }
-        }
-
-        if (model.Type == ResourceType.Furniture)
-        {
-            if (string.IsNullOrWhiteSpace(model.Material))
-            {
-                ModelState.AddModelError(nameof(model.Material), "This field is required.");
-            }
-
-            if (string.IsNullOrWhiteSpace(model.Dimensions))
-            {
-                ModelState.AddModelError(nameof(model.Dimensions), "This field is required.");
-            }
-        }
-
-        if (model.Type == ResourceType.Catering)
-        {
-            if (string.IsNullOrWhiteSpace(model.MenuItems))
-            {
-                ModelState.AddModelError(nameof(model.MenuItems), "This field is required.");
-            }
-
-            if (string.IsNullOrWhiteSpace(model.PriceItems))
-            {
-                ModelState.AddModelError(nameof(model.PriceItems), "This field is required.");
-            }
-        }
-
-        if (model.Type == ResourceType.Personnel)
-        {
-            Console.WriteLine(model.ShiftAsString);
-            if (string.IsNullOrWhiteSpace(model.Position))
-            {
-                ModelState.AddModelError(nameof(model.Position), "This field is required.");
-            }
-
-            if (string.IsNullOrWhiteSpace(model.ShiftAsString))
-            {
-                ModelState.AddModelError(nameof(model.ShiftAsString), "This field is required.");
-            }
-
-            if (string.IsNullOrWhiteSpace(model.Experience))
-            {
-                ModelState.AddModelError(nameof(model.Experience), "This field is required.");
-            }
-        }
-
-        // Sending all validation errors to frontend
-        if (!ModelState.IsValid)
-        {
             return PartialView("_ValidationMessages", ModelState);
         }
 
-        var user = await _userService.GetUserAsync();
-
-        if (user == null)
-        {
-            throw new InvalidOperationException("User must be authenticated.");
-        }
-
-        var resource = new Resource
-        {
-            UserId = user.Id,
-            ProviderName = null!,
-            ProviderPhoneNumber = null!,
-            ProviderEmail = null!,
-            Name = null!,
-            Description = null!,
-            Type = model.Type,
-            Cost = 0.00m,
-            CostType = null!,
-            Quantity = 0,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
-
-        using var transaction = await _context.Database.BeginTransactionAsync();
-        try
-        {
-            switch (model.Type)
-            {
-                case ResourceType.Venue:
-                    resource = new Resource
-                    {
-                        UserId = user.Id,
-                        ProviderName = model.ProviderName,
-                        ProviderPhoneNumber = model.ProviderPhoneNumber,
-                        ProviderEmail = model.ProviderEmail,
-                        Name = model.Name,
-                        Description = model.Description,
-                        Type = model.Type,
-                        Cost = model.CostAsDecimal,
-                        CostType = model.CostType,
-                        Quantity = 1,
-                        Capacity = model.Capacity,
-                        Size = model.Size,
-                        AddressLine1 = model.AddressLine1,
-                        AddressLine2 = model.AddressLine2,
-                        CityMunicipality = "Davao City",
-                        Province = "Davao del Sur",
-                        CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow
-                    };
-                    _context.Resources.Add(resource);
-                    break;
-                case ResourceType.Equipment:
-                    string specificationsJson = JsonSerializer.Serialize(model.Specifications);
-                    resource = new Resource
-                    {
-                        UserId = user.Id,
-                        ProviderName = model.ProviderName,
-                        ProviderPhoneNumber = model.ProviderPhoneNumber,
-                        ProviderEmail = model.ProviderEmail,
-                        Name = model.Name,
-                        Description = model.Description,
-                        Type = model.Type,
-                        Cost = model.CostAsDecimal,
-                        CostType = model.CostType,
-                        Quantity = 1,
-                        Brand = model.Brand,
-                        Specifications = specificationsJson,
-                        CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow
-                    };
-                    _context.Resources.Add(resource);
-                    break;
-                case ResourceType.Furniture:
-                    resource = new Resource
-                    {
-                        UserId = user.Id,
-                        ProviderName = model.ProviderName,
-                        ProviderPhoneNumber = model.ProviderPhoneNumber,
-                        ProviderEmail = model.ProviderEmail,
-                        Name = model.Name,
-                        Description = model.Description,
-                        Type = model.Type,
-                        Cost = model.CostAsDecimal,
-                        CostType = model.CostType,
-                        Quantity = 1,
-                        Material = model.Material,
-                        Dimensions = model.Dimensions,
-                        CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow
-                    };
-                    _context.Resources.Add(resource);
-                    break;
-                case ResourceType.Catering:
-                    resource = new Resource
-                    {
-                        UserId = user.Id,
-                        ProviderName = model.ProviderName,
-                        ProviderPhoneNumber = model.ProviderPhoneNumber,
-                        ProviderEmail = model.ProviderEmail,
-                        Name = model.Name,
-                        Description = model.Description,
-                        Type = model.Type,
-                        Cost = model.CostAsDecimal,
-                        CostType = model.CostType,
-                        Quantity = 1,
-                        MenuItems = model.MenuItems,
-                        PriceItems = model.PriceItems,
-                        CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow
-                    };
-                    _context.Resources.Add(resource);
-                    break;
-                case ResourceType.Personnel:
-                    resource = new Resource
-                    {
-                        UserId = user.Id,
-                        ProviderName = model.ProviderName,
-                        ProviderPhoneNumber = model.ProviderPhoneNumber,
-                        ProviderEmail = model.ProviderEmail,
-                        Name = model.Name,
-                        Description = model.Description,
-                        Type = model.Type,
-                        Cost = model.CostAsDecimal,
-                        CostType = model.CostType,
-                        Quantity = 1,
-                        Position = model.Position,
-                        Shift = model.ShiftAsString,
-                        Experience = model.Experience,
-                        CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow
-                    };
-                    _context.Resources.Add(resource);
-                    break;
-            }
-
-            await _context.SaveChangesAsync();
-
-            string newFileName = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
-            newFileName += Path.GetExtension(model.ImageFile!.FileName);
-            string imageFullPath = _environment.WebRootPath + "/resources/" + newFileName;
-
-            // Ensure the directory exists
-            string directoryPath = Path.GetDirectoryName(imageFullPath)!;
-            if (!Directory.Exists(directoryPath))
-            {
-                Directory.CreateDirectory(directoryPath);
-            }
-
-            using (var stream = System.IO.File.Create(imageFullPath))
-            {
-                await model.ImageFile.CopyToAsync(stream);
-            }
-
-            Image image = new Image
-            {
-                ResourceId = resource.Id,
-                ImageFileName = newFileName
-            };
-
-            _context.Images.Add(image);
-
-            // Save to the database
-            await _context.SaveChangesAsync();
-            await transaction.CommitAsync();
-            Response.Headers.Append("HX-Redirect", Url.Action("Resources", "Admin"));
-
-            return Content(string.Empty);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-            await transaction.RollbackAsync();
-            ModelState.AddModelError("", "An error occurred while saving data.");
-            Response.Headers.Append("HX-Redirect", Url.Action("Resources", "Admin"));
-            return View("~/Views/Admin/Resources.cshtml", model);
-        }
-
+        Response.Headers.Append("HX-Redirect", Url.Action("Resources", "Admin"));
+        return Content(string.Empty);
     }
 
+    [Route("admin/view-resource/{id}")]
+    [HttpGet]
+    public async Task<IActionResult> ViewResource(Guid id)
+    {
+        var resource = await _resourceService.GetResourceByIdAsync(id);
+
+        if (resource == null)
+        {
+            return NotFound();
+        }
+
+        return PartialView("~/Views/Admin/Partials/_ViewResourcePartial.cshtml", resource);
+    }
+
+    [Route("admin/delete-resource/{id}")]
+    [HttpDelete]
+    public async Task<IActionResult> DeleteResource(Guid id)
+    {
+        var success = await _resourceService.DeleteResourceAsync(id);
+        if (!success)
+        {
+            return NotFound(); // Return 404 if resource doesn't exist
+        }
+
+        Response.Headers.Append("HX-Redirect", Url.Action("Resources", "Admin")); // Redirect to resource list after deletion
+        return Content(string.Empty);
+    }
+
+
+    // [Route("admin/view-edit-resource/{id}")]
+    // [HttpGet]
+    // public async Task<IActionResult> EditResource(Guid id)
+    // {
+    //     var resource = await _resourceService.GetResourceByIdAsync(id);
+
+    //     if(resource == null)
+    //     {
+    //         return NotFound();
+    //     }
+
+    //     return PartialView("~/Views/Admin/Partials/_EditResourcePartial.cshtml", resource);
+    // }
 }

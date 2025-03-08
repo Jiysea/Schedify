@@ -67,7 +67,10 @@
                             #
                         </th>
                         <th class="p-3 text-start border-b-2 border-charcoal-900">
-                            Name
+                            Resource Name
+                        </th>
+                        <th class="p-3 text-start border-b-2 border-charcoal-900">
+                            Provider
                         </th>
                         <th class="p-3 text-start border-b-2 border-charcoal-900">
                             Quantity
@@ -102,13 +105,20 @@
                                 @Model.Resources[i].Name
                             </td>
                             <td class="p-3">
+                                @Model.Resources[i].ProviderName
+                            </td>
+                            <td class="p-3">
                                 @Model.Resources[i].Quantity
                             </td>
                             <td class="p-3">
                                 @Model.Resources[i].Type
                             </td>
                             <td class="flex items-center justify-start gap-2 p-3">
-                                <button type="button" x-on:click="viewResourceModal = !viewResourceModal"
+                                <button type="button" 
+                                    x-on:click="viewResourceModal = !viewResourceModal"
+                                    hx-get="/admin/view-resource/@Model.Resources[i].Id"
+                                    hx-target="#resourceViewContent"
+                                    hx-swap="innerHTML"
                                     class="text-center p-2 duration-200 ease-in-out rounded-md bg-coffee-700 hover:bg-coffee-800 active:bg-coffee-900 text-coffee-50">
 
                                     <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
@@ -127,7 +137,8 @@
     </main>
 
     @* Add Resource Modal *@
-    <partial name="~/Views/Admin/Partials/_AddResourceModal.cshtml" />
+    <partial name="~/Views/Admin/Partials/AddResourceModal.cshtml" />
+
     @* View Resource Modal *@
-    <partial name="~/Views/Admin/Partials/_ViewResourceModal.cshtml" />
+    <partial name="~/Views/Admin/Partials/ViewResourceModal.cshtml" />
 </div>

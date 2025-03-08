@@ -27,7 +27,7 @@ public class RegisterViewModel
     public string? ExtensionName { get; set; }
 
     [Required(ErrorMessage = "This field is required.")]
-    [DataType(DataType.DateTime, ErrorMessage = "Invalid date format.")]
+    [DataType(DataType.Date, ErrorMessage = "Invalid date format.")]
     public required DateTime Birthdate { get; set; }
 
     [Required(ErrorMessage = "This field is required.")]

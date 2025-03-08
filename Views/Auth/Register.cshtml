@@ -165,8 +165,8 @@
                                 *
                             </span>
                         </label>
-                        <input type="text" autocomplete="off" id="phonenumber" asp-for="PhoneNumber"
-                            class="input-coffee px-3 py-2 focus:ring-2 focus:ring-offset-2" placeholder="+639">
+                        <input type="text" autocomplete="off" maxlength="11" id="phonenumber" asp-for="PhoneNumber"
+                            class="input-coffee px-3 py-2 focus:ring-2 focus:ring-offset-2" placeholder="ex. 09123456789">
 
                         <div id="validation-PhoneNumber">
                             <span asp-validation-for="PhoneNumber"></span>
@@ -281,7 +281,7 @@
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             flatpickr("#birthdate", {
-                dateFormat: "m-d-Y",
+                dateFormat: "Y-m-d",
                 maxDate: "today",
             });
         });

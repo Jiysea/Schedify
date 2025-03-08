@@ -1,0 +1,13 @@
+@model ResourceViewModel
+
+<div x-cloak x-show="viewResourceModal"
+    class="fixed inset-0 flex justify-center items-start bg-black/50 backdrop-blur-sm overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-charcoal-700 z-50 p-4">
+
+    @* Box *@
+    <div id="resourceViewContent" x-data x-trap="viewResourceModal" class="bg-charcoal-900 rounded-lg shadow-lg"
+        @@keydown.escape = "viewResourceModal = false;" >
+
+        @* The Partials will be swapped here *@
+
+    </div>
+</div>

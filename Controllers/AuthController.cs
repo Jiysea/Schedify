@@ -29,7 +29,7 @@ public class AuthController : Controller
 
     [Route("auth/login")]
     [HttpPost]
-    public async Task<IActionResult> Login(LoginViewModel model)
+    public async Task<IActionResult> LoginUser(LoginViewModel model)
     {
         if (!ModelState.IsValid)
         {
@@ -72,8 +72,9 @@ public class AuthController : Controller
 
     [Route("auth/register")]
     [HttpPost]
-    public async Task<IActionResult> Register(RegisterViewModel model)
+    public async Task<IActionResult> RegisterUser(RegisterViewModel model)
     {
+        Console.WriteLine(model.Birthdate);
         if (!ModelState.IsValid)
         {
             return PartialView("_ValidationMessages", ModelState);

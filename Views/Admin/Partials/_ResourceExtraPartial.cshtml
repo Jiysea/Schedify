@@ -17,7 +17,7 @@
     @* Address Line 1 *@
     <div class="flex flex-col col-span-full gap-1 relative">
         <label for="addressline1" class="text-xs text-charcoal-300">Address Line 1</label>
-        <input type="text" class="input-charcoal-dark p-2" id="addressline1" asp-for="@Model.AddressLine1"
+        <input type="text" class="input-charcoal-dark p-2" id="addressline1" asp-for="AddressLine1"
             placeholder="Type address here" />
         <div id="validation-AddressLine1">
         </div>
@@ -26,7 +26,7 @@
     @* Address Line 2 *@
     <div class="flex flex-col col-span-full gap-1 relative">
         <label for="addressline2" class="text-xs text-charcoal-300">Address Line 2</label>
-        <input type="text" class="input-charcoal-dark p-2" id="addressline2" asp-for="@Model.AddressLine2"
+        <input type="text" class="input-charcoal-dark p-2" id="addressline2" asp-for="AddressLine2"
             placeholder="Type address here" />
         <div id="validation-AddressLine2">
         </div>
@@ -47,7 +47,7 @@
     @* Capacity *@
     <div class="flex flex-col gap-1 relative">
         <label for="capacity" class="text-xs text-charcoal-300">Capacity</label>
-        <input type="number" inputmode="numeric" class="input-charcoal-dark p-2" id="capacity" asp-for="@Model.Capacity"
+        <input type="number" inputmode="numeric" class="input-charcoal-dark p-2" id="capacity" asp-for="Capacity"
             placeholder="Enter capacity here" />
         <div id="validation-Capacity">
         </div>
@@ -56,7 +56,7 @@
     @* Size *@
     <div class="flex flex-col col-span-3 gap-1 w-full relative">
         <label for="size" class="text-xs text-charcoal-300">Size</label>
-        <input type="text" class="input-charcoal-dark p-2" id="size" asp-for="@Model.Size" placeholder="Type size here" />
+        <input type="text" class="input-charcoal-dark p-2" id="size" asp-for="Size" placeholder="Type size here" />
         <div id="validation-Size">
         </div>
     </div>
@@ -77,7 +77,7 @@ else if (Model.Type == ResourceType.Equipment)
     @* Brand *@
     <div class="flex flex-col col-span-full gap-1 relative">
         <label for="brand" class="text-xs text-charcoal-300">Brand</label>
-        <input type="text" class="input-charcoal-dark p-2" id="brand" asp-for="@Model.Brand"
+        <input type="text" class="input-charcoal-dark p-2" id="brand" asp-for="Brand"
             placeholder="Type brand here" />
         <div id="validation-Brand">
         </div>
@@ -158,8 +158,8 @@ else if (Model.Type == ResourceType.Furniture)
     @* Material *@
     <div class="flex flex-col col-span-3 gap-1 relative">
         <label for="material" class="text-xs text-charcoal-300">Material</label>
-        <input type="text" class="input-charcoal-dark p-2" id="material" asp-for="@Model.Material"
-            placeholder="ex. Dining Table, Window Frame, etc." />
+        <input type="text" class="input-charcoal-dark p-2" id="material" asp-for="Material"
+            placeholder="ex. Metal, Wood, Plastic, etc." />
         <div id="validation-Material">
         </div>
     </div>
@@ -167,7 +167,7 @@ else if (Model.Type == ResourceType.Furniture)
     @* Dimensions *@
     <div class="flex flex-col col-span-2 gap-1 relative">
         <label for="dimensions" class="text-xs text-charcoal-300">Dimensions</label>
-        <input type="text" class="input-charcoal-dark p-2" id="dimensions" asp-for="@Model.Dimensions"
+        <input type="text" class="input-charcoal-dark p-2" id="dimensions" asp-for="Dimensions"
             placeholder="ex. 6ft x 3ft x 30in, 1920x1080px, etc." />
         <div id="validation-Dimensions">
         </div>
@@ -189,14 +189,14 @@ else if (Model.Type == ResourceType.Catering)
     @* Menu Items *@
     <div class="flex flex-col col-span-3 gap-1 relative">
         <label for="menuitems" class="text-xs text-charcoal-300">Menu Items</label>
-        <input type="text" class="input-charcoal-dark p-2" id="menuitems" asp-for="@Model.MenuItems"
+        <input type="text" class="input-charcoal-dark p-2" id="menuitems" asp-for="MenuItems"
             placeholder="Type menu items here" />
     </div>
 
     @* Price Items *@
     <div class="flex flex-col col-span-2 gap-1 relative">
         <label for="priceitems" class="text-xs text-charcoal-300">Price Items</label>
-        <input type="text" class="input-charcoal-dark p-2" id="priceitems" asp-for="@Model.PriceItems"
+        <input type="text" class="input-charcoal-dark p-2" id="priceitems" asp-for="PriceItems"
             placeholder="Type price items here" />
     </div>
 }
@@ -216,7 +216,7 @@ else if (Model.Type == ResourceType.Personnel)
     @* Position *@
     <div class="flex flex-col col-span-2 gap-1 relative">
         <label for="position" class="text-xs text-charcoal-300">Position</label>
-        <input type="text" class="input-charcoal-dark p-2" id="position" asp-for="@Model.Position"
+        <input type="text" class="input-charcoal-dark p-2" id="position" asp-for="Position"
             placeholder="Type position here" />
         <div id="validation-Position">
         </div>
@@ -228,12 +228,12 @@ else if (Model.Type == ResourceType.Personnel)
         <span class="flex items-center gap-2 w-full">
             <span class="flex items-start gap-2 w-full">
                 <label for="shiftfromdate" class="text-charcoal-300 text-xs">From</label>
-                <input type="text" class="input-charcoal-dark p-2" id="shiftfromdate" asp-for="@Model.ShiftFromDate"
+                <input type="text" class="input-charcoal-dark p-2" id="shiftfromdate" asp-for="ShiftFromDate"
                     placeholder="Select a start time" />
             </span>
             <span class="flex items-start gap-2 w-full">
                 <label for="shifttodate" class="text-charcoal-300 text-xs">To</label>
-                <input type="text" class="input-charcoal-dark p-2" id="shifttodate" asp-for="@Model.ShiftToDate"
+                <input type="text" class="input-charcoal-dark p-2" id="shifttodate" asp-for="ShiftToDate"
                     placeholder="Select an end time" />
             </span>
         </span>
@@ -244,7 +244,7 @@ else if (Model.Type == ResourceType.Personnel)
     @* Experience *@
     <div class="flex flex-col col-span-full gap-1 relative">
         <label for="experience" class="text-xs text-charcoal-300">Experience</label>
-        <input type="text" class="input-charcoal-dark p-2" id="experience" asp-for="@Model.Experience"
+        <input type="text" class="input-charcoal-dark p-2" id="experience" asp-for="Experience"
             placeholder="Type experience here" />
         <div id="validation-Experience">
         </div>

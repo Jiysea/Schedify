@@ -16,6 +16,8 @@ public class ResourceViewModel
     [MaxFileSize(5)]
     public IFormFile? ImageFile { get; set; }
 
+    public string? ImageFileName { get; set; }
+
     [Required(ErrorMessage = "This field is required.")]
     [StringLength(250)]
     public string ProviderName { get; set; } = null!;

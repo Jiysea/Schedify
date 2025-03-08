@@ -29,11 +29,14 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.SlidingExpiration = true;
 
     options.LoginPath = "/login";
+
+    options.AccessDeniedPath = "/login"; // Change this to your desired page
 });
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ResourceService>();
+builder.Services.AddScoped<EventService>();
 
 var app = builder.Build();
 
