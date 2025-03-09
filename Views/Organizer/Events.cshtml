@@ -115,11 +115,12 @@
         </div>
     </main>
 
-    @* View Events *@
+    @* View, Update & Delete Events *@
     @await Html.PartialAsync("~/Views/Organizer/Partials/ViewEventModal.cshtml", Model.ViewEventViewModel)
 
     @* Create Events *@ 
     @await Html.PartialAsync("~/Views/Organizer/Partials/CreateEventModal.cshtml", Model.CreateEventViewModel)
+
 </div>
 
 @section Scripts {

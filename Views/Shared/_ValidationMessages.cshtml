@@ -2,15 +2,13 @@
 
 @foreach (var entry in Model)
 {
-	@* Console.Write(entry.Key + ": ");
-	Console.Write(entry.Value.Errors.Count > 0 ? entry.Value.Errors[0].ErrorMessage : "n/a");
-	Console.WriteLine(" (" + entry.Value.AttemptedValue + ")"); *@
 	<div id="validation-@entry.Key" hx-swap-oob="true" class="absolute start-0 top-full text-xs font-normal text-red-500 ">
 		@if (entry.Value.Errors.Count > 0) // Correct way to check for errors
 		{
-		@entry.Value.Errors[0].ErrorMessage
+			@entry.Value.Errors[0].ErrorMessage
 		}
-		else if (entry.Value.Errors.Count == 0) {
+		else if (entry.Value.Errors.Count == 0)
+		{
 			@* Empty-Lonely_Sadness *@
 		}
 	</div>

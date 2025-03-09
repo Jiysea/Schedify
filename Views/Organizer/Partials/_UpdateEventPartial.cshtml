@@ -1,0 +1,129 @@
+@model UpdateEventViewModel
+
+<header class="flex items-center justify-between text-lg font-medium py-3 px-4">
+    <h1 class="text-coffee-900">Edit Event</h1>
+    <button x-on:click="viewEventModal = false"
+        class="flex items-center justify-center size-8 p-1 rounded-md text-zinc-500 hover:bg-coffee-100 active:bg-coffee-200 hover:text-coffee-700 active:text-coffee-900 duration-200 ease-in-out">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256">
+            <path
+                d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z">
+            </path>
+        </svg>
+    </button>
+</header>
+
+<hr class="w-full border-coffee-100">
+
+<main class="flex flex-col gap-10 p-5 relative">
+    <form hx-post="/organizer/update-event" hx-swap="none" hx-vals='{"Id": "@Model.Id"}'>
+        @* Body *@
+        <div class="flex flex-col gap-10">
+
+            @* General Information *@
+            <div class="relative grid grid-cols-6 gap-3 p-5 border rounded-xl border-coffee-300">
+                <h3
+                    class="select-none flex items-center gap-2 absolute start-4 -top-3 px-2 font-medium text-sm text-pumpkin-600 bg-coffee-50">
+                    <svg class="size-6" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                        viewBox="0 0 256 256">
+                        <path
+                            d="M88,112a8,8,0,0,1,8-8h80a8,8,0,0,1,0,16H96A8,8,0,0,1,88,112Zm8,40h80a8,8,0,0,0,0-16H96a8,8,0,0,0,0,16ZM232,64V184a24,24,0,0,1-24,24H32A24,24,0,0,1,8,184.11V88a8,8,0,0,1,16,0v96a8,8,0,0,0,16,0V64A16,16,0,0,1,56,48H216A16,16,0,0,1,232,64Zm-16,0H56V184a23.84,23.84,0,0,1-1.37,8H208a8,8,0,0,0,8-8Z">
+                        </path>
+                    </svg>
+                    General Information
+                </h3>
+
+                @* Event Name *@
+                <div class="flex flex-col col-span-full gap-1 relative">
+                    <label for="edit-name" class="text-xs text-coffee-900">Event Name</label>
+                    <input type="text" autocomplete="off" maxlength="100" autofocus class="input-coffee p-2"
+                        id="edit-name" asp-for="Name" placeholder="Type event name here" />
+
+                    <div id="edit-validation-Name">
+                    </div>
+                </div>
+
+                @* Description *@
+                <div class="flex flex-col col-span-full gap-1 relative">
+                    <label for="edit-description" class="text-xs text-coffee-900">Description</label>
+                    <textarea type="text" autocomplete="off" autofocus class="input-coffee p-2 scrollbar-thin"
+                        maxlength="500" rows="3" id="edit-description" style="resize: none;" asp-for="Description"
+                        placeholder="Describe what kind of event this will be or how your attendees are going to enjoy this."></textarea>
+
+                    <div id="edit-validation-Description">
+                    </div>
+                </div>
+
+                @* Entry Fee *@
+                <div class="flex flex-col col-span-2 gap-1 relative">
+                    <label for="edit-entryfee" class="text-xs text-coffee-900">Entry Fee</label>
+                    <input type="text" x-mask:dynamic="$money($input)" autocomplete="off" autofocus
+                        class="input-coffee p-2" id="edit-entryfee" asp-for="EntryFeeString" placeholder="Type fee here" />
+
+                    <div id="edit-validation-EntryFeeString">
+                    </div>
+                </div>
+
+                @* Event Duration *@
+                <div class="flex flex-col col-span-4 gap-1 relative w-full">
+                    <p for="shift" class="text-xs text-coffee-900">Event Duration</p>
+                    <span class="flex items-center gap-2 w-full">
+                        <div class="flex flex-col gap-1">
+                            <span class="flex items-start gap-2 w-full">
+                                <label for="edit-startat" class="text-xs text-coffee-500 whitespace-nowrap">
+                                    Start At</label>
+                                <input type="text" class="input-coffee p-2" id="edit-startat" asp-for="StartAt"
+                                    placeholder="Select a start time">
+                            </span>
+                            <div id="edit-validation-StartAt"></div>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <span class="flex items-start gap-2 w-full">
+                                <label for="edit-endat" class="text-xs text-coffee-500 whitespace-nowrap">
+                                    End At</label>
+                                <input type="text" class="input-coffee p-2" id="edit-endat" asp-for="EndAt"
+                                    placeholder="Select a start time">
+                            </span>
+                            <div id="edit-validation-EndAt"></div>
+                        </div>
+                    </span>
+                </div>
+            </div>
+
+            @* Footer *@
+            <div class="flex items-center justify-center gap-2 w-full">
+                <button type="submit"
+                    class="duration-200 ease-in-out text-sm py-2 rounded-md w-full font-semibold text-coffee-50 bg-coffee-700 hover:bg-coffee-800 active:bg-coffee-900">
+                    SAVE
+                </button>
+                <button type="button" hx-get="/organizer/view-event/@Model.Id" hx-target="#viewEventModalContent"
+                    hx-swap="innerHTML"
+                    class="duration-200 ease-in-out text-sm py-2 px-3 rounded-md font-semibold focus:outline-none text-center text-coffee-50 bg-coffee-700 hover:bg-coffee-800 active:bg-coffee-900">
+                    CANCEL
+                </button>
+            </div>
+        </div>
+    </form>
+</main>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        let startPicker = flatpickr("#edit-startat", {
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+            defaultDate: new Date().fp_incr(1),
+            minDate: new Date().fp_incr(1), // Tomorrow
+            onChange: function (selectedDates) {
+                if (selectedDates.length > 0) {
+                    endPicker.set("minDate", selectedDates[0]); // Set end date min to start date
+                }
+            }
+        });
+
+        let endPicker = flatpickr("#edit-endat", {
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+            minDate: new Date().fp_incr(1), // Tomorrow
+            defaultDate: new Date().fp_incr(1), // Tomorrow
+        });
+    });
+</script>

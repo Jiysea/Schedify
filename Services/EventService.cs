@@ -153,13 +153,57 @@ public class EventService
         }
     }
 
+    public async Task<(bool IsSuccess, Dictionary<string, string>? Error, Event? Event)> UpdateEventAsync(UpdateEventViewModel model)
+    {
+        using var transaction = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            var user = await _userService.GetUserAsync();
+            if (user == null)
+            {
+                return (false, new Dictionary<string, string> { { "Authentication", "User must be authenticated." } }, null);
+            }
+
+            if (model.Status != EventStatus.Draft)
+            {
+                return (false, new Dictionary<string, string> { { "InvalidStatus", "The event status should be on \"Draft\" before updating." } }, null);
+            }
+
+            var _event = await _context.Events.FindAsync(model.Id);
+
+            if(_event == null)
+            {
+                return (false, new Dictionary<string, string> { { "NotFound", "Event not found." } }, null);
+            }
+
+            _context.Entry(_event).CurrentValues.SetValues(model);
+
+            if(!_context.ChangeTracker.HasChanges())
+            {
+                return (false, new Dictionary<string, string> { { "NoChanges", "Seems like there's no need to change." } }, null);
+            }
+
+            _event.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            await transaction.CommitAsync();
+            return (true, null, _event);
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            return (false, new Dictionary<string, string> { { "Exception", $"An error occurred: {ex.Message}" } }, null);
+        }
+    }
+
     public async Task<ViewEventViewModel?> GetEventByIdAsync(Guid Id)
     {
         var _event = await _context.Events
             .Include(e => e.Conversation)
             .FirstOrDefaultAsync(e => e.Id == Id);
 
-        if(_event == null) return null;
+        if (_event == null) return null;
 
         return new ViewEventViewModel()
         {
@@ -172,6 +216,26 @@ public class EventService
             EntryFee = _event.EntryFee.ToString("N2"),
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
+        };
+    }
+
+    public async Task<UpdateEventViewModel?> GetEditEventByIdAsync(Guid Id)
+    {
+        var _event = await _context.Events
+            .Include(e => e.Conversation)
+            .FirstOrDefaultAsync(e => e.Id == Id);
+
+        if (_event == null) return null;
+        
+        return new UpdateEventViewModel()
+        {
+            Id = _event.Id,
+            Name = _event.Name,
+            Description = _event.Description,
+            StartAt = _event.StartAt,
+            EndAt = _event.EndAt,
+            Status = _event.Status,
+            EntryFeeString = _event.EntryFee.ToString("N2"),
         };
     }
 
@@ -196,9 +260,21 @@ public class EventService
         var _event = await _context.Events
             .FindAsync(Id);
 
-        if(_event == null) return false;
+        if (_event == null) return false;
 
         _event.Status = EventStatus.Open;
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> UnopenEventByIdAsync(Guid Id)
+    {
+        var _event = await _context.Events
+            .FindAsync(Id);
+
+        if (_event == null) return false;
+
+        _event.Status = EventStatus.Draft;
         await _context.SaveChangesAsync();
         return true;
     }

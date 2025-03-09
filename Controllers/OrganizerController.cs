@@ -52,7 +52,8 @@ public class OrganizerController : Controller
             foreach (var error in result.Error!)
             {
                 ModelState.AddModelError(error.Key, error.Value);
-                if(error.Key == "Authentication") {
+                if (error.Key == "Authentication")
+                {
                     Response.Headers.Append("HX-Redirect", Url.Action("Login", "Auth"));
                 }
             }
@@ -79,6 +80,59 @@ public class OrganizerController : Controller
         return PartialView("~/Views/Organizer/Partials/_ViewEventPartial.cshtml", _event);
     }
 
+    [Route("organizer/show-update-event/{id}")]
+    [HttpGet]
+    public async Task<IActionResult> ShowUpdateEvent(Guid id)
+    {
+        var _event = await _eventService.GetEditEventByIdAsync(id);
+
+        if (_event == null)
+        {
+            return NotFound();
+        }
+
+        if (_event.Status != EventStatus.Draft)
+        {
+            // Redirect to resource list when event status is not Draft
+            Response.Headers.Append("HX-Redirect", Url.Action("Events", "Organizer"));
+            return Content(string.Empty);
+        }
+
+        return PartialView("~/Views/Organizer/Partials/_UpdateEventPartial.cshtml", _event);
+    }
+
+    [Route("organizer/update-event")]
+    [HttpPost]
+    public async Task<IActionResult> UpdateEvent(Guid Id, UpdateEventViewModel model)
+    {
+        var result = await _eventService.UpdateEventAsync(model);
+
+        if (!result.IsSuccess)
+        {
+            // Split error messages and add them to ModelState
+            foreach (var error in result.Error!)
+            {   
+                ModelState.AddModelError(error.Key, error.Value);
+                if (error.Key == "Authentication")
+                {
+                    Response.Headers.Append("HX-Redirect", Url.Action("Login", "Auth"));
+                    return Content(string.Empty);
+                }
+
+                if (error.Key == "NoChanges")
+                {
+                    Response.Headers.Append("HX-Redirect", Url.Action("Events", "Organizer"));
+                    return Content(string.Empty);
+                }
+            }
+
+            return PartialView("_ValidationEditMessages", ModelState);
+        }
+
+        Response.Headers.Append("HX-Redirect", Url.Action("Events", "Organizer"));
+        return Content(string.Empty);
+    }
+
     [Route("organizer/delete-event/{id}")]
     [HttpDelete]
     public async Task<IActionResult> DeleteResource(Guid id)
@@ -98,6 +152,21 @@ public class OrganizerController : Controller
     public async Task<IActionResult> OpenEvent(Guid id)
     {
         var success = await _eventService.OpenEventByIdAsync(id);
+
+        if (!success)
+        {
+            return NotFound();
+        }
+
+        Response.Headers.Append("HX-Redirect", Url.Action("Events", "Organizer")); // Redirect to resource list after deletion
+        return Content(string.Empty);
+    }
+
+    [Route("organizer/unopen-event/{id}")]
+    [HttpPatch]
+    public async Task<IActionResult> UnopenEvent(Guid id)
+    {
+        var success = await _eventService.UnopenEventByIdAsync(id);
 
         if (!success)
         {
