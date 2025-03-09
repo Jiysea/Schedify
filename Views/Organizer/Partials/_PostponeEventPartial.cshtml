@@ -1,0 +1,150 @@
+@model UpdateEventViewModel
+
+<header class="flex items-center justify-between text-lg font-medium py-3 px-4">
+    <h1 class="text-coffee-900">Postpone Event</h1>
+    <button x-on:click="viewEventModal = false"
+        class="flex items-center justify-center size-8 p-1 rounded-md text-zinc-500 hover:bg-coffee-100 active:bg-coffee-200 hover:text-coffee-700 active:text-coffee-900 duration-200 ease-in-out">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256">
+            <path
+                d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z">
+            </path>
+        </svg>
+    </button>
+</header>
+
+<hr class="w-full border-coffee-100">
+
+<main class="flex flex-col gap-10 p-5 relative">
+    <form hx-post="/organizer/postpone-event" hx-swap="none" hx-vals='{"Id": "@Model.Id"}'>
+
+        @* Body *@
+        <div class="flex flex-col gap-10">
+
+            @* Header *@
+            <div class="relative grid grid-cols-6 gap-3 p-5 border border-coffee-300 rounded-lg w-full">
+                <h1 class="absolute -top-3 start-4 text-sm font-semibold bg-coffee-50 text-pumpkin-600">
+                    Are you sure about postponing this event?
+                </h1>
+
+                @* Event Name *@
+                <span class="flex items-center gap-2 col-span-full text-sm text-coffee-900">
+                    <svg class="size-6 text-coffee-600" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                        fill="currentColor" viewBox="0 0 256 256">
+                        <path
+                            d="M88,112a8,8,0,0,1,8-8h80a8,8,0,0,1,0,16H96A8,8,0,0,1,88,112Zm8,40h80a8,8,0,0,0,0-16H96a8,8,0,0,0,0,16ZM232,64V184a24,24,0,0,1-24,24H32A24,24,0,0,1,8,184.11V88a8,8,0,0,1,16,0v96a8,8,0,0,0,16,0V64A16,16,0,0,1,56,48H216A16,16,0,0,1,232,64Zm-16,0H56V184a23.84,23.84,0,0,1-1.37,8H208a8,8,0,0,0,8-8Z">
+                        </path>
+                    </svg>
+                    @Model.Name
+                </span>
+
+                @* Description *@
+                <span class="flex items-center gap-2 col-span-full text-sm text-coffee-900">
+                    <svg class="size-6 text-coffee-600" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                        fill="currentColor" viewBox="0 0 256 256">
+                        <path
+                            d="M232,56H72V40a8,8,0,0,0-8-8H48A32,32,0,0,0,16,64V176a32,32,0,0,0,32,32H232a8,8,0,0,0,8-8V64A8,8,0,0,0,232,56ZM32,64A16,16,0,0,1,48,48h8v96H48a31.82,31.82,0,0,0-16,4.29ZM224,192H48a16,16,0,0,1,0-32H64a8,8,0,0,0,8-8V72H224ZM104,136a8,8,0,0,0,0,16h16v8a8,8,0,0,0,16,0v-8h24v8a8,8,0,0,0,16,0v-8h16a8,8,0,0,0,0-16H176V120h16a8,8,0,0,0,0-16H176V96a8,8,0,0,0-16,0v8H136V96a8,8,0,0,0-16,0v8H104a8,8,0,0,0,0,16h16v16Zm32-16h24v16H136Z">
+                        </path>
+                    </svg>
+                    @Model.Description
+                </span>
+
+                @* Entry Fee *@
+                <span class="flex items-center gap-2 col-span-full text-sm text-coffee-900">
+                    <svg class="size-6 text-coffee-600" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                        fill="currentColor" viewBox="0 0 256 256">
+                        <path
+                            d="M184,89.57V84c0-25.08-37.83-44-88-44S8,58.92,8,84v40c0,20.89,26.25,37.49,64,42.46V172c0,25.08,37.83,44,88,44s88-18.92,88-44V132C248,111.3,222.58,94.68,184,89.57ZM232,132c0,13.22-30.79,28-72,28-3.73,0-7.43-.13-11.08-.37C170.49,151.77,184,139,184,124V105.74C213.87,110.19,232,122.27,232,132ZM72,150.25V126.46A183.74,183.74,0,0,0,96,128a183.74,183.74,0,0,0,24-1.54v23.79A163,163,0,0,1,96,152,163,163,0,0,1,72,150.25Zm96-40.32V124c0,8.39-12.41,17.4-32,22.87V123.5C148.91,120.37,159.84,115.71,168,109.93ZM96,56c41.21,0,72,14.78,72,28s-30.79,28-72,28S24,97.22,24,84,54.79,56,96,56ZM24,124V109.93c8.16,5.78,19.09,10.44,32,13.57v23.37C36.41,141.4,24,132.39,24,124Zm64,48v-4.17c2.63.1,5.29.17,8,.17,3.88,0,7.67-.13,11.39-.35A121.92,121.92,0,0,0,120,171.41v23.46C100.41,189.4,88,180.39,88,172Zm48,26.25V174.4a179.48,179.48,0,0,0,24,1.6,183.74,183.74,0,0,0,24-1.54v23.79a165.45,165.45,0,0,1-48,0Zm64-3.38V171.5c12.91-3.13,23.84-7.79,32-13.57V172C232,180.39,219.59,189.4,200,194.87Z">
+                        </path>
+                    </svg>
+                    ₱@Model.EntryFeeString
+                </span>
+
+                @* Event Duration *@
+                <span class="flex items-center gap-2 col-span-full text-sm text-coffee-900">
+                    <svg class="size-6 text-coffee-600" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                        fill="currentColor" viewBox="0 0 256 256">
+                        <path
+                            d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Zm-48-56a8,8,0,0,1-8,8H104a8,8,0,0,1,0-16h48A8,8,0,0,1,160,152Z">
+                        </path>
+                    </svg>
+                    @Model.StartAt.ToString("MMM dd (dddd)") - @Model.EndAt.ToString("MMM dd (dddd)")
+                </span>
+            </div>
+
+            @* Event Duration *@
+            <div class="relative grid grid-cols-6 gap-3 w-full px-2">
+                <span
+                    class="select-none flex items-center col-span-full w-full gap-2 font-medium text-sm text-pumpkin-600">
+                    <svg class="size-7" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                        viewBox="0 0 256 256">
+                        <path
+                            d="M128,40a96,96,0,1,0,96,96A96.11,96.11,0,0,0,128,40Zm0,176a80,80,0,1,1,80-80A80.09,80.09,0,0,1,128,216ZM173.66,90.34a8,8,0,0,1,0,11.32l-40,40a8,8,0,0,1-11.32-11.32l40-40A8,8,0,0,1,173.66,90.34ZM96,16a8,8,0,0,1,8-8h48a8,8,0,0,1,0,16H104A8,8,0,0,1,96,16Z">
+                        </path>
+                    </svg>
+                    Change Event Duration
+                </span>
+
+                @* Event Duration *@
+                <div class="flex items-center justify-center col-span-full gap-2 relative w-full">
+
+                    <div class="flex flex-col gap-1 w-full">
+                        <label for="postpone-startat" class="text-xs text-coffee-500 whitespace-nowrap">
+                            Start At</label>
+                        <input type="text" class="input-coffee p-2" id="postpone-startat" asp-for="StartAt"
+                            placeholder="Select a start time">
+                        <div id="edit-validation-StartAt"></div>
+                    </div>
+
+                    <div class="flex flex-col gap-1 w-full">
+                        <label for="postpone-endat" class="text-xs text-coffee-500 whitespace-nowrap">
+                            End At</label>
+                        <input type="text" class="input-coffee p-2" id="postpone-endat" asp-for="EndAt"
+                            placeholder="Select an end time">
+                        <div id="edit-validation-EndAt"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-center relative px-2 w-full">
+                <div id="edit-validation-CustomError"></div>
+            </div>
+
+            @* Footer *@
+            <div class="flex items-center justify-center gap-2 w-full">
+                <button type="submit"
+                    class="duration-200 ease-in-out text-sm py-2 rounded-md w-full font-semibold text-coffee-50 bg-coffee-700 hover:bg-coffee-800 active:bg-coffee-900">
+                    SAVE
+                </button>
+                <button type="button" hx-get="/organizer/view-event/@Model.Id" hx-target="#viewEventModalContent"
+                    hx-swap="innerHTML"
+                    class="duration-200 ease-in-out text-sm py-2 px-3 rounded-md font-semibold focus:outline-none text-center text-coffee-50 bg-coffee-700 hover:bg-coffee-800 active:bg-coffee-900">
+                    CANCEL
+                </button>
+            </div>
+        </div>
+    </form>
+</main>
+
+
+<script>
+    document.addEventListener("htmx:afterSwap", () => {
+        let startPicker = flatpickr("#postpone-startat", {
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+            defaultDate: `@Model.StartAt.ToString("yyyy-MM-dd HH:mm")`,
+            minDate: `@Model.StartAt.ToString("yyyy-MM-dd HH:mm")`, // Tomorrow
+            onChange: function (selectedDates) {
+                if (selectedDates.length > 0) {
+                    endPicker.set("minDate", selectedDates[0]); // Set end date min to start date
+                }
+            }
+        });
+
+        let endPicker = flatpickr("#postpone-endat", {
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+            defaultDate: `@Model.EndAt.ToString("yyyy-MM-dd HH:mm")`,
+            minDate: `@Model.StartAt.ToString("yyyy-MM-dd HH:mm")`, // Tomorrow
+        });
+    });
+</script>

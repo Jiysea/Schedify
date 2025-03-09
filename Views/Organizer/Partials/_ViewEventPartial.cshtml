@@ -47,15 +47,30 @@
         else if (@Model.Status == EventStatus.Open)
         {
             <button type="button"
-                class="flex flex-1 items-center justify-center p-2 text-sm font-semibold duration-200 ease-in-out rounded-md border border-zinc-500 hover:border-transparent hover:bg-zinc-600 active:bg-zinc-700 text-zinc-500 hover:text-zinc-50"
-                hx-patch="/organizer/unopen-event/@Model.Id" hx-swap="none"
+                class="flex flex-1 items-center justify-center p-2 text-sm font-semibold duration-200 ease-in-out rounded-md border bg-red-700 hover:bg-red-800 active:bg-red-900 text-red-50"
+                hx-patch="/organizer/cancel-event/@Model.Id" hx-swap="none"
                 hx-confirm="Are you sure you want to move this event back to draft?">
-                MOVE TO DRAFT
+                CANCEL
+            </button>
+            <button type="button"
+                class="flex flex-1 items-center justify-center p-2 text-sm font-semibold duration-200 ease-in-out rounded-md border bg-coffee-700 hover:bg-coffee-800 active:bg-coffee-900 text-coffee-50"
+                hx-get="/organizer/show-postpone-event/@Model.Id" hx-swap="innerHTML" hx-target="#viewEventModalContent">
+                POSTPONE
             </button>
         }
         else if (@Model.Status == EventStatus.Ongoing)
         {
-
+            <button type="button"
+                class="flex flex-1 items-center justify-center p-2 text-sm font-semibold duration-200 ease-in-out rounded-md border bg-red-700 hover:bg-red-800 active:bg-red-900 text-red-50"
+                hx-patch="/organizer/cancel-event/@Model.Id" hx-swap="none"
+                hx-confirm="Are you sure you want to move this event back to draft?">
+                CANCEL
+            </button>
+            <button type="button"
+                class="flex flex-1 items-center justify-center p-2 text-sm font-semibold duration-200 ease-in-out rounded-md border bg-coffee-700 hover:bg-coffee-800 active:bg-coffee-900 text-coffee-50"
+                hx-get="/organizer/show-postpone-event/@Model.Id" hx-swap="innerHTML" hx-target="#viewEventModalContent">
+                POSTPONE
+            </button>
         }
         else if (@Model.Status == EventStatus.Completed)
         {
@@ -75,7 +90,8 @@
     <div class="relative grid grid-cols-2 gap-3 p-5 border rounded-xl border-coffee-300">
         <h3
             class="select-none flex items-center gap-2 absolute start-4 -top-3 px-2 font-medium text-sm text-pumpkin-600 bg-coffee-50">
-            <svg class="size-6" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256">
+            <svg class="size-6" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                viewBox="0 0 256 256">
                 <path
                     d="M88,112a8,8,0,0,1,8-8h80a8,8,0,0,1,0,16H96A8,8,0,0,1,88,112Zm8,40h80a8,8,0,0,0,0-16H96a8,8,0,0,0,0,16ZM232,64V184a24,24,0,0,1-24,24H32A24,24,0,0,1,8,184.11V88a8,8,0,0,1,16,0v96a8,8,0,0,0,16,0V64A16,16,0,0,1,56,48H216A16,16,0,0,1,232,64Zm-16,0H56V184a23.84,23.84,0,0,1-1.37,8H208a8,8,0,0,0,8-8Z">
                 </path>
@@ -110,7 +126,7 @@
         @* Status *@
         <div class="flex flex-col col-span-full relative">
             <p class="text-xs text-coffee-900">Status</p>
-            <span class="p-2">
+            <span class="p-2 font-semibold uppercase">
                 @if (@Model.Status == EventStatus.Draft)
                 {
                     <span class="rounded-md py-1 px-3 text-zinc-700 bg-zinc-300">

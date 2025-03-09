@@ -21,7 +21,7 @@ public class UpdateEventViewModel
     [Required(ErrorMessage = "This field is required.")]
     public DateTime EndAt { get; set; }
 
-    public EventStatus Status { get; set; } = EventStatus.Draft;
+    public EventStatus Status { get; set; }
 
     [Required(ErrorMessage = "This field is required.")]
     public string EntryFeeString { get; set; } = null!;

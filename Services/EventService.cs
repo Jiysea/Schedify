@@ -171,14 +171,19 @@ public class EventService
 
             var _event = await _context.Events.FindAsync(model.Id);
 
-            if(_event == null)
+            if (_event == null)
             {
                 return (false, new Dictionary<string, string> { { "NotFound", "Event not found." } }, null);
             }
 
+            if (_event.Status != EventStatus.Draft)
+            {
+                return (false, new Dictionary<string, string> { { "InvalidStatus", "The event status should be on \"Draft\" before updating." } }, null);
+            }
+
             _context.Entry(_event).CurrentValues.SetValues(model);
 
-            if(!_context.ChangeTracker.HasChanges())
+            if (!_context.ChangeTracker.HasChanges())
             {
                 return (false, new Dictionary<string, string> { { "NoChanges", "Seems like there's no need to change." } }, null);
             }
@@ -226,7 +231,7 @@ public class EventService
             .FirstOrDefaultAsync(e => e.Id == Id);
 
         if (_event == null) return null;
-        
+
         return new UpdateEventViewModel()
         {
             Id = _event.Id,
@@ -247,6 +252,11 @@ public class EventService
 
         if (_event == null) return false;
 
+        if (_event.Status != EventStatus.Draft)
+        {
+            return false;
+        }
+
         // Delete associated conversations first
         _context.Conversations.Remove(_event.Conversation);
 
@@ -262,20 +272,75 @@ public class EventService
 
         if (_event == null) return false;
 
+        if (_event.Status != EventStatus.Draft)
+        {
+            return false;
+        }
+
         _event.Status = EventStatus.Open;
         await _context.SaveChangesAsync();
         return true;
     }
 
-    public async Task<bool> UnopenEventByIdAsync(Guid Id)
+    public async Task<bool> CancelEventByIdAsync(Guid Id)
     {
         var _event = await _context.Events
             .FindAsync(Id);
 
         if (_event == null) return false;
 
-        _event.Status = EventStatus.Draft;
-        await _context.SaveChangesAsync();
-        return true;
+        if (_event.Status == EventStatus.Open || _event.Status == EventStatus.Ongoing || _event.Status == EventStatus.Postponed)
+        {
+            _event.Status = EventStatus.Cancelled;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        return false;
+    }
+
+    public async Task<(bool IsSuccess, Dictionary<string, string>? Error, Event? Event)> PostponeEventByIdAsync(UpdateEventViewModel model)
+    {
+        using var transaction = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            var user = await _userService.GetUserAsync();
+            if (user == null)
+            {
+                return (false, new Dictionary<string, string> { { "Authentication", "User must be authenticated." } }, null);
+            }
+
+            var _event = await _context.Events.FindAsync(model.Id);
+
+            if (_event == null)
+            {
+                return (false, new Dictionary<string, string> { { "NotFound", "Event not found." } }, null);
+            }
+
+            if (_event.StartAt == model.StartAt)
+            {
+                return (false, new Dictionary<string, string> { { "NoChanges", "You need to set a new event duration to postpone the event." } }, null);
+            }
+
+            if (_event.Status == EventStatus.Open || _event.Status == EventStatus.Ongoing)
+            {
+                _event.Status = EventStatus.Postponed;
+                _event.StartAt = model.StartAt;
+                _event.EndAt = model.EndAt;
+                _event.UpdatedAt = DateTime.UtcNow;
+
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+                return (true, null, _event);
+            }
+
+            return (false, new Dictionary<string, string> { { "InvalidStatus", "The event status should be on \"Open\" or \"Onoing\" before updating." } }, null);
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            return (false, new Dictionary<string, string> { { "Exception", $"An error occurred: {ex.Message}" } }, null);
+        }
     }
 }

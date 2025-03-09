@@ -81,7 +81,7 @@
                                 <label for="edit-endat" class="text-xs text-coffee-500 whitespace-nowrap">
                                     End At</label>
                                 <input type="text" class="input-coffee p-2" id="edit-endat" asp-for="EndAt"
-                                    placeholder="Select a start time">
+                                    placeholder="Select an end time">
                             </span>
                             <div id="edit-validation-EndAt"></div>
                         </div>
@@ -106,7 +106,7 @@
 </main>
 
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("htmx:afterSwap", () => {
         let startPicker = flatpickr("#edit-startat", {
             enableTime: true,
             dateFormat: "Y-m-d H:i",

@@ -5,7 +5,7 @@
 
     @* Box *@
     <div x-data x-trap="addResourceModal" class="bg-charcoal-900 rounded-lg shadow-lg"
-        @@keydown.escape = "addResourceModal = false;" >
+        @@keydown.escape = "addResourceModal = false;">
 
                         @* Top Header *@
                         <header class="flex items-center justify-between text-lg font-medium py-3 px-4">
@@ -47,10 +47,11 @@
                                             <select class="input-charcoal-dark p-2" id="type" asp-for="Type"
                                                 hx-get="/admin/resource-extra" hx-target="#resource-extra" hx-swap="innerHTML"
                                                 hx-trigger="change" hx-vals='js:{"selectedOption": event.target.value}' x-on:change="
-                                                                    showQuantity = ($el.value != 'Venue');
-                                                                    if(showQuantity) {
-                                                                        document.getElementById('quantity').value = 1;
-                                                                    }" asp-items="@(new SelectList(Model.ResourceTypes))">
+                                                    showQuantity = ($el.value != 'Venue');
+                                                    if(showQuantity) {
+                                                        document.getElementById('quantity').value = 1;
+                                                    }"
+                                                asp-items="@(new SelectList(Model.ResourceTypes))">
                                             </select>
                                         </div>
 
@@ -145,8 +146,8 @@
 
                                         @* Cost Type *@
                                         <div class="flex flex-col gap-1 relative" :class="{
-                                                                'col-span-2': (!showQuantity),
-                                                            }">
+                                                                                                                                'col-span-2': (!showQuantity),
+                                                                                                                            }">
                                             <label for="costtype" class="text-xs text-charcoal-300">Type of Cost</label>
                                             <select class="input-charcoal-dark p-2" id="costtype" name="CostType" asp-for="CostType"
                                                 hx-get="/admin/cost-types" hx-trigger="load, change from:#type" hx-swap="innerHTML"
@@ -172,7 +173,7 @@
                                             <textarea id="description" class="input-charcoal-dark p-2" maxlength="300" rows="3"
                                                 asp-for="Description" style="resize: none;"
                                                 placeholder="Describe anything about this resource.">
-                                                            </textarea>
+                                                                                                                            </textarea>
                                             <div id="validation-Description">
                                             </div>
                                         </div>
