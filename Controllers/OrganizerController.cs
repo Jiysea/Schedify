@@ -11,10 +11,12 @@ public class OrganizerController : Controller
 {
     private readonly ApplicationDbContext _context;
     private readonly EventService _eventService;
-    public OrganizerController(ApplicationDbContext context, EventService eventService)
+    private readonly ResourceService _resourceService;
+    public OrganizerController(ApplicationDbContext context, EventService eventService, ResourceService resourceService)
     {
-        _eventService = eventService;
         _context = context;
+        _eventService = eventService;
+        _resourceService = resourceService;
     }
 
     [Route("organizer/events")]
@@ -25,11 +27,21 @@ public class OrganizerController : Controller
         startDate ??= new DateTime(DateTime.UtcNow.Year, 1, 1, 0, 0, 0, DateTimeKind.Utc); // Jan 1st, 00:00 UTC
         endDate ??= DateTime.UtcNow.Date.AddHours(23).AddMinutes(59); // Today at 23:59 UTC
 
+        var draftEvents = _eventService.GetEventsByOrganizerDraft(startDate, endDate);
+        var publishedEvents = _eventService.GetEventsByOrganizerPublished(startDate, endDate);
+        var concludedEvents = _eventService.GetEventsByOrganizerConcluded(startDate, endDate);
+
+        var pAttendeeCount = _eventService.GetAttendeeCounts(publishedEvents);
+        var cAttendeeCount = _eventService.GetAttendeeCounts(concludedEvents);
+        var mergedAttendeeCounts = pAttendeeCount.Concat(cAttendeeCount)
+            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
         var viewModel = new OrganizerEventsViewModel
         {
-            DraftEvents = _eventService.GetEventsByOrganizerDraft(startDate, endDate),
-            PublishedEvents = _eventService.GetEventsByOrganizerPublished(startDate, endDate),
-            ConcludedEvents = _eventService.GetEventsByOrganizerConcluded(startDate, endDate),
+            DraftEvents = draftEvents,
+            PublishedEvents = publishedEvents,
+            ConcludedEvents = concludedEvents,
+            EventAttendeeCounts = mergedAttendeeCounts,
         };
 
         if (Request.Headers["HX-Request"].Any())
@@ -168,6 +180,21 @@ public class OrganizerController : Controller
         return Content(string.Empty);
     }
 
+    [Route("organizer/draft-event/{id}")]
+    [HttpPatch]
+    public async Task<IActionResult> DraftEvent(Guid id)
+    {
+        var success = await _eventService.DraftEventByIdAsync(id);
+
+        if (!success)
+        {
+            return NotFound();
+        }
+
+        Response.Headers.Append("HX-Redirect", Url.Action("Events", "Organizer")); // Redirect to resource list after deletion
+        return Content(string.Empty);
+    }
+
     [Route("organizer/cancel-event/{id}")]
     [HttpPatch]
     public async Task<IActionResult> CancelEvent(Guid id)
@@ -244,75 +271,80 @@ public class OrganizerController : Controller
         return Content(string.Empty);
     }
 
+
+    // --------------------------------------------------------------------------------------
+    // Resources
+    // --------------------------------------------------------------------------------------
+
+
     [Route("organizer/resources")]
     [HttpGet]
-    public ActionResult Resources() => View();
+    public IActionResult Resources()
+    {
+        var venueResources = _resourceService.GetVenues();
+        var model = new OrganizerResourcesViewModel
+        {
+            Resources = venueResources,
+            ResourceImages = _resourceService.GetResourceImageFromList(venueResources),
+        };
 
-    [Route("organizer/feedbacks")]
+        return View(model);
+    }
+
+    [Route("organizer/view-resource/{id}")]
     [HttpGet]
-    public ActionResult Feedbacks() => View();
+    public async Task<IActionResult> ViewResource(Guid id)
+    {
+        var resource = await _resourceService.GetResourceByIdForOrganizersAsync(id);
 
-    [Route("organizer/stats")]
+        if (resource == null)
+        {
+            return NotFound();
+        }
+
+        return PartialView("~/Views/Organizer/Partials/_ViewResourcePartial.cshtml", resource);
+    }
+
+    [Route("organizer/show-add-event-resource/{id}")]
     [HttpGet]
-    public ActionResult Stats() => View();
-
-
-    [Route("organizer/venues")]
-    public IActionResult Venues()
+    public async Task<IActionResult> AddToEventResource(Guid id)
     {
-        if (Request.Headers["HX-Request"] == "true")
+        var DraftEvents = _eventService.GetEventsByOrganizerDraft(new DateTime(DateTime.UtcNow.Year, 1, 1, 0, 0, 0, DateTimeKind.Utc), DateTime.UtcNow.Date.AddHours(23).AddMinutes(59));
+        var result = await _resourceService.GetResourceAndEvents(id, DraftEvents);
+
+        if (result == null)
         {
-            return PartialView("~/Views/Organizer/Partials/_VenuesPartial.cshtml", new { });
+            return NotFound();
         }
 
-        return RedirectToAction("Resources", "Organizer");
+        return PartialView("~/Views/Organizer/Partials/_AddToEventResourcePartial.cshtml", result);
     }
-    [Route("organizer/equipments")]
-    public IActionResult Equipments()
+
+    [Route("organizer/update-total-cost")]
+    [HttpPost]
+    public async Task<IActionResult> UpdateTotalCost(EventResourceViewModel model)
     {
-        if (Request.Headers["HX-Request"] == "true")
+        var DraftEvents = _eventService.GetEventsByOrganizerDraft(new DateTime(DateTime.UtcNow.Year, 1, 1, 0, 0, 0, DateTimeKind.Utc), DateTime.UtcNow.Date.AddHours(23).AddMinutes(59));
+        var resource = await _context.Resources.FindAsync(model.ResourceId);
+
+        if (resource == null)
         {
-            return PartialView("~/Views/Organizer/Partials/_EquipmentsPartial.cshtml", new { });
+            return NotFound();
         }
 
-        return RedirectToAction("Resources", "Organizer");
-
-    }
-    [Route("organizer/furnitures")]
-    public IActionResult Furnitures()
-    {
-
-        if (Request.Headers["HX-Request"] == "true")
+        var updatedModel = new EventResourceViewModel
         {
-            return PartialView("~/Views/Organizer/Partials/_FurnituresPartial.cshtml", new { });
-        }
-
-        return RedirectToAction("Resources", "Organizer");
-
-    }
-    [Route("organizer/personnels")]
-    public IActionResult Personnels()
-    {
-
-        if (Request.Headers["HX-Request"] == "true")
-        {
-            return PartialView("~/Views/Organizer/Partials/_PersonnelsPartial.cshtml", new { });
-        }
-
-        return RedirectToAction("Resources", "Organizer");
-
-    }
-    [Route("organizer/caterings")]
-    public IActionResult Caterings()
-    {
-
-        if (Request.Headers["HX-Request"] == "true")
-        {
-            return PartialView("~/Views/Organizer/Partials/_CateringsPartial.cshtml", new { });
-        }
-
-        return RedirectToAction("Resources", "Organizer");
-
+            ResourceId = model.ResourceId,
+            DraftEvents = DraftEvents,
+            CostType = resource.CostType,
+            Type = resource.Type,
+            QuantityFromResource = resource.Quantity,
+            CostFromResource = resource.Cost,
+            Shift = resource.Type == ResourceType.Personnel ? resource.Shift : null,
+            QuantityFromForm = model.QuantityFromForm,
+        };
+        
+        return PartialView("~/Views/Organizer/Partials/_TotalCostUpdatePartial.cshtml", updatedModel.TotalCost);
     }
 
     [Route("organizer/by-events")]
@@ -327,4 +359,86 @@ public class OrganizerController : Controller
         return RedirectToAction("Resources", "Organizer");
 
     }
+
+    [Route("organizer/venues")]
+    public IActionResult Venues()
+    {
+        if (Request.Headers["HX-Request"] == "true")
+        {
+            var venueResources = _resourceService.GetVenues();
+            var model = new OrganizerResourcesViewModel
+            {
+                Resources = venueResources,
+                ResourceImages = _resourceService.GetResourceImageFromList(venueResources),
+            };
+            return PartialView("~/Views/Organizer/Partials/_TypeVenuesPartial.cshtml", model);
+        }
+
+        return RedirectToAction("Resources", "Organizer");
+    }
+
+
+    // --------------------------------------------------------------------------------------
+    // Equipments
+    // --------------------------------------------------------------------------------------
+
+
+    [Route("organizer/equipments")]
+    public IActionResult Equipments()
+    {
+        if (Request.Headers["HX-Request"] == "true")
+        {
+            return PartialView("~/Views/Organizer/Partials/_TypeEquipmentsPartial.cshtml", new { });
+        }
+
+        return RedirectToAction("Resources", "Organizer");
+
+    }
+
+    [Route("organizer/furnitures")]
+    public IActionResult Furnitures()
+    {
+
+        if (Request.Headers["HX-Request"] == "true")
+        {
+            return PartialView("~/Views/Organizer/Partials/_TypeFurnituresPartial.cshtml", new { });
+        }
+
+        return RedirectToAction("Resources", "Organizer");
+
+    }
+
+    [Route("organizer/caterings")]
+    public IActionResult Caterings()
+    {
+
+        if (Request.Headers["HX-Request"] == "true")
+        {
+            return PartialView("~/Views/Organizer/Partials/_TypeCateringsPartial.cshtml", new { });
+        }
+
+        return RedirectToAction("Resources", "Organizer");
+
+    }
+
+    [Route("organizer/personnels")]
+    public IActionResult Personnels()
+    {
+
+        if (Request.Headers["HX-Request"] == "true")
+        {
+            return PartialView("~/Views/Organizer/Partials/_TypePersonnelsPartial.cshtml", new { });
+        }
+
+        return RedirectToAction("Resources", "Organizer");
+
+    }
+
+    [Route("organizer/feedbacks")]
+    [HttpGet]
+    public IActionResult Feedbacks() => View();
+
+    [Route("organizer/stats")]
+    [HttpGet]
+    public IActionResult Stats() => View();
 }

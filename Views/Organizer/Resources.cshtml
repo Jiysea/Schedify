@@ -1,9 +1,8 @@
+@model OrganizerResourcesViewModel
+
 @{
     ViewData["Title"] = "Resources";
 }
-
-
-
 
 <div class="min-h-screen bg-[#F9FBFA] ms-[250px]">
     <partial name="~/Views/Organizer/Partials/_SidebarPartial.cshtml" />
@@ -14,7 +13,7 @@
 
     </header>
 
-    <main class="flex flex-col items-center w-full">
+    <main x-data="{ viewResourceModal: false }" class="flex flex-col items-center w-full">
 
         @* Sub Header (Resources, Search, Browse, By Event) *@
         <div class="flex flex-col items-center w-full px-4 pt-4 border-b-2 gap-1 border-zinc-100">
@@ -78,43 +77,46 @@
             </nav>
         </div>
 
-        <div id="content"
-            class="overflow-y-auto max-h-[65vh] min-h-[65vh] scrollbar-thin scrollbar-track-transparent scrollbar-thumb-coffee-700">
-            <partial name="~/Views/Organizer/Partials/_VenuesPartial.cshtml" model="new { }" />
+        <div id="resource-content"
+            class="overflow-y-auto max-h-[65vh] min-h-[65vh] w-full scrollbar-thin scrollbar-track-transparent scrollbar-thumb-coffee-700">
+            @await Html.PartialAsync("~/Views/Organizer/Partials/_TypeVenuesPartial.cshtml", Model)
         </div>
+
+        @* Pagination *@
+        <footer class="flex items-center justify-end mt-3">
+
+            <div
+                class="text-sm flex items-center justify-center ps-2 py-1.5 border-2 rounded-lg bg-white border-zinc-300 divide-x-2 divide-zinc-300">
+
+                @* Page Number *@
+                <span class="text-zinc-500 px-3"><strong>1-8</strong> of 258</span>
+
+                @* Previous & Next buttons *@
+                <span class="flex items-center justify-center gap-3 px-3">
+                    <button
+                        class="duration-200 ease-in-out flex items-center size-7 rounded-md p-1 text-zinc-500 hover:bg-zinc-100 active:bg-zinc-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                            viewBox="0 0 256 256">
+                            <path
+                                d="M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z">
+                            </path>
+                        </svg>
+                    </button>
+                    <button
+                        class="duration-200 ease-in-out flex items-center size-7 rounded-md p-1 text-zinc-500 hover:bg-zinc-100 active:bg-zinc-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                            viewBox="0 0 256 256">
+                            <path
+                                d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z">
+                            </path>
+                        </svg>
+                    </button>
+                </span>
+            </div>
+        </footer>
+
+        @* View Resource Modal *@
+        @await Html.PartialAsync("~/Views/Organizer/Partials/ViewResourceModal.cshtml", Model.ViewResourceViewModel)
+
     </main>
-
-    @* Pagination *@
-    <footer class="flex items-center justify-end mt-3">
-
-        <div
-            class="text-sm flex items-center justify-center ps-2 py-1.5 border-2 rounded-lg bg-white border-zinc-300 divide-x-2 divide-zinc-300">
-
-            @* Page Number *@
-            <span class="text-zinc-500 px-3"><strong>1-8</strong> of 258</span>
-
-            @* Previous & Next buttons *@
-            <span class="flex items-center justify-center gap-3 px-3">
-                <button
-                    class="duration-200 ease-in-out flex items-center size-7 rounded-md p-1 text-zinc-500 hover:bg-zinc-100 active:bg-zinc-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
-                        viewBox="0 0 256 256">
-                        <path
-                            d="M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z">
-                        </path>
-                    </svg>
-                </button>
-                <button
-                    class="duration-200 ease-in-out flex items-center size-7 rounded-md p-1 text-zinc-500 hover:bg-zinc-100 active:bg-zinc-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
-                        viewBox="0 0 256 256">
-                        <path
-                            d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z">
-                        </path>
-                    </svg>
-                </button>
-            </span>
-        </div>
-
-    </footer>
 </div>

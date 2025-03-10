@@ -1,4 +1,4 @@
-<div class="grid grid-cols-2 w-full px-4 py-2 bg-white text-zinc-500 border-b-2 border-zinc-100">
+<div class="grid grid-cols-2 w-full text-center h-[7.5vh] px-4 bg-white text-zinc-500 border-b-2 border-zinc-100">
 
     @* Col 1 *@
     <span class="flex items-center justify-start gap-2">
@@ -8,9 +8,9 @@
     @* Col 2 *@
     <div x-data="{open: false}" class="flex items-center justify-end gap-2">
 
-        <span class="relative">
-            <button x-on:click="open = !open;" type="menu" class="rounded-full border-b-2 border-zinc-100">
-                <img class="size-10 object-cover rounded-full pointer-events-none" src="~/images/avatar.jpg"
+        <span class="relative flex items-center">
+            <button x-on:click="open = !open;" type="menu" class="rounded-full text-center">
+                <img class="size-7 object-cover rounded-full pointer-events-none" src="~/images/avatar.jpg"
                     alt="User's Avatar">
             </button>
 

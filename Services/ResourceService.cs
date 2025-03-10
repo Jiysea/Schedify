@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Schedify.Data;
@@ -23,6 +24,48 @@ public class ResourceService
     public List<Resource> GetResources()
     {
         return _context.Resources.OrderByDescending(r => r.CreatedAt).ToList();
+    }
+
+    public Dictionary<Guid, string?> GetResourceImages()
+    {
+        return _context.Images
+            .Where(img => img.ResourceId != null)
+            .ToDictionary(img => img.ResourceId!.Value, img => img.ImageFileName);
+    }
+
+    public List<Resource> GetVenues()
+    {
+        return _context.Resources
+            .Where(r => r.Type == ResourceType.Venue)
+            .OrderByDescending(r => r.CreatedAt).ToList();
+    }
+
+    public Dictionary<Guid, string> GetResourceImageFromList(List<Resource> resources)
+    {
+        var resourceIds = resources.Select(e => e.Id).ToList();
+
+        return _context.Images
+            .Where(img => img.ResourceId.HasValue && resourceIds.Contains(img.ResourceId.Value))
+            .ToDictionary(img => img.ResourceId!.Value, img => img.ImageFileName!);
+    }
+
+    public async Task<EventResourceViewModel?> GetResourceAndEvents(Guid ResourceId, List<Event> Events)
+    {
+        var resource = await _context.Resources
+            .FindAsync(ResourceId);
+
+        if (resource == null) return null;
+
+        return new EventResourceViewModel
+        {
+            ResourceId = ResourceId,
+            DraftEvents = Events,
+            CostType = resource.CostType,
+            Type = resource.Type,
+            QuantityFromResource = resource.Quantity,
+            CostFromResource = resource.Cost,
+            Shift = resource.Type == ResourceType.Personnel ? resource.Shift : null,
+        };
     }
 
     public async Task<ResourceViewModel?> GetResourceByIdAsync(Guid Id)
@@ -51,7 +94,7 @@ public class ResourceService
             Cost = resource.Cost.ToString("N2"),
             CostType = resource.CostType,
             Quantity = resource.Quantity,
-            Capacity = resource.Type == ResourceType.Venue ? resource.Quantity : 0,
+            Capacity = resource.Type == ResourceType.Venue ? resource.Capacity : 0,
             Size = resource.Type == ResourceType.Venue ? resource.Size : null,
             AddressLine1 = resource.Type == ResourceType.Venue ? resource.AddressLine1 : null,
             AddressLine2 = resource.Type == ResourceType.Venue ? resource.AddressLine2 : null,
@@ -71,12 +114,50 @@ public class ResourceService
         };
     }
 
-    public Dictionary<Guid, string?> GetResourceImages()
+    public async Task<ViewResourceViewModel?> GetResourceByIdForOrganizersAsync(Guid Id)
     {
-        return _context.Images
-            .Where(img => img.ResourceId != null)
-            .ToDictionary(img => img.ResourceId!.Value, img => img.ImageFileName);
+        var resource = await _context.Resources
+            .Include(r => r.Image)
+            .FirstOrDefaultAsync(r => r.Id == Id);
+
+        if (resource == null || resource.Image!.ImageFileName == null) return null;
+
+        // Check if the image exists in local storage
+        if (!File.Exists(Path.Combine(_environment.WebRootPath, "resources", resource.Image!.ImageFileName))) return null;
+
+        return new ViewResourceViewModel
+        {
+            ImageFileName = resource.Image!.ImageFileName,
+            Id = resource.Id,
+            ProviderName = resource.ProviderName,
+            ProviderPhoneNumber = resource.ProviderPhoneNumber,
+            ProviderEmail = resource.ProviderEmail,
+            Name = resource.Name,
+            Description = resource.Description,
+            Type = resource.Type,
+            Cost = resource.Cost.ToString("N2"),
+            CostType = resource.CostType,
+            Quantity = resource.Quantity,
+            Capacity = resource.Type == ResourceType.Venue ? resource.Capacity : 0,
+            Size = resource.Type == ResourceType.Venue ? resource.Size : null,
+            AddressLine1 = resource.Type == ResourceType.Venue ? resource.AddressLine1 : null,
+            AddressLine2 = resource.Type == ResourceType.Venue ? resource.AddressLine2 : null,
+            CityMunicipality = resource.Type == ResourceType.Venue ? resource.CityMunicipality : null,
+            Province = resource.Type == ResourceType.Venue ? resource.Province : null,
+            Brand = resource.Type == ResourceType.Equipment ? resource.Brand : null,
+            Specifications = resource.Type == ResourceType.Equipment ? JsonSerializer.Deserialize<Dictionary<string, string>>(resource.Specifications!)! : [],
+            Material = resource.Type == ResourceType.Furniture ? resource.Material : null,
+            Dimensions = resource.Type == ResourceType.Furniture ? resource.Dimensions : null,
+            MenuItems = resource.Type == ResourceType.Catering ? resource.MenuItems : null,
+            PriceItems = resource.Type == ResourceType.Catering ? resource.PriceItems : null,
+            Position = resource.Type == ResourceType.Personnel ? resource.Position : null,
+            Shift = resource.Type == ResourceType.Personnel ? resource.Shift : null,
+            Experience = resource.Type == ResourceType.Personnel ? resource.Experience : null,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
     }
+
 
     public async Task<bool> DeleteResourceAsync(Guid Id)
     {

@@ -14,4 +14,7 @@ public class OrganizerEventsViewModel
 
     // Dictionary to store EventId and the number of attendees for that event
     public Dictionary<Guid, int> EventAttendeeCounts { get; set; } = new();
+
+    
+
 }

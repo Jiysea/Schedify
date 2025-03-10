@@ -13,4 +13,7 @@ public class ViewEventViewModel
     public string EntryFee { get; set; } = null!;
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+
+    // To Check whether the event has a venue or not (for Draft only)
+    public bool EventHasVenue { get; set; }
 }

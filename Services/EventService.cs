@@ -67,7 +67,7 @@ public class EventService
         }
 
         return eventsQuery
-            .Where(r => r.UserId == userId && (r.Status == EventStatus.Open || r.Status == EventStatus.Ongoing))
+            .Where(r => r.UserId == userId && (r.Status == EventStatus.Open || r.Status == EventStatus.Ongoing || r.Status == EventStatus.Postponed))
             .OrderByDescending(r => r.CreatedAt)
             .ToList();
     }
@@ -94,9 +94,35 @@ public class EventService
         }
 
         return eventsQuery
-            .Where(r => r.UserId == userId && (r.Status == EventStatus.Completed || r.Status == EventStatus.Cancelled || r.Status == EventStatus.Postponed))
+            .Where(r => r.UserId == userId && (r.Status == EventStatus.Completed || r.Status == EventStatus.Cancelled))
             .OrderByDescending(r => r.CreatedAt)
             .ToList();
+    }
+
+    public Dictionary<Guid, int> GetAttendeeCounts(List<Event> events)
+    {
+        var eventIds = events.Select(e => e.Id).ToList();
+
+        return _context.EventBookings
+            .Where(eb => eventIds.Contains(eb.EventId))
+            .GroupBy(eb => eb.EventId)
+            .Select(g => new { EventId = g.Key, Count = g.Count() })
+            .ToDictionary(g => g.EventId, g => g.Count);
+    }
+
+    public bool IsEventHasVenue(Guid Id)
+    {
+        var eventResources = _context.EventResources.Where(er => er.EventId == Id).ToList();
+
+        foreach (var eventResource in eventResources)
+        {
+            if (eventResource.Resource.Type == ResourceType.Venue)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public async Task<(bool IsSuccess, Dictionary<string, string>? Error, Event? Event)> CreateEventAsync(CreateEventViewModel model)
@@ -210,6 +236,8 @@ public class EventService
 
         if (_event == null) return null;
 
+        bool hasVenue = IsEventHasVenue(_event.Id);
+
         return new ViewEventViewModel()
         {
             Id = _event.Id,
@@ -221,6 +249,7 @@ public class EventService
             EntryFee = _event.EntryFee.ToString("N2"),
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
+            EventHasVenue = hasVenue,
         };
     }
 
@@ -278,6 +307,18 @@ public class EventService
         }
 
         _event.Status = EventStatus.Open;
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> DraftEventByIdAsync(Guid Id)
+    {
+        var _event = await _context.Events
+            .FindAsync(Id);
+
+        if (_event == null) return false;
+
+        _event.Status = EventStatus.Draft;
         await _context.SaveChangesAsync();
         return true;
     }
