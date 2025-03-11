@@ -23,7 +23,7 @@
                     hx-confirm="Are you sure you want to open this event?"
                     class="flex w-full items-center justify-center gap-2 p-2 text-sm font-semibold duration-200 ease-in-out rounded-md"
                     :class="{ 'text-coffee-50 bg-coffee-700 hover:bg-coffee-800 active:bg-coffee-700': @(Model.EventHasVenue.ToString().ToLower()), 'text-coffee-300 bg-coffee-100 cursor-not-allowed': @((!Model.EventHasVenue).ToString().ToLower()), }"
-                    @(Model.EventHasVenue ? $"hx-patch='/organizer/open-event/{Model.Id}' hx-swap='none'" : $"disabled")>
+                    @(Model.EventHasVenue ? $"hx-patch=/organizer/open-event/{Model.Id} hx-swap=none" : $"disabled")>
                     <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
                         viewBox="0 0 256 256">
                         <path

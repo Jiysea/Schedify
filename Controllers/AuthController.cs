@@ -54,7 +54,7 @@ public class AuthController : Controller
         var roles = await _userManager.GetRolesAsync(user);
 
         if (roles.Contains("Admin"))
-            Response.Headers.Append("HX-Redirect", Url.Action("Dashboard", "Admin"));
+            Response.Headers.Append("HX-Redirect", Url.Action("Resources", "Admin"));
         else if (roles.Contains("Organizer"))
             Response.Headers.Append("HX-Redirect", Url.Action("Events", "Organizer"));
         else if (roles.Contains("Attendee"))
