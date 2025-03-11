@@ -33,10 +33,10 @@ public class ResourceService
             .ToDictionary(img => img.ResourceId!.Value, img => img.ImageFileName);
     }
 
-    public List<Resource> GetVenues()
+    public List<Resource> GetResourcesByType(ResourceType type)
     {
         return _context.Resources
-            .Where(r => r.Type == ResourceType.Venue)
+            .Where(r => r.Type == type)
             .OrderByDescending(r => r.CreatedAt).ToList();
     }
 
@@ -95,7 +95,7 @@ public class ResourceService
             CostType = resource.CostType,
             Quantity = resource.Quantity,
             Capacity = resource.Type == ResourceType.Venue ? resource.Capacity : 0,
-            Size = resource.Type == ResourceType.Venue ? resource.Size : null,
+            Size = resource.Type == ResourceType.Venue ? (int.TryParse(resource.Size, out var num) ? num : 0).ToString("N0") : null,
             AddressLine1 = resource.Type == ResourceType.Venue ? resource.AddressLine1 : null,
             AddressLine2 = resource.Type == ResourceType.Venue ? resource.AddressLine2 : null,
             CityMunicipality = resource.Type == ResourceType.Venue ? "Davao City" : null,
@@ -138,7 +138,7 @@ public class ResourceService
             CostType = resource.CostType,
             Quantity = resource.Quantity,
             Capacity = resource.Type == ResourceType.Venue ? resource.Capacity : 0,
-            Size = resource.Type == ResourceType.Venue ? resource.Size : null,
+            Size = resource.Type == ResourceType.Venue ? (int.TryParse(resource.Size, out var num) ? num : 0).ToString("N0") : null,
             AddressLine1 = resource.Type == ResourceType.Venue ? resource.AddressLine1 : null,
             AddressLine2 = resource.Type == ResourceType.Venue ? resource.AddressLine2 : null,
             CityMunicipality = resource.Type == ResourceType.Venue ? resource.CityMunicipality : null,

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Schedify.Data;
+using Schedify.Models;
 using Schedify.Services;
 using Schedify.ViewModels;
 
@@ -281,11 +282,11 @@ public class OrganizerController : Controller
     [HttpGet]
     public IActionResult Resources()
     {
-        var venueResources = _resourceService.GetVenues();
+        var resources = _resourceService.GetResourcesByType(ResourceType.Venue);
         var model = new OrganizerResourcesViewModel
         {
-            Resources = venueResources,
-            ResourceImages = _resourceService.GetResourceImageFromList(venueResources),
+            Resources = resources,
+            ResourceImages = _resourceService.GetResourceImageFromList(resources),
         };
 
         return View(model);
@@ -365,11 +366,11 @@ public class OrganizerController : Controller
     {
         if (Request.Headers["HX-Request"] == "true")
         {
-            var venueResources = _resourceService.GetVenues();
+            var resources = _resourceService.GetResourcesByType(ResourceType.Venue);
             var model = new OrganizerResourcesViewModel
             {
-                Resources = venueResources,
-                ResourceImages = _resourceService.GetResourceImageFromList(venueResources),
+                Resources = resources,
+                ResourceImages = _resourceService.GetResourceImageFromList(resources),
             };
             return PartialView("~/Views/Organizer/Partials/_TypeVenuesPartial.cshtml", model);
         }
@@ -388,7 +389,13 @@ public class OrganizerController : Controller
     {
         if (Request.Headers["HX-Request"] == "true")
         {
-            return PartialView("~/Views/Organizer/Partials/_TypeEquipmentsPartial.cshtml", new { });
+            var resources = _resourceService.GetResourcesByType(ResourceType.Equipment);
+            var model = new OrganizerResourcesViewModel
+            {
+                Resources = resources,
+                ResourceImages = _resourceService.GetResourceImageFromList(resources),
+            };
+            return PartialView("~/Views/Organizer/Partials/_TypeEquipmentsPartial.cshtml", model);
         }
 
         return RedirectToAction("Resources", "Organizer");
@@ -401,7 +408,13 @@ public class OrganizerController : Controller
 
         if (Request.Headers["HX-Request"] == "true")
         {
-            return PartialView("~/Views/Organizer/Partials/_TypeFurnituresPartial.cshtml", new { });
+            var resources = _resourceService.GetResourcesByType(ResourceType.Furniture);
+            var model = new OrganizerResourcesViewModel
+            {
+                Resources = resources,
+                ResourceImages = _resourceService.GetResourceImageFromList(resources),
+            };
+            return PartialView("~/Views/Organizer/Partials/_TypeFurnituresPartial.cshtml", model);
         }
 
         return RedirectToAction("Resources", "Organizer");
@@ -414,7 +427,13 @@ public class OrganizerController : Controller
 
         if (Request.Headers["HX-Request"] == "true")
         {
-            return PartialView("~/Views/Organizer/Partials/_TypeCateringsPartial.cshtml", new { });
+            var resources = _resourceService.GetResourcesByType(ResourceType.Catering);
+            var model = new OrganizerResourcesViewModel
+            {
+                Resources = resources,
+                ResourceImages = _resourceService.GetResourceImageFromList(resources),
+            };
+            return PartialView("~/Views/Organizer/Partials/_TypeCateringsPartial.cshtml", model);
         }
 
         return RedirectToAction("Resources", "Organizer");
@@ -427,7 +446,13 @@ public class OrganizerController : Controller
 
         if (Request.Headers["HX-Request"] == "true")
         {
-            return PartialView("~/Views/Organizer/Partials/_TypePersonnelsPartial.cshtml", new { });
+            var resources = _resourceService.GetResourcesByType(ResourceType.Personnel);
+            var model = new OrganizerResourcesViewModel
+            {
+                Resources = resources,
+                ResourceImages = _resourceService.GetResourceImageFromList(resources),
+            };
+            return PartialView("~/Views/Organizer/Partials/_TypePersonnelsPartial.cshtml", model);
         }
 
         return RedirectToAction("Resources", "Organizer");
