@@ -33,11 +33,14 @@ public class ResourceService
             .ToDictionary(img => img.ResourceId!.Value, img => img.ImageFileName);
     }
 
-    public List<Resource> GetResourcesByType(ResourceType type)
+    public List<Resource> GetResourcesByType(ResourceType type, int newPage, int pageSize)
     {
         return _context.Resources
-            .Where(r => r.Type == type)
-            .OrderByDescending(r => r.CreatedAt).ToList();
+            .Where(r => r.Type == type && r.Quantity > 0)
+            .OrderByDescending(r => r.CreatedAt)
+            .Skip((newPage - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
     }
 
     public Dictionary<Guid, string> GetResourceImageFromList(List<Resource> resources)
@@ -52,14 +55,18 @@ public class ResourceService
     public async Task<EventResourceViewModel?> GetResourceAndEvents(Guid ResourceId, List<Event> Events)
     {
         var resource = await _context.Resources
-            .FindAsync(ResourceId);
+            .Include(r => r.Image)
+            .FirstOrDefaultAsync(r => r.Id == ResourceId);
 
         if (resource == null) return null;
 
         return new EventResourceViewModel
         {
             ResourceId = ResourceId,
+            EventId = Events.First().Id,
+            Resource = resource,
             DraftEvents = Events,
+            SelectedEvent = Events.First().Name,
             CostType = resource.CostType,
             Type = resource.Type,
             QuantityFromResource = resource.Quantity,

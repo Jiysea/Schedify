@@ -110,21 +110,6 @@ public class EventService
             .ToDictionary(g => g.EventId, g => g.Count);
     }
 
-    public bool IsEventHasVenue(Guid Id)
-    {
-        var eventResources = _context.EventResources.Where(er => er.EventId == Id).ToList();
-
-        foreach (var eventResource in eventResources)
-        {
-            if (eventResource.Resource.Type == ResourceType.Venue)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     public async Task<(bool IsSuccess, Dictionary<string, string>? Error, Event? Event)> CreateEventAsync(CreateEventViewModel model)
     {
         // var validationErrors = ValidateResourceModel(model);
@@ -253,6 +238,21 @@ public class EventService
         };
     }
 
+    public bool IsEventHasVenue(Guid Id)
+    {
+        var eventResources = _context.EventResources.Include(er => er.Resource).Where(er => er.EventId == Id).ToList();
+
+        foreach (var eventResource in eventResources)
+        {
+            if (eventResource.Resource.Type == ResourceType.Venue)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public async Task<UpdateEventViewModel?> GetEditEventByIdAsync(Guid Id)
     {
         var _event = await _context.Events
@@ -296,6 +296,10 @@ public class EventService
 
     public async Task<bool> OpenEventByIdAsync(Guid Id)
     {
+        Console.WriteLine(Id);
+        Console.WriteLine(Id);
+        Console.WriteLine(Id);
+        Console.WriteLine(Id);
         var _event = await _context.Events
             .FindAsync(Id);
 
@@ -384,4 +388,46 @@ public class EventService
             return (false, new Dictionary<string, string> { { "Exception", $"An error occurred: {ex.Message}" } }, null);
         }
     }
+
+    public async Task<(bool IsSuccess, Dictionary<string, string>? Error, EventResource? EventResource)> AddToEventResourceAsync(EventResourceViewModel model)
+    {
+        using var transaction = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            var user = await _userService.GetUserAsync();
+            if (user == null)
+            {
+                return (false, new Dictionary<string, string> { { "Authentication", "User must be authenticated." } }, null);
+            }
+
+            var resource = await _context.Resources.FindAsync(model.ResourceId);
+
+            if (resource == null) return (false, new Dictionary<string, string> { { "NullError", "Resource not found." } }, null);
+            
+            resource.Quantity -= model.QuantityFromForm;
+            resource.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+            
+            var eventResource = new EventResource
+            {
+                ResourceId = resource.Id,
+                EventId = model.EventId,
+                TotalCost = model.TotalCost,
+                Quantity = model.QuantityFromForm,
+                AddedAt = DateTime.UtcNow,
+            };
+
+            _context.EventResources.Add(eventResource);
+            await _context.SaveChangesAsync();
+
+            await transaction.CommitAsync();
+            return (true, null, eventResource);
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            return (false, new Dictionary<string, string> { { "Exception", $"An error occurred: {ex.Message}" } }, null);
+        }
+    }
+
 }

@@ -1,3 +1,4 @@
+@using System.Text.Json
 @model EventResourceViewModel
 
 <header class="flex items-center justify-between text-lg font-medium py-3 px-4">
@@ -16,21 +17,207 @@
 
 <main class="flex flex-col gap-10 p-5 relative">
 
-    <form hx-post="/organizer/add-to-event-resource" hx-swap="none" hx-vals='{"ResourceId": "@Model.ResourceId"}'>
+    <form hx-post="/organizer/add-event-resource" hx-swap="none" hx-vals='{"ResourceId": "@Model.ResourceId", "EventId": "@Model.EventId", "QuantityFromResource": @Model.QuantityFromResource, "CostFromResource": @Model.CostFromResource, "Type": "@Model.Type", "CostType": "@Model.CostType"}'>
         @* Body *@
         <div class="flex flex-col gap-10">
 
             @* List of Events (Dropdown) *@
-            <div x-data="{ open: false }" class="relative flex items-center">
-                <button type="button" x-ref="selectedEvent" x-on:click="open = !open" class="input-coffee p-2 text-sm focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-coffee-500">
+            <div x-data="{ open: false }" class="relative flex flex-col gap-1">
+                <p class="text-xs text-coffee-900">Choose an event</p>
+                <button type="button" x-ref="selectedEvent" x-on:click="open = !open"
+                    class="input-coffee flex items-center justify-between p-2 text-sm focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-coffee-500">
                     @Model.SelectedEvent
+                    <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                        viewBox="0 0 256 256">
+                        <path
+                            d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z">
+                        </path>
+                    </svg>
                 </button>
-                <div x-show="open" x-anchor.bottom.offset.10="$refs.selectedEvent" class="z-50 w-60 flex flex-col items-center justify-center bg-white rounded-md border border-coffee-300">
-                    @foreach(var evt in Model.DraftEvents)
+
+                <div x-show="open" x-anchor.bottom.offset.10="$refs.selectedEvent" x-on:click.outside="open = false;"
+                    class="z-50 flex flex-col items-center justify-center w-full bg-white rounded-md border border-coffee-300">
+                    @foreach (var evt in Model.DraftEvents)
+                    {   
+                        <button type="button" x-on:click="open = false"
+                            hx-post="/organizer/update-selected-event" hx-swap="innerHTML"
+                            hx-target="#viewResourceModalContent" hx-vals='{"EventId": "@evt.Id"}'
+                            class="duration-200 ease-in-out flex items-center justify-start text-start w-full px-1.5 py-3 text-xs font-medium text-coffee-900 hover:bg-coffee-100 active:bg-coffee-300">
+                            @evt.Name
+                        </button>
+                    }
+                </div>
+            </div>
+
+            <div class="relative flex flex-col gap-2 border border-coffee-300 rounded-lg p-5">
+                <p class="absolute start-4 -top-3 px-2 font-semibold text-sm bg-coffee-50 text-pumpkin-600">Add this @Model.Type to your
+                    event?</p>
+
+                @* Resource Information Body *@
+                <div class="grid grid-cols-4 gap-2">
+                    @* Resource Image *@
+                    <div class="flex items-center justify-center col-span-full w-full py-6 min-h-32 max-h-32">
+                        <img src="/resources/@Model.Resource!.Image!.ImageFileName" alt="Resource Image"
+                            class="h-32 object-cover rounded-md">
+                    </div>
+
+                    @* Resource Name *@
+                    <div class="flex flex-col col-span-full gap-1 relative">
+                        <p for="name" class="text-xs text-coffee-900">Resource Name</p>
+                        <span class="p-2 text-sm text-coffee-700">
+                            @Model.Resource.Name
+                        </span>
+                    </div>
+
+                    @* Cost *@
+                    <div class="flex flex-col col-span-2 gap-1 relative">
+                        <p for="cost" class="text-xs text-coffee-900">Cost</p>
+                        <span class="p-2 text-sm text-coffee-700">
+                            ₱@Model.Resource.Cost.ToString("N2")
+                        </span>
+                    </div>
+
+                    @* Cost Type *@
+                    <div class="flex flex-col col-span-2 gap-1 relative">
+                        <p for="costtype" class="text-xs text-coffee-900">Type of Cost</p>
+                        <span class="p-2 text-sm text-coffee-700">
+                            @Model.CostType
+                        </span>
+                    </div>
+
+                    @if (Model.Type == ResourceType.Venue)
                     {
-                    <button type="button" x-on:click="open = false" class="duration-200 ease-in-out flex items-center justify-start text-start w-full px-1.5 py-3 text-xs font-medium text-coffee-900 hover:bg-coffee-100 active:bg-coffee-300">
-                        @evt.Name
-                    </button>
+                        @* Address Line 1 *@
+                        <div class="flex flex-col col-span-full gap-1 relative">
+                            <p for="costtype" class="text-xs text-coffee-900">Address Line @(Model.Resource.AddressLine2 == null ? "" : "1")</p>
+                            <span class="p-2 text-sm text-coffee-700">
+                                @Model.Resource.AddressLine1
+                            </span>
+                        </div>
+
+                        @if (Model.Resource.AddressLine2 != null)
+                        {
+                            @* Address Line 2 *@
+                            <div class="flex flex-col col-span-full gap-1 relative">
+                                <p for="addressline2" class="text-xs text-coffee-900">Address Line 2</p>
+                                <span class="p-2 text-sm text-coffee-700">
+                                    Model.Resource.AddressLine2
+                                </span>
+                            </div>
+                        }
+
+                        @* City/Municipality *@
+                        <div class="flex flex-col col-span-2 gap-1 relative">
+                            <p for="citymunicipality" class="text-xs text-coffee-900">City/Municipality</p>
+                            <span class="p-2 text-sm text-coffee-700">
+                                @Model.Resource.CityMunicipality
+                            </span>
+                        </div>
+
+                        @* Province *@
+                        <div class="flex flex-col col-span-2 gap-1 relative">
+                            <p for="province" class="text-xs text-coffee-900">Province</p>
+                            <span class="p-2 text-sm text-coffee-700">
+                                @Model.Resource.Province
+                            </span>
+                        </div>
+
+                        @* Capacity *@
+                        <div class="flex flex-col col-span-2 gap-1 relative">
+                            <p for="capacity" class="text-xs text-coffee-900">Capacity</p>
+                            <span class="p-2 text-sm text-coffee-700">
+                                @Model.Resource.Capacity
+                            </span>
+                        </div>
+
+                        @* Size *@
+                        <div class="flex flex-col col-span-2 gap-1 w-full relative">
+                            <p for="size" class="text-xs text-coffee-900">Size</p>
+                            <span class="p-2 text-sm text-coffee-700">
+                                @Model.Resource.Size ft&sup2;
+                            </span>
+                        </div>
+                    }
+                    else if (Model.Type == ResourceType.Equipment)
+                    {
+                        @* Brand *@
+                        <div class="flex flex-col col-span-full gap-1 relative">
+                            <p for="brand" class="text-xs text-coffee-900">Brand</p>
+                            <span class="p-2 text-sm text-coffee-700">
+                                @Model.Resource.Brand
+                            </span>
+                        </div>
+
+                        var specifications = JsonSerializer.Deserialize<Dictionary<string, string>>(Model.Resource.Specifications!)!;
+                            
+                        @* Specifications *@
+                        <div class="flex flex-col col-span-full gap-2 w-full relative">
+                            <p for="specificationtype" class="text-xs text-coffee-900">Specifications</p>
+                            <div class="ps-4 text-coffee-700">
+                                @foreach (var spec in specifications)
+                                {
+                                    <div class="flex items-center gap-1">
+                                        <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256"><path d="M156,128a28,28,0,1,1-28-28A28,28,0,0,1,156,128Z"></path></svg>
+                                        <span class="text-sm text-coffee-900">@spec.Key:</span>
+                                        <span class="text-sm text-coffee-700">@spec.Value</span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                    else if (Model.Type == ResourceType.Furniture)
+                    {
+                        @* Material *@
+                        <div class="flex flex-col col-span-2 gap-1 relative">
+                            <p for="material" class="text-xs text-coffee-900">Material</p>
+                            <span class="p-2 text-sm text-coffee-700">
+                                @Model.Resource.Material
+                            </span>
+                        </div>
+
+                        @* Dimensions *@
+                        <div class="flex flex-col col-span-2 gap-1 relative">
+                            <p for="dimensions" class="text-xs text-coffee-900">Dimensions</p>
+                            <span class="p-2 text-sm text-coffee-700">
+                                @Model.Resource.Dimensions
+                            </span>
+                        </div>
+                    }
+                    else if (Model.Type == ResourceType.Catering)
+                    {
+                        @* Menu Items *@
+                        <div class="flex flex-col col-span-full gap-1 relative">
+                            <p for="menuitems" class="text-xs text-coffee-900">Menu Items</p>
+                            <span class="p-2 text-sm text-coffee-700">
+                                @Model.Resource.MenuItems
+                            </span>
+                        </div>
+                    }
+                    else if (Model.Type == ResourceType.Personnel)
+                    {
+                        @* Position *@
+                        <div class="flex flex-col col-span-2 gap-1 relative">
+                            <p for="position" class="text-xs text-coffee-900">Position</p>
+                            <span class="p-2 text-sm text-coffee-700">
+                                @Model.Resource.Position
+                            </span>
+                        </div>
+
+                        @* Preferred Shift *@
+                        <div class="flex flex-col col-span-2 gap-1 relative w-full">
+                            <p for="shift" class="text-xs text-coffee-900">Preferred Shift</p>
+                            <span class="p-2 text-sm text-coffee-700">
+                                @Model.Resource.Shift
+                            </span>
+                        </div>
+
+                        @* Experience *@
+                        <div class="flex flex-col col-span-full gap-1 relative">
+                            <p for="experience" class="text-xs text-coffee-900">Experience</p>
+                            <span class="p-2 text-sm text-coffee-700">
+                                @Model.Resource.Experience
+                            </span>
+                        </div>
                     }
                 </div>
             </div>
@@ -45,8 +232,8 @@
 
             @* Quantity *@
             <div class="flex flex-col col-span-2 gap-1 relative">
-                <label for="edit-entryfee" class="text-xs text-coffee-900">Quantity</label>
-                <input type="number" inputmode="numeric" class="input-coffee p-2" asp-for="QuantityFromForm"
+                <label for="QuantityFromResource" class="text-xs text-coffee-900">Quantity</label>
+                <input type="number" id="QuantityFromResource" inputmode="numeric" class="input-coffee p-2" asp-for="QuantityFromForm"
                     hx-post="/organizer/update-total-cost" hx-swap="innerHTML" hx-trigger="change"
                     hx-target="#updateTotalCost" min="1" max="@Model.QuantityFromResource"
                     placeholder="Type quantity here">

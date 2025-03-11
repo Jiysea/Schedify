@@ -14,8 +14,11 @@ public class EventResourceViewModel
     public ResourceType Type { get; set; }
 
     // From Resource
+    public Resource? Resource { get; set; }
     public int QuantityFromResource { get; set; }
     public decimal CostFromResource { get; set; }
+
+
     public string SelectedEvent { get; set; } = "No Draft Events";
     public List<Event> DraftEvents { get; set; } = new List<Event>();
 
@@ -41,7 +44,16 @@ public class EventResourceViewModel
         }
     }
 
+    public int TotalDays
+    {
+        get
+        {
+            return (int)(EventEndAt - EventStartAt).TotalDays;
+        }
+    }
+
     // From Form
+    [Range(1, int.MaxValue, ErrorMessage = "Value must be at least 1.")]
     public int QuantityFromForm { get; set; } = 1;
 
     [DataType(DataType.Currency)]
@@ -61,23 +73,55 @@ public class EventResourceViewModel
                 case ResourceType.Venue:
                     if (CostType == "Per Hour")
                     {
-                        return QuantityFromForm * CostFromResource;
+                        return CostFromResource * TotalHours;
                     }
                     if (CostType == "Per Day")
                     {
-                        return QuantityFromForm * CostFromResource;
+                        return CostFromResource * TotalDays;
                     }
                     if (CostType == "Fixed Rate")
                     {
-                        Console.WriteLine("Are you sure this is fixed rate? ");
+                        return CostFromResource;
+                    }
+                    break;
+                case ResourceType.Equipment:
+                case ResourceType.Furniture:
+                    if (CostType == "Per Unit")
+                    {
                         return QuantityFromForm * CostFromResource;
+                    }
+                    if (CostType == "In Bulk")
+                    {
+                        return CostFromResource;
+                    }
+                    break;
+                case ResourceType.Catering:
+                    if (CostType == "Per Serving")
+                    {
+                        return QuantityFromForm * CostFromResource;
+                    }
+                    if (CostType == "In Bulk")
+                    {
+                        return CostFromResource;
                     }
                     break;
                 case ResourceType.Personnel:
-
+                    if (CostType == "Per Hour")
+                    {
+                        return QuantityFromForm * (CostFromResource * TotalHours);
+                    }
+                    if (CostType == "Per Day")
+                    {
+                        return QuantityFromForm * (CostFromResource * TotalDays);
+                    }
+                    if (CostType == "Fixed Rate")
+                    {
+                        return QuantityFromForm * CostFromResource;
+                    }
                     break;
             }
 
+            Console.WriteLine("Yawa");
             return 0.00m;
         }
     }

@@ -24,7 +24,8 @@
                     class="flex w-full items-center justify-center gap-2 p-2 text-sm font-semibold duration-200 ease-in-out rounded-md"
                     :class="{ 'text-coffee-50 bg-coffee-700 hover:bg-coffee-800 active:bg-coffee-700': @(Model.EventHasVenue.ToString().ToLower()), 'text-coffee-300 bg-coffee-100 cursor-not-allowed': @((!Model.EventHasVenue).ToString().ToLower()), }"
                     @(Model.EventHasVenue ? $"hx-patch='/organizer/open-event/{Model.Id}' hx-swap='none'" : $"disabled")>
-                    <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256">
+                    <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                        viewBox="0 0 256 256">
                         <path
                             d="M232,72H160a40,40,0,0,0-32,16A40,40,0,0,0,96,72H24a8,8,0,0,0-8,8V200a8,8,0,0,0,8,8H96a24,24,0,0,1,24,24,8,8,0,0,0,16,0,24,24,0,0,1,24-24h72a8,8,0,0,0,8-8V80A8,8,0,0,0,232,72ZM96,192H32V88H96a24,24,0,0,1,24,24v88A39.81,39.81,0,0,0,96,192Zm128,0H160a39.81,39.81,0,0,0-24,8V112a24,24,0,0,1,24-24h64ZM89.6,43.19a48,48,0,0,1,76.8,0,8,8,0,0,1-12.79,9.62,32,32,0,0,0-51.22,0A8,8,0,1,1,89.6,43.19Z">
                         </path>
@@ -32,32 +33,36 @@
                     OPEN FOR BOOKING
                 </button>
 
-                @* For OPEN FOR REGISTRATION button only *@
-                <div x-show="hover" x-transition.opacity x-anchor.bottom.offset.5="$refs.openEvent"
-                    x-on:mouseover="hover = true;" x-on:mouseleave="hover = false"
-                    class="z-50 flex flex-col justify-center gap-1 bg-white rounded-md px-4 py-2 text-sm font-medium border border-zinc-300">
-                    <div class="flex items-center gap-1">
-                        You need to get a
-                        <span class="flex items-center gap-0.5 relative text-pumpkin-600">
-                            Venue
-                        </span>
-                        first before opening this event.
-                    </div>
+                @if (!Model.EventHasVenue)
+                {
+                    @* For OPEN FOR REGISTRATION button only *@
+                    <div x-show="hover" x-transition.opacity x-anchor.bottom.offset.5="$refs.openEvent"
+                        x-on:mouseover="hover = true;" x-on:mouseleave="hover = false"
+                        class="z-50 flex flex-col justify-center gap-1 bg-white rounded-md px-4 py-2 text-sm font-medium border border-zinc-300">
+                        <div class="flex items-center gap-1">
+                            You need to get a
+                            <span class="flex items-center gap-0.5 relative text-pumpkin-600">
+                                Venue
+                            </span>
+                            first before opening this event.
+                        </div>
 
-                    <div class="flex items-center gap-1">
-                        You can find venues in the
-                        <a href="/organizer/resources"
-                            class="flex items-center gap-0.5 relative hover:underline hover:underline-offset-4 decoration-pumpkin-600 text-pumpkin-600">
-                            <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-                                fill="currentColor" viewBox="0 0 256 256">
-                                <path
-                                    d="M223.68,66.15,135.68,18a15.88,15.88,0,0,0-15.36,0l-88,48.17a16,16,0,0,0-8.32,14v95.64a16,16,0,0,0,8.32,14l88,48.17a15.88,15.88,0,0,0,15.36,0l88-48.17a16,16,0,0,0,8.32-14V80.18A16,16,0,0,0,223.68,66.15ZM128,32l80.34,44-29.77,16.3-80.35-44ZM128,120,47.66,76l33.9-18.56,80.34,44ZM40,90l80,43.78v85.79L40,175.82Zm176,85.78h0l-80,43.79V133.82l32-17.51V152a8,8,0,0,0,16,0V107.55L216,90v85.77Z">
-                                </path>
-                            </svg>
-                            Resources
-                        </a> page
+                        <div class="flex items-center gap-1">
+                            You can find venues in the
+                            <a href="/organizer/resources"
+                                class="flex items-center gap-0.5 relative hover:underline hover:underline-offset-4 decoration-pumpkin-600 text-pumpkin-600">
+                                <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                                    fill="currentColor" viewBox="0 0 256 256">
+                                    <path
+                                        d="M223.68,66.15,135.68,18a15.88,15.88,0,0,0-15.36,0l-88,48.17a16,16,0,0,0-8.32,14v95.64a16,16,0,0,0,8.32,14l88,48.17a15.88,15.88,0,0,0,15.36,0l88-48.17a16,16,0,0,0,8.32-14V80.18A16,16,0,0,0,223.68,66.15ZM128,32l80.34,44-29.77,16.3-80.35-44ZM128,120,47.66,76l33.9-18.56,80.34,44ZM40,90l80,43.78v85.79L40,175.82Zm176,85.78h0l-80,43.79V133.82l32-17.51V152a8,8,0,0,0,16,0V107.55L216,90v85.77Z">
+                                    </path>
+                                </svg>
+                                Resources
+                            </a> page
+                        </div>
                     </div>
-                </div>
+                }
+
             </div>
 
             <button type="button"
@@ -83,11 +88,11 @@
         }
         else if (@Model.Status == EventStatus.Open)
         {
-            <button type="button" hx-confirm="Are you sure you want to draft this event?"
+            @* <button type="button" hx-confirm="Are you sure you want to draft this event?"
                 class="flex flex-1 items-center justify-center p-2 text-sm font-semibold duration-200 ease-in-out rounded-md border border-coffee-700 hover:border-transparent text-coffee-700 hover:text-coffee-50 hover:bg-coffee-800 active:bg-coffee-900"
                 hx-patch="/organizer/draft-event/@Model.Id" hx-swap="none">
                 Draft this shit
-            </button>
+            </button> *@
             <button type="button"
                 class="flex flex-1 items-center justify-center p-2 text-sm font-semibold duration-200 ease-in-out rounded-md border bg-red-700 hover:bg-red-800 active:bg-red-900 text-red-50"
                 hx-patch="/organizer/cancel-event/@Model.Id" hx-swap="none"

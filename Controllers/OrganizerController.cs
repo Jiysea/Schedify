@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Schedify.Data;
 using Schedify.Models;
 using Schedify.Services;
@@ -28,9 +30,9 @@ public class OrganizerController : Controller
         startDate ??= new DateTime(DateTime.UtcNow.Year, 1, 1, 0, 0, 0, DateTimeKind.Utc); // Jan 1st, 00:00 UTC
         endDate ??= DateTime.UtcNow.Date.AddHours(23).AddMinutes(59); // Today at 23:59 UTC
 
-        var draftEvents = _eventService.GetEventsByOrganizerDraft(startDate, endDate);
-        var publishedEvents = _eventService.GetEventsByOrganizerPublished(startDate, endDate);
-        var concludedEvents = _eventService.GetEventsByOrganizerConcluded(startDate, endDate);
+        var draftEvents = _eventService.GetEventsByOrganizerDraft(startDate, endDate?.AddHours(23).AddMinutes(59));
+        var publishedEvents = _eventService.GetEventsByOrganizerPublished(startDate, endDate?.AddHours(23).AddMinutes(59));
+        var concludedEvents = _eventService.GetEventsByOrganizerConcluded(startDate, endDate?.AddHours(23).AddMinutes(59));
 
         var pAttendeeCount = _eventService.GetAttendeeCounts(publishedEvents);
         var cAttendeeCount = _eventService.GetAttendeeCounts(concludedEvents);
@@ -82,7 +84,7 @@ public class OrganizerController : Controller
     [Route("organizer/view-event/{id}")]
     [HttpGet]
     public async Task<IActionResult> ViewEvent(Guid id)
-    {
+    {   
         var _event = await _eventService.GetEventByIdAsync(id);
 
         if (_event == null)
@@ -116,7 +118,7 @@ public class OrganizerController : Controller
 
     [Route("organizer/update-event")]
     [HttpPost]
-    public async Task<IActionResult> UpdateEvent(Guid Id, UpdateEventViewModel model)
+    public async Task<IActionResult> UpdateEvent(UpdateEventViewModel model)
     {
         var result = await _eventService.UpdateEventAsync(model);
 
@@ -282,14 +284,46 @@ public class OrganizerController : Controller
     [HttpGet]
     public IActionResult Resources()
     {
-        var resources = _resourceService.GetResourcesByType(ResourceType.Venue);
+        int pageSize = 8; // Default page size
+        int newPage = 0; // Calculate new page number
+
+        if (newPage < 1) newPage = 1; // Prevent negative pages
+        var totalCount = _context.Resources.Count(r => r.Type == ResourceType.Venue && r.Quantity > 0);
+        var resources = _resourceService.GetResourcesByType(ResourceType.Venue, newPage, pageSize);
+
         var model = new OrganizerResourcesViewModel
         {
             Resources = resources,
             ResourceImages = _resourceService.GetResourceImageFromList(resources),
+            CurrentPage = newPage,
+            PageSize = pageSize,
+            TotalCount = totalCount
         };
 
         return View(model);
+    }
+
+    [Route("organizer/resource-change-page/{change}")]
+    [HttpGet]
+    public IActionResult ChangePage(ResourceType type, int change, int currentPage)
+    {
+        int pageSize = 8; // Default page size
+        int newPage = currentPage + change; // Calculate new page number
+
+        if (newPage < 1) newPage = 1; // Prevent negative pages
+        var totalCount = _context.Resources.Count(r => r.Type == type && r.Quantity > 0);
+        var resources = _resourceService.GetResourcesByType(type, newPage, pageSize);
+
+        var viewModel = new OrganizerResourcesViewModel
+        {
+            Resources = resources,
+            ResourceImages = _resourceService.GetResourceImageFromList(resources),
+            CurrentPage = newPage,
+            PageSize = pageSize,
+            TotalCount = totalCount
+        };
+
+        return View("~/Views/Organizer/Resources.cshtml");
     }
 
     [Route("organizer/view-resource/{id}")]
@@ -308,7 +342,7 @@ public class OrganizerController : Controller
 
     [Route("organizer/show-add-event-resource/{id}")]
     [HttpGet]
-    public async Task<IActionResult> AddToEventResource(Guid id)
+    public async Task<IActionResult> ShowAddToEventResource(Guid id)
     {
         var DraftEvents = _eventService.GetEventsByOrganizerDraft(new DateTime(DateTime.UtcNow.Year, 1, 1, 0, 0, 0, DateTimeKind.Utc), DateTime.UtcNow.Date.AddHours(23).AddMinutes(59));
         var result = await _resourceService.GetResourceAndEvents(id, DraftEvents);
@@ -321,12 +355,58 @@ public class OrganizerController : Controller
         return PartialView("~/Views/Organizer/Partials/_AddToEventResourcePartial.cshtml", result);
     }
 
+    [Route("organizer/add-event-resource")]
+    [HttpPost]
+    public async Task<IActionResult> AddToEventResource(EventResourceViewModel model)
+    {
+        Console.WriteLine(model.CostType);
+        Console.WriteLine(model.Type);
+        Console.WriteLine(model.QuantityFromForm);
+        Console.WriteLine(model.QuantityFromResource);
+        Console.WriteLine(model.MaxQuantityReached);
+        Console.WriteLine(model.TotalCost);
+        Console.WriteLine(model.CostFromResource);
+        if (!ModelState.IsValid)
+        {
+            foreach (var state in ModelState)
+            {
+                foreach (var error in state.Value.Errors)
+                {
+                    Console.WriteLine(error.ErrorMessage);
+                }
+            }
+            return PartialView("_ValidationMessages", ModelState);
+        }
+
+        var result = await _eventService.AddToEventResourceAsync(model);
+
+        if (!result.IsSuccess)
+        {
+            // Split error messages and add them to ModelState
+            foreach (var error in result.Error!)
+            {
+                ModelState.AddModelError(error.Key, error.Value);
+                if (error.Key == "Authentication")
+                {
+                    Response.Headers.Append("HX-Redirect", Url.Action("Login", "Auth"));
+                }
+            }
+
+            return PartialView("_ValidationMessages", ModelState);
+        }
+
+        Response.Headers.Append("HX-Redirect", Url.Action("Resources", "Organizer"));
+        return Content(string.Empty);
+    }
+
     [Route("organizer/update-total-cost")]
     [HttpPost]
     public async Task<IActionResult> UpdateTotalCost(EventResourceViewModel model)
     {
         var DraftEvents = _eventService.GetEventsByOrganizerDraft(new DateTime(DateTime.UtcNow.Year, 1, 1, 0, 0, 0, DateTimeKind.Utc), DateTime.UtcNow.Date.AddHours(23).AddMinutes(59));
-        var resource = await _context.Resources.FindAsync(model.ResourceId);
+        var resource = await _context.Resources
+            .Include(r => r.Image)
+            .FirstOrDefaultAsync(r => r.Id == model.ResourceId);
 
         if (resource == null)
         {
@@ -336,6 +416,7 @@ public class OrganizerController : Controller
         var updatedModel = new EventResourceViewModel
         {
             ResourceId = model.ResourceId,
+            Resource = resource,
             DraftEvents = DraftEvents,
             CostType = resource.CostType,
             Type = resource.Type,
@@ -344,8 +425,44 @@ public class OrganizerController : Controller
             Shift = resource.Type == ResourceType.Personnel ? resource.Shift : null,
             QuantityFromForm = model.QuantityFromForm,
         };
-        
+
         return PartialView("~/Views/Organizer/Partials/_TotalCostUpdatePartial.cshtml", updatedModel.TotalCost);
+    }
+
+    [Route("organizer/update-selected-event")]
+    [HttpPost]
+    public async Task<IActionResult> UpdateSelectedEvent(Guid EventId, EventResourceViewModel model)
+    {
+        var DraftEvents = _eventService.GetEventsByOrganizerDraft(new DateTime(DateTime.UtcNow.Year, 1, 1, 0, 0, 0, DateTimeKind.Utc), DateTime.UtcNow.Date.AddHours(23).AddMinutes(59));
+        var selectedEvent = await _context.Events.FindAsync(EventId);
+
+        if (selectedEvent == null) return NotFound();
+
+        var resource = await _context.Resources
+            .Include(r => r.Image)
+            .FirstOrDefaultAsync(r => r.Id == model.ResourceId);
+
+        if (resource == null)
+        {
+            return NotFound();
+        }
+
+        var updatedModel = new EventResourceViewModel
+        {
+            EventId = EventId,
+            ResourceId = model.ResourceId,
+            Resource = resource,
+            DraftEvents = DraftEvents,
+            SelectedEvent = selectedEvent.Name,
+            CostType = resource.CostType,
+            Type = resource.Type,
+            QuantityFromResource = resource.Quantity,
+            CostFromResource = resource.Cost,
+            Shift = resource.Type == ResourceType.Personnel ? resource.Shift : null,
+            QuantityFromForm = model.QuantityFromForm,
+        };
+
+        return PartialView("~/Views/Organizer/Partials/_AddToEventResourcePartial.cshtml", updatedModel);
     }
 
     [Route("organizer/by-events")]
@@ -366,11 +483,20 @@ public class OrganizerController : Controller
     {
         if (Request.Headers["HX-Request"] == "true")
         {
-            var resources = _resourceService.GetResourcesByType(ResourceType.Venue);
+            int pageSize = 8; // Default page size
+            int newPage = 0; // Calculate new page number
+
+            if (newPage < 1) newPage = 1; // Prevent negative pages
+            var totalCount = _context.Resources.Count(r => r.Type == ResourceType.Venue && r.Quantity > 0);
+            var resources = _resourceService.GetResourcesByType(ResourceType.Venue, newPage, pageSize);
+
             var model = new OrganizerResourcesViewModel
             {
                 Resources = resources,
                 ResourceImages = _resourceService.GetResourceImageFromList(resources),
+                CurrentPage = newPage,
+                PageSize = pageSize,
+                TotalCount = totalCount
             };
             return PartialView("~/Views/Organizer/Partials/_TypeVenuesPartial.cshtml", model);
         }
@@ -378,22 +504,25 @@ public class OrganizerController : Controller
         return RedirectToAction("Resources", "Organizer");
     }
 
-
-    // --------------------------------------------------------------------------------------
-    // Equipments
-    // --------------------------------------------------------------------------------------
-
-
     [Route("organizer/equipments")]
     public IActionResult Equipments()
     {
         if (Request.Headers["HX-Request"] == "true")
         {
-            var resources = _resourceService.GetResourcesByType(ResourceType.Equipment);
+            int pageSize = 8; // Default page size
+            int newPage = 0; // Calculate new page number
+
+            if (newPage < 1) newPage = 1; // Prevent negative pages
+            var totalCount = _context.Resources.Count(r => r.Type == ResourceType.Equipment && r.Quantity > 0);
+            var resources = _resourceService.GetResourcesByType(ResourceType.Equipment, newPage, pageSize);
+
             var model = new OrganizerResourcesViewModel
             {
                 Resources = resources,
                 ResourceImages = _resourceService.GetResourceImageFromList(resources),
+                CurrentPage = newPage,
+                PageSize = pageSize,
+                TotalCount = totalCount
             };
             return PartialView("~/Views/Organizer/Partials/_TypeEquipmentsPartial.cshtml", model);
         }
@@ -408,11 +537,20 @@ public class OrganizerController : Controller
 
         if (Request.Headers["HX-Request"] == "true")
         {
-            var resources = _resourceService.GetResourcesByType(ResourceType.Furniture);
+            int pageSize = 8; // Default page size
+            int newPage = 0; // Calculate new page number
+
+            if (newPage < 1) newPage = 1; // Prevent negative pages
+            var totalCount = _context.Resources.Count(r => r.Type == ResourceType.Furniture && r.Quantity > 0);
+            var resources = _resourceService.GetResourcesByType(ResourceType.Furniture, newPage, pageSize);
+
             var model = new OrganizerResourcesViewModel
             {
                 Resources = resources,
                 ResourceImages = _resourceService.GetResourceImageFromList(resources),
+                CurrentPage = newPage,
+                PageSize = pageSize,
+                TotalCount = totalCount
             };
             return PartialView("~/Views/Organizer/Partials/_TypeFurnituresPartial.cshtml", model);
         }
@@ -427,11 +565,20 @@ public class OrganizerController : Controller
 
         if (Request.Headers["HX-Request"] == "true")
         {
-            var resources = _resourceService.GetResourcesByType(ResourceType.Catering);
+            int pageSize = 8; // Default page size
+            int newPage = 0; // Calculate new page number
+
+            if (newPage < 1) newPage = 1; // Prevent negative pages
+            var totalCount = _context.Resources.Count(r => r.Type == ResourceType.Catering && r.Quantity > 0);
+            var resources = _resourceService.GetResourcesByType(ResourceType.Catering, newPage, pageSize);
+
             var model = new OrganizerResourcesViewModel
             {
                 Resources = resources,
                 ResourceImages = _resourceService.GetResourceImageFromList(resources),
+                CurrentPage = newPage,
+                PageSize = pageSize,
+                TotalCount = totalCount
             };
             return PartialView("~/Views/Organizer/Partials/_TypeCateringsPartial.cshtml", model);
         }
@@ -446,11 +593,20 @@ public class OrganizerController : Controller
 
         if (Request.Headers["HX-Request"] == "true")
         {
-            var resources = _resourceService.GetResourcesByType(ResourceType.Personnel);
+            int pageSize = 8; // Default page size
+            int newPage = 0; // Calculate new page number
+
+            if (newPage < 1) newPage = 1; // Prevent negative pages
+            var totalCount = _context.Resources.Count(r => r.Type == ResourceType.Personnel && r.Quantity > 0);
+            var resources = _resourceService.GetResourcesByType(ResourceType.Personnel, newPage, pageSize);
+
             var model = new OrganizerResourcesViewModel
             {
                 Resources = resources,
                 ResourceImages = _resourceService.GetResourceImageFromList(resources),
+                CurrentPage = newPage,
+                PageSize = pageSize,
+                TotalCount = totalCount
             };
             return PartialView("~/Views/Organizer/Partials/_TypePersonnelsPartial.cshtml", model);
         }
@@ -458,6 +614,12 @@ public class OrganizerController : Controller
         return RedirectToAction("Resources", "Organizer");
 
     }
+
+
+    // --------------------------------------------------------------------------------------
+    // Feedbacks
+    // --------------------------------------------------------------------------------------
+
 
     [Route("organizer/feedbacks")]
     [HttpGet]

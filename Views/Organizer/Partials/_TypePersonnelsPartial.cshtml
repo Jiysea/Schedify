@@ -4,97 +4,137 @@
     <partial name="~/Views/Organizer/Partials/_ResourceNav.cshtml" model="@("Personnels")" />
 </nav>
 
-<div class="flex flex-col gap-3 size-full px-6 py-4">
-    <main class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 grid-rows-2 gap-6">
+@* Pagination *@
+<footer hx-swap-oob="true" id="resources-pagination" class="flex items-center justify-end mt-3">
+    @if (Model.Resources.Count > 0)
+    {
+        <div
+            class="text-sm flex items-center justify-center ps-2 py-1.5 border-2 rounded-lg bg-white border-zinc-300 divide-x-2 divide-zinc-300">
 
-        @* Cards Content *@
-        @foreach (var evt in Model.Resources)
-        {
-            <div class="flex flex-col border-2 rounded-lg border-zinc-300 bg-white">
+            @* Page Number *@
+            <span class="text-zinc-500 px-3"><strong>1-8</strong> of 258</span>
 
-                @* Resource Image *@
-                <span class="flex items-center justify-center">
-                    <img class="object-cover h-24 w-full rounded-t-md"
-                        src="/resources/@(Model.ResourceImages.GetValueOrDefault(evt.Id, ""))" alt="Venue spot">
-                </span>
+            @* Previous & Next buttons *@
+            <span class="flex items-center justify-center gap-3 px-3">
+                <button
+                    class="duration-200 ease-in-out flex items-center size-7 rounded-md p-1 text-zinc-500 hover:bg-zinc-100 active:bg-zinc-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                        viewBox="0 0 256 256">
+                        <path
+                            d="M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z">
+                        </path>
+                    </svg>
+                </button>
+                <button
+                    class="duration-200 ease-in-out flex items-center size-7 rounded-md p-1 text-zinc-500 hover:bg-zinc-100 active:bg-zinc-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                        viewBox="0 0 256 256">
+                        <path
+                            d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z">
+                        </path>
+                    </svg>
+                </button>
+            </span>
+        </div>
+    }
+</footer>
 
-                @* Body *@
-                <div class="flex flex-col gap-2 text-xs text-zinc-500 py-2 px-4">
+<div id="resource-content"
+    class="flex flex-col @(Model.Resources.Count > 0 ? "justify-start" : "justify-center") items-center overflow-y-auto max-h-[65vh] min-h-[65vh] w-full scrollbar-thin scrollbar-track-transparent scrollbar-thumb-coffee-700">
+    <div class="flex flex-col gap-3 size-full px-6 py-4">
+        <main class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 grid-rows-2 gap-6">
 
-                    @* Resource Name *@
-                    <h1 class="font-semibold text-lg text-coffee-900 line-clamp-2 overflow-hidden text-ellipsis">@evt.Name
-                    </h1>
+            @* Cards Content *@
+            @foreach (var evt in Model.Resources)
+            {
+                <div class="flex flex-col border-2 rounded-lg border-zinc-300 bg-white">
 
-                    @* Cost and Cost Type *@
-                    <span class="flex items-center justify-between gap-2">
+                    @* Resource Image *@
+                    <span class="flex items-center justify-center">
+                        <img class="object-cover h-24 w-full rounded-t-md"
+                            src="/resources/@(Model.ResourceImages.GetValueOrDefault(evt.Id, ""))" alt="Venue spot">
+                    </span>
+
+                    @* Body *@
+                    <div class="flex flex-col gap-2 text-xs text-zinc-500 py-2 px-4">
+
+                        @* Resource Name *@
+                        <h1 class="font-semibold text-lg text-coffee-900 line-clamp-2 overflow-hidden text-ellipsis">
+                            @evt.Name
+                        </h1>
+
+                        @* Cost and Cost Type *@
+                        <span class="flex items-center justify-between gap-2">
+                            <p class="flex items-center gap-2">
+                                <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                                    fill="currentColor" viewBox="0 0 256 256">
+                                    <path
+                                        d="M184,89.57V84c0-25.08-37.83-44-88-44S8,58.92,8,84v40c0,20.89,26.25,37.49,64,42.46V172c0,25.08,37.83,44,88,44s88-18.92,88-44V132C248,111.3,222.58,94.68,184,89.57ZM232,132c0,13.22-30.79,28-72,28-3.73,0-7.43-.13-11.08-.37C170.49,151.77,184,139,184,124V105.74C213.87,110.19,232,122.27,232,132ZM72,150.25V126.46A183.74,183.74,0,0,0,96,128a183.74,183.74,0,0,0,24-1.54v23.79A163,163,0,0,1,96,152,163,163,0,0,1,72,150.25Zm96-40.32V124c0,8.39-12.41,17.4-32,22.87V123.5C148.91,120.37,159.84,115.71,168,109.93ZM96,56c41.21,0,72,14.78,72,28s-30.79,28-72,28S24,97.22,24,84,54.79,56,96,56ZM24,124V109.93c8.16,5.78,19.09,10.44,32,13.57v23.37C36.41,141.4,24,132.39,24,124Zm64,48v-4.17c2.63.1,5.29.17,8,.17,3.88,0,7.67-.13,11.39-.35A121.92,121.92,0,0,0,120,171.41v23.46C100.41,189.4,88,180.39,88,172Zm48,26.25V174.4a179.48,179.48,0,0,0,24,1.6,183.74,183.74,0,0,0,24-1.54v23.79a165.45,165.45,0,0,1-48,0Zm64-3.38V171.5c12.91-3.13,23.84-7.79,32-13.57V172C232,180.39,219.59,189.4,200,194.87Z">
+                                    </path>
+                                </svg>
+                                ₱@evt.Cost.ToString("N2")
+                            </p>
+
+                            <p class="flex items-center gap-2">
+                                <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                                    fill="currentColor" viewBox="0 0 256 256">
+                                    <path
+                                        d="M230.33,141.06a24.43,24.43,0,0,0-21.24-4.23l-41.84,9.62A28,28,0,0,0,140,112H89.94a31.82,31.82,0,0,0-22.63,9.37L44.69,144H16A16,16,0,0,0,0,160v40a16,16,0,0,0,16,16H120a7.93,7.93,0,0,0,1.94-.24l64-16a6.94,6.94,0,0,0,1.19-.4L226,182.82l.44-.2a24.6,24.6,0,0,0,3.93-41.56ZM16,160H40v40H16Zm203.43,8.21-38,16.18L119,200H56V155.31l22.63-22.62A15.86,15.86,0,0,1,89.94,128H140a12,12,0,0,1,0,24H112a8,8,0,0,0,0,16h32a8.32,8.32,0,0,0,1.79-.2l67-15.41.31-.08a8.6,8.6,0,0,1,6.3,15.9ZM164,96a36,36,0,0,0,5.9-.48,36,36,0,1,0,28.22-47A36,36,0,1,0,164,96Zm60-12a20,20,0,1,1-20-20A20,20,0,0,1,224,84ZM164,40a20,20,0,0,1,19.25,14.61,36,36,0,0,0-15,24.93A20.42,20.42,0,0,1,164,80a20,20,0,0,1,0-40Z">
+                                    </path>
+                                </svg>
+                                @evt.CostType
+                            </p>
+                        </span>
+
+                        @* Position *@
                         <p class="flex items-center gap-2">
                             <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
                                 fill="currentColor" viewBox="0 0 256 256">
                                 <path
-                                    d="M184,89.57V84c0-25.08-37.83-44-88-44S8,58.92,8,84v40c0,20.89,26.25,37.49,64,42.46V172c0,25.08,37.83,44,88,44s88-18.92,88-44V132C248,111.3,222.58,94.68,184,89.57ZM232,132c0,13.22-30.79,28-72,28-3.73,0-7.43-.13-11.08-.37C170.49,151.77,184,139,184,124V105.74C213.87,110.19,232,122.27,232,132ZM72,150.25V126.46A183.74,183.74,0,0,0,96,128a183.74,183.74,0,0,0,24-1.54v23.79A163,163,0,0,1,96,152,163,163,0,0,1,72,150.25Zm96-40.32V124c0,8.39-12.41,17.4-32,22.87V123.5C148.91,120.37,159.84,115.71,168,109.93ZM96,56c41.21,0,72,14.78,72,28s-30.79,28-72,28S24,97.22,24,84,54.79,56,96,56ZM24,124V109.93c8.16,5.78,19.09,10.44,32,13.57v23.37C36.41,141.4,24,132.39,24,124Zm64,48v-4.17c2.63.1,5.29.17,8,.17,3.88,0,7.67-.13,11.39-.35A121.92,121.92,0,0,0,120,171.41v23.46C100.41,189.4,88,180.39,88,172Zm48,26.25V174.4a179.48,179.48,0,0,0,24,1.6,183.74,183.74,0,0,0,24-1.54v23.79a165.45,165.45,0,0,1-48,0Zm64-3.38V171.5c12.91-3.13,23.84-7.79,32-13.57V172C232,180.39,219.59,189.4,200,194.87Z">
+                                    d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm16-40a8,8,0,0,1-8,8,16,16,0,0,1-16-16V128a8,8,0,0,1,0-16,16,16,0,0,1,16,16v40A8,8,0,0,1,144,176ZM112,84a12,12,0,1,1,12,12A12,12,0,0,1,112,84Z">
                                 </path>
                             </svg>
-                            ₱@evt.Cost.ToString("N2")
+                            @evt.Position
                         </p>
 
+                        @* Shift *@
                         <p class="flex items-center gap-2">
                             <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
                                 fill="currentColor" viewBox="0 0 256 256">
                                 <path
-                                    d="M230.33,141.06a24.43,24.43,0,0,0-21.24-4.23l-41.84,9.62A28,28,0,0,0,140,112H89.94a31.82,31.82,0,0,0-22.63,9.37L44.69,144H16A16,16,0,0,0,0,160v40a16,16,0,0,0,16,16H120a7.93,7.93,0,0,0,1.94-.24l64-16a6.94,6.94,0,0,0,1.19-.4L226,182.82l.44-.2a24.6,24.6,0,0,0,3.93-41.56ZM16,160H40v40H16Zm203.43,8.21-38,16.18L119,200H56V155.31l22.63-22.62A15.86,15.86,0,0,1,89.94,128H140a12,12,0,0,1,0,24H112a8,8,0,0,0,0,16h32a8.32,8.32,0,0,0,1.79-.2l67-15.41.31-.08a8.6,8.6,0,0,1,6.3,15.9ZM164,96a36,36,0,0,0,5.9-.48,36,36,0,1,0,28.22-47A36,36,0,1,0,164,96Zm60-12a20,20,0,1,1-20-20A20,20,0,0,1,224,84ZM164,40a20,20,0,0,1,19.25,14.61,36,36,0,0,0-15,24.93A20.42,20.42,0,0,1,164,80a20,20,0,0,1,0-40Z">
+                                    d="M136,72v43.05l36.42-18.21a8,8,0,0,1,7.16,14.31l-48,24A8,8,0,0,1,120,128V72a8,8,0,0,1,16,0Zm-8,144a88,88,0,1,1,88-88,8,8,0,0,0,16,0A104,104,0,1,0,128,232a8,8,0,0,0,0-16Zm103.73,5.94a8,8,0,1,1-15.46,4.11C213.44,215.42,203.46,208,192,208s-21.44,7.42-24.27,18.05A8,8,0,0,1,160,232a8.15,8.15,0,0,1-2.06-.27,8,8,0,0,1-5.67-9.79,40,40,0,0,1,17.11-23.32,32,32,0,1,1,45.23,0A40,40,0,0,1,231.73,221.94ZM176,176a16,16,0,1,0,16-16A16,16,0,0,0,176,176Z">
                                 </path>
                             </svg>
-                            @evt.CostType
+                            @evt.Shift
                         </p>
-                    </span>
 
-                    @* Position *@
-                    <p class="flex items-center gap-2">
-                        <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256">
-                            <path
-                                d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm16-40a8,8,0,0,1-8,8,16,16,0,0,1-16-16V128a8,8,0,0,1,0-16,16,16,0,0,1,16,16v40A8,8,0,0,1,144,176ZM112,84a12,12,0,1,1,12,12A12,12,0,0,1,112,84Z">
-                            </path>
-                        </svg>
-                        @evt.Position
-                    </p>
+                        @* Experience *@
+                        <p class="flex items-center gap-2">
+                            <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                                fill="currentColor" viewBox="0 0 256 256">
+                                <path
+                                    d="M254.3,107.91,228.78,56.85a16,16,0,0,0-21.47-7.15L182.44,62.13,130.05,48.27a8.14,8.14,0,0,0-4.1,0L73.56,62.13,48.69,49.7a16,16,0,0,0-21.47,7.15L1.7,107.9a16,16,0,0,0,7.15,21.47l27,13.51,55.49,39.63a8.06,8.06,0,0,0,2.71,1.25l64,16a8,8,0,0,0,7.6-2.1l55.07-55.08,26.42-13.21a16,16,0,0,0,7.15-21.46Zm-54.89,33.37L165,113.72a8,8,0,0,0-10.68.61C136.51,132.27,116.66,130,104,122L147.24,80h31.81l27.21,54.41ZM41.53,64,62,74.22,36.43,125.27,16,115.06Zm116,119.13L99.42,168.61l-49.2-35.14,28-56L128,64.28l9.8,2.59-45,43.68-.08.09a16,16,0,0,0,2.72,24.81c20.56,13.13,45.37,11,64.91-5L188,152.66Zm62-57.87-25.52-51L214.47,64,240,115.06Zm-87.75,92.67a8,8,0,0,1-7.75,6.06,8.13,8.13,0,0,1-1.95-.24L80.41,213.33a7.89,7.89,0,0,1-2.71-1.25L51.35,193.26a8,8,0,0,1,9.3-13l25.11,17.94L126,208.24A8,8,0,0,1,131.82,217.94Z">
+                                </path>
+                            </svg>
+                            @evt.Experience
+                        </p>
 
-                    @* Shift *@
-                    <p class="flex items-center gap-2">
-                        <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
-                            viewBox="0 0 256 256">
-                            <path
-                                d="M136,72v43.05l36.42-18.21a8,8,0,0,1,7.16,14.31l-48,24A8,8,0,0,1,120,128V72a8,8,0,0,1,16,0Zm-8,144a88,88,0,1,1,88-88,8,8,0,0,0,16,0A104,104,0,1,0,128,232a8,8,0,0,0,0-16Zm103.73,5.94a8,8,0,1,1-15.46,4.11C213.44,215.42,203.46,208,192,208s-21.44,7.42-24.27,18.05A8,8,0,0,1,160,232a8.15,8.15,0,0,1-2.06-.27,8,8,0,0,1-5.67-9.79,40,40,0,0,1,17.11-23.32,32,32,0,1,1,45.23,0A40,40,0,0,1,231.73,221.94ZM176,176a16,16,0,1,0,16-16A16,16,0,0,0,176,176Z">
-                            </path>
-                        </svg>
-                        @evt.Shift
-                    </p>
-
-                    @* Experience *@
-                    <p class="flex items-center gap-2">
-                        <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
-                            viewBox="0 0 256 256">
-                            <path
-                                d="M254.3,107.91,228.78,56.85a16,16,0,0,0-21.47-7.15L182.44,62.13,130.05,48.27a8.14,8.14,0,0,0-4.1,0L73.56,62.13,48.69,49.7a16,16,0,0,0-21.47,7.15L1.7,107.9a16,16,0,0,0,7.15,21.47l27,13.51,55.49,39.63a8.06,8.06,0,0,0,2.71,1.25l64,16a8,8,0,0,0,7.6-2.1l55.07-55.08,26.42-13.21a16,16,0,0,0,7.15-21.46Zm-54.89,33.37L165,113.72a8,8,0,0,0-10.68.61C136.51,132.27,116.66,130,104,122L147.24,80h31.81l27.21,54.41ZM41.53,64,62,74.22,36.43,125.27,16,115.06Zm116,119.13L99.42,168.61l-49.2-35.14,28-56L128,64.28l9.8,2.59-45,43.68-.08.09a16,16,0,0,0,2.72,24.81c20.56,13.13,45.37,11,64.91-5L188,152.66Zm62-57.87-25.52-51L214.47,64,240,115.06Zm-87.75,92.67a8,8,0,0,1-7.75,6.06,8.13,8.13,0,0,1-1.95-.24L80.41,213.33a7.89,7.89,0,0,1-2.71-1.25L51.35,193.26a8,8,0,0,1,9.3-13l25.11,17.94L126,208.24A8,8,0,0,1,131.82,217.94Z">
-                            </path>
-                        </svg>
-                        @evt.Experience
-                    </p>
-
-                    @* Footer Action Buttons *@
-                    <span class="mt-2 flex items-center justify-center gap-3 px-4 text-xs">
-                        <button x-on:click="viewResourceModal = !viewResourceModal"
-                            hx-get="/organizer/view-resource/@evt.Id" hx-swap="innerHTML"
-                            hx-target="#viewResourceModalContent"
-                            class="duration-200 ease-in-out w-36 flex items-center justify-center px-3 py-1.5 rounded-md border-2 border-coffee-600 hover:border-transparent hover:bg-coffee-700 active:bg-coffee-900 text-coffee-600 hover:text-coffee-50 active:text-coffee-50">
-                            View
-                        </button>
-                        <button
-                            class="duration-200 ease-in-out w-36 flex items-center justify-center px-3 py-1.5 rounded-md border-2 border-transparent text-coffee-50 bg-coffee-600 hover:bg-coffee-700 active:bg-coffee-900">
-                            Add
-                        </button>
-                    </span>
+                        @* Footer Action Buttons *@
+                        <span class="mt-2 flex items-center justify-center gap-3 px-4 text-xs">
+                            <button x-on:click="viewResourceModal = !viewResourceModal"
+                                hx-get="/organizer/view-resource/@evt.Id" hx-swap="innerHTML"
+                                hx-target="#viewResourceModalContent"
+                                class="duration-200 ease-in-out w-36 flex items-center justify-center px-3 py-1.5 rounded-md border-2 border-coffee-600 hover:border-transparent hover:bg-coffee-700 active:bg-coffee-900 text-coffee-600 hover:text-coffee-50 active:text-coffee-50">
+                                View
+                            </button>
+                            <button
+                                class="duration-200 ease-in-out w-36 flex items-center justify-center px-3 py-1.5 rounded-md border-2 border-transparent text-coffee-50 bg-coffee-600 hover:bg-coffee-700 active:bg-coffee-900">
+                                Add
+                            </button>
+                        </span>
+                    </div>
                 </div>
-            </div>
-        }
-    </main>
+            }
+        </main>
+    </div>
 </div>

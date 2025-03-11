@@ -1,0 +1,15 @@
+@model AttendeeEventsViewModel
+
+@{
+    ViewData["Title"] = "Events";
+    var firstDate = new DateTime(DateTime.UtcNow.Year, 1, 1);
+    var currentDate = DateTime.UtcNow;
+    var firstFormatted = firstDate.ToString("MM-dd-YYYY");
+    var currentFormatted = currentDate.ToString("MM-dd-YYYY");
+}
+
+<partial name="~/Views/Attendee/Partials/_TopbarPartial.cshtml" />
+
+<div x-data="{viewEventModal: false, createEventModal: false}" class="min-h-screen bg-[#F9FBFA]">
+
+</div>
