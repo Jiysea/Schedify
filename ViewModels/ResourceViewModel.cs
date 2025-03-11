@@ -76,8 +76,6 @@ public class ResourceViewModel
 
     public string? MenuItems { get; set; }
 
-    public string? PriceItems { get; set; }
-
     public string? Position { get; set; }
 
     [StringLength(30)]

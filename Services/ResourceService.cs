@@ -105,7 +105,6 @@ public class ResourceService
             Material = resource.Type == ResourceType.Furniture ? resource.Material : null,
             Dimensions = resource.Type == ResourceType.Furniture ? resource.Dimensions : null,
             MenuItems = resource.Type == ResourceType.Catering ? resource.MenuItems : null,
-            PriceItems = resource.Type == ResourceType.Catering ? resource.PriceItems : null,
             Position = resource.Type == ResourceType.Personnel ? resource.Position : null,
             Shift = resource.Type == ResourceType.Personnel ? resource.Shift : null,
             Experience = resource.Type == ResourceType.Personnel ? resource.Experience : null,
@@ -149,7 +148,6 @@ public class ResourceService
             Material = resource.Type == ResourceType.Furniture ? resource.Material : null,
             Dimensions = resource.Type == ResourceType.Furniture ? resource.Dimensions : null,
             MenuItems = resource.Type == ResourceType.Catering ? resource.MenuItems : null,
-            PriceItems = resource.Type == ResourceType.Catering ? resource.PriceItems : null,
             Position = resource.Type == ResourceType.Personnel ? resource.Position : null,
             Shift = resource.Type == ResourceType.Personnel ? resource.Shift : null,
             Experience = resource.Type == ResourceType.Personnel ? resource.Experience : null,
@@ -255,7 +253,6 @@ public class ResourceService
 
             case ResourceType.Catering:
                 if (string.IsNullOrWhiteSpace(model.MenuItems)) errors["MenuItems"] = "Menu Items are required.";
-                if (string.IsNullOrWhiteSpace(model.PriceItems)) errors["PriceItems"] = "Price Items are required.";
                 break;
 
             case ResourceType.Personnel:
@@ -309,7 +306,6 @@ public class ResourceService
 
             case ResourceType.Catering:
                 resource.MenuItems = model.MenuItems;
-                resource.PriceItems = model.PriceItems;
                 break;
 
             case ResourceType.Personnel:

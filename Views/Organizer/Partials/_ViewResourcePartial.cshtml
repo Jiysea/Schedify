@@ -82,7 +82,7 @@
         </span>
 
         @* Resource Name *@
-        <div class="flex flex-col col-span-2 gap-1 relative">
+        <div class="flex flex-col col-span-full gap-1 relative">
             <p for="name" class="text-xs text-coffee-900">Resource Name</p>
             <span class="p-2 text-coffee-700">
                 @Model.Name
@@ -90,7 +90,7 @@
         </div>
 
         @* Cost *@
-        <div class="flex flex-col gap-1 relative">
+        <div class="flex flex-col col-span-2 gap-1 relative">
             <p for="cost" class="text-xs text-coffee-900">Cost</p>
             <span class="p-2 text-coffee-700">
                 @Model.Cost
@@ -141,19 +141,22 @@
 
             @* Address Line 1 *@
             <div class="flex flex-col col-span-full gap-1 relative">
-                <p for="addressline1" class="text-xs text-coffee-900">Address Line 1</p>
+                <p for="addressline1" class="text-xs text-coffee-900">Address Line @(Model.AddressLine2 != null ? "1" : "")</p>
                 <span class="p-2 text-coffee-900">
                     @Model.AddressLine1
                 </span>
             </div>
 
-            @* Address Line 2 *@
-            <div class="flex flex-col col-span-full gap-1 relative">
-                <p for="addressline2" class="text-xs text-coffee-900">Address Line 2</p>
-                <span class="p-2 text-coffee-700">
-                    @(Model.AddressLine2 ?? "n/a")
-                </span>
-            </div>
+            @if (Model.AddressLine2 != null)
+            {
+                @* Address Line 2 *@
+                <div class="flex flex-col col-span-full gap-1 relative">
+                    <p for="addressline2" class="text-xs text-coffee-900">Address Line 2</p>
+                    <span class="p-2 text-coffee-700">
+                        Model.AddressLine2
+                    </span>
+                </div>
+            }
 
             @* City/Municipality *@
             <div class="flex flex-col col-span-2 gap-1 relative">
@@ -172,7 +175,7 @@
             </div>
 
             @* Capacity *@
-            <div class="flex flex-col gap-1 relative">
+            <div class="flex flex-col col-span-2 gap-1 relative">
                 <p for="capacity" class="text-xs text-coffee-900">Capacity</p>
                 <span class="p-2 text-coffee-700">
                     @Model.Capacity
@@ -180,7 +183,7 @@
             </div>
 
             @* Size *@
-            <div class="flex flex-col col-span-3 gap-1 w-full relative">
+            <div class="flex flex-col gap-1 w-full relative">
                 <p for="size" class="text-xs text-coffee-900">Size</p>
                 <span class="p-2 text-coffee-700">
                     @Model.Size ft&sup2;
@@ -267,18 +270,10 @@
             </span>
 
             @* Menu Items *@
-            <div class="flex flex-col col-span-3 gap-1 relative">
+            <div class="flex flex-col col-span-full gap-1 relative">
                 <p for="menuitems" class="text-xs text-coffee-900">Menu Items</p>
                 <span class="p-2 text-coffee-700">
                     @Model.MenuItems
-                </span>
-            </div>
-
-            @* Price Items *@
-            <div class="flex flex-col col-span-2 gap-1 relative">
-                <p for="priceitems" class="text-xs text-coffee-900">Price Items</p>
-                <span class="p-2 text-coffee-700">
-                    @Model.PriceItems
                 </span>
             </div>
         }
@@ -325,7 +320,8 @@
     <div class="relative flex items-center w-full">
         <button type="button"
             class="flex items-center justify-center w-full p-2 font-medium text-sm duration-200 ease-in-out rounded-md text-coffee-50 bg-coffee-700 hover:bg-coffee-800 active:bg-coffee-700"
-            hx-get="/organizer/show-add-event-resource/@Model.Id" hx-swap="innerHTML" hx-target="#viewResourceModalContent">
+            hx-get="/organizer/show-add-event-resource/@Model.Id" hx-swap="innerHTML"
+            hx-target="#viewResourceModalContent">
             ADD TO RESOURCE
         </button>
     </div>

@@ -26,7 +26,6 @@ public class ViewResourceViewModel
     public string? Material { get; set; }
     public string? Dimensions { get; set; }
     public string? MenuItems { get; set; }
-    public string? PriceItems { get; set; }
     public string? Position { get; set; }
     public string? Shift { get; set; }
     public DateTime ShiftFromDate { get; set; }
