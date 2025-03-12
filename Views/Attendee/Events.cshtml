@@ -10,9 +10,9 @@
 
 <partial name="~/Views/Attendee/Partials/_TopbarPartial.cshtml" />
 
-<div x-data="{viewEventModal: false, createEventModal: false}" class="min-h-screen bg-[#F9FBFA]">
+<div x-data="{viewEventModal: false}" class="min-h-screen bg-[#F9FBFA]">
     <header class="flex flex-col items-center w-full h-[8vh]">
-        
+
         @* Sub Header (My Events, Date Range, Filter, & Create New Event Button) *@
         <div class="flex items-center w-full p-4 border-b-2 gap-3 border-zinc-100">
             <div class="flex items-center gap-3">
@@ -26,8 +26,8 @@
                 </span>
                 <h2 class="font-semibold text-2xl text-coffee-900">List of Events</h2>
                 <span class="rounded bg-zinc-300 text-zinc-700 px-2">
-                @Model.EventsCount
-            </span>
+                    @Model.EventsCount
+                </span>
             </div>
         </div>
     </header>
@@ -40,4 +40,7 @@
             @await Html.PartialAsync("~/Views/Attendee/Partials/_EventsListPartial.cshtml", Model)
         </div>
     </main>
+
+    @* View Events *@
+    @await Html.PartialAsync("~/Views/Organizer/Partials/ViewEventModal.cshtml", Model.ViewEventViewModel)
 </div>
