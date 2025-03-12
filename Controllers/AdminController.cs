@@ -39,9 +39,11 @@ public class AdminController : Controller
     [Route("admin/resources")]
     public ActionResult Resources()
     {
+        var resources = _resourceService.GetResources();
+
         var viewModel = new ResourceViewModel
         {
-            Resources = _resourceService.GetResources(),
+            Resources = resources,
             ResourceImages = _resourceService.GetResourceImages()
         };
 
@@ -108,12 +110,16 @@ public class AdminController : Controller
     public async Task<IActionResult> ViewResource(Guid id)
     {
         var resource = await _resourceService.GetResourceByIdAsync(id);
-
+        
         if (resource == null)
         {
             return NotFound();
         }
-
+        Console.WriteLine(resource.IsUsed);
+        Console.WriteLine(resource.IsUsed);
+        Console.WriteLine(resource.IsUsed);
+        Console.WriteLine(resource.IsUsed);
+        Console.WriteLine(resource.IsUsed);
         return PartialView("~/Views/Admin/Partials/_ViewResourcePartial.cshtml", resource);
     }
 

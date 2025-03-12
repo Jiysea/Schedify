@@ -12,6 +12,8 @@ public class ResourceViewModel
     public DateTime? CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 
+    public bool IsUsed {get;set;}
+
     [AllowedExtensions([".jpg", ".jpeg", ".png"])]
     [MaxFileSize(5)]
     public IFormFile? ImageFile { get; set; }

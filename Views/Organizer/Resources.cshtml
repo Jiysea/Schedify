@@ -86,16 +86,20 @@
         <footer id="resources-pagination" class="flex items-center justify-end mt-3">
             @if (Model.Resources.Count > 0)
             {
+                int start = (Model.CurrentPage - 1) * Model.PageSize + 1;
+                int end = Math.Min(Model.CurrentPage * Model.PageSize, Model.TotalCount);
+
                 <div
                     class="text-sm flex items-center justify-center ps-2 py-1.5 border-2 rounded-lg bg-white border-zinc-300 divide-x-2 divide-zinc-300">
+                    <!-- Page Number -->
+                    <span class="text-zinc-500 px-3"><strong>@start-@end</strong> of @Model.TotalCount</span>
 
-                    @* Page Number *@
-                    <span class="text-zinc-500 px-3"><strong>1-8</strong> of 258</span>
-
-                    @* Previous & Next buttons *@
+                    <!-- Previous & Next buttons -->
                     <span class="flex items-center justify-center gap-3 px-3">
-                        <button
-                            class="duration-200 ease-in-out flex items-center size-7 rounded-md p-1 text-zinc-500 hover:bg-zinc-100 active:bg-zinc-200">
+                        <button hx-get="/organizer/resources-change-page/-1?currentPage=@Model.CurrentPage"
+                            hx-target="#resources-container" hx-swap="outerHTML"
+                            class="duration-200 ease-in-out flex items-center size-7 rounded-md p-1 text-zinc-500 hover:bg-zinc-100 active:bg-zinc-200"
+                            @(Model.CurrentPage == 1 ? "disabled" : "")>
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
                                 viewBox="0 0 256 256">
                                 <path
@@ -103,8 +107,11 @@
                                 </path>
                             </svg>
                         </button>
-                        <button
-                            class="duration-200 ease-in-out flex items-center size-7 rounded-md p-1 text-zinc-500 hover:bg-zinc-100 active:bg-zinc-200">
+
+                        <button hx-get="/organizer/resources-change-page/1?currentPage=@Model.CurrentPage"
+                            hx-target="#resources-container" hx-swap="outerHTML"
+                            class="duration-200 ease-in-out flex items-center size-7 rounded-md p-1 text-zinc-500 hover:bg-zinc-100 active:bg-zinc-200"
+                            @(end >= Model.TotalCount ? "disabled" : "")>
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
                                 viewBox="0 0 256 256">
                                 <path
@@ -115,7 +122,6 @@
                     </span>
                 </div>
             }
-
         </footer>
 
         @* View Resource Modal *@

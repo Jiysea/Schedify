@@ -18,6 +18,30 @@ public class EventService
         _environment = environment;
     }
 
+    public List<PublishedEventDto> GetEventsPublished()
+    {
+        var events = _context.Events
+            .Include(e => e.EventBookings)
+            .Where(e => e.Status == EventStatus.Open)
+            .Select(e => new PublishedEventDto
+            {
+                Event = e,
+                Resource = e.EventResources
+                    .Where(er => er.Resource.Type == ResourceType.Venue)
+                    .Select(er => er.Resource)
+                    .FirstOrDefault(),
+                Image = e.EventResources
+                    .Where(er => er.Resource.Type == ResourceType.Venue)
+                    .Select(er => er.Resource.Image)
+                    .FirstOrDefault(),
+                AttendeeCount = e.EventBookings.Count
+            })
+            .OrderByDescending(e => e.Event.CreatedAt)
+            .ToList();
+
+        return events;
+    }
+
     public List<Event> GetEventsByOrganizerDraft(DateTime? startDate, DateTime? endDate)
     {
         var userIdString = _userService.GetUserId();
@@ -403,11 +427,11 @@ public class EventService
             var resource = await _context.Resources.FindAsync(model.ResourceId);
 
             if (resource == null) return (false, new Dictionary<string, string> { { "NullError", "Resource not found." } }, null);
-            
+
             resource.Quantity -= model.QuantityFromForm;
             resource.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
-            
+
             var eventResource = new EventResource
             {
                 ResourceId = resource.Id,

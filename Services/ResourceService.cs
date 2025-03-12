@@ -23,7 +23,7 @@ public class ResourceService
 
     public List<Resource> GetResources()
     {
-        return _context.Resources.OrderByDescending(r => r.CreatedAt).ToList();
+        return _context.Resources.Include(r => r.EventResources).OrderByDescending(r => r.CreatedAt).ToList();
     }
 
     public Dictionary<Guid, string?> GetResourceImages()
@@ -65,6 +65,8 @@ public class ResourceService
             ResourceId = ResourceId,
             EventId = Events.First().Id,
             Resource = resource,
+            EventStartAt = Events.First().StartAt,
+            EventEndAt = Events.First().EndAt,
             DraftEvents = Events,
             SelectedEvent = Events.First().Name,
             CostType = resource.CostType,
@@ -79,6 +81,7 @@ public class ResourceService
     {
         var resource = await _context.Resources
             .Include(r => r.Image)
+            .Include(r => r.EventResources)
             .FirstOrDefaultAsync(r => r.Id == Id);
 
         var imageFileName = await _context.Images
@@ -88,8 +91,13 @@ public class ResourceService
 
         if (resource == null) return null;
 
+        bool isUsed = false;
+
+        if (resource.EventResources.Any() == true) isUsed = true;
+
         return new ResourceViewModel
         {
+            IsUsed = isUsed,
             ImageFileName = resource.Image?.ImageFileName,
             Id = resource.Id,
             ProviderName = resource.ProviderName,

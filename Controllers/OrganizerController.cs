@@ -346,7 +346,7 @@ public class OrganizerController : Controller
     {
         var DraftEvents = _eventService.GetEventsByOrganizerDraft(new DateTime(DateTime.UtcNow.Year, 1, 1, 0, 0, 0, DateTimeKind.Utc), DateTime.UtcNow.Date.AddHours(23).AddMinutes(59));
         var result = await _resourceService.GetResourceAndEvents(id, DraftEvents);
-
+    
         if (result == null)
         {
             return NotFound();
@@ -418,6 +418,8 @@ public class OrganizerController : Controller
             ResourceId = model.ResourceId,
             Resource = resource,
             DraftEvents = DraftEvents,
+            EventStartAt = DraftEvents.First().StartAt,
+            EventEndAt = DraftEvents.First().EndAt,
             CostType = resource.CostType,
             Type = resource.Type,
             QuantityFromResource = resource.Quantity,
@@ -453,6 +455,8 @@ public class OrganizerController : Controller
             ResourceId = model.ResourceId,
             Resource = resource,
             DraftEvents = DraftEvents,
+            EventStartAt = DraftEvents.First().StartAt,
+            EventEndAt = DraftEvents.First().EndAt,
             SelectedEvent = selectedEvent.Name,
             CostType = resource.CostType,
             Type = resource.Type,
