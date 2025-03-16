@@ -39,7 +39,7 @@
         <div class="flex flex-col col-span-2 gap-1 relative">
             <p for="type" class="text-xs text-coffee-900">Type of Resource</p>
             <span class="p-2 text-coffee-700">
-                @Model.Type
+                @Model.ResourceType
             </span>
         </div>
 
@@ -99,7 +99,7 @@
 
         @* Cost Type *@
         <div class="flex flex-col gap-1 relative" :class="{
-                'col-span-2': ('@Model.Type' == 'Venue'),
+                'col-span-2': ('@Model.ResourceType' == 'Venue'),
             }">
             <p for="costtype" class="text-xs text-coffee-900">Type of Cost</p>
             <span class="p-2 text-coffee-700">
@@ -108,7 +108,7 @@
         </div>
 
         @* Quantity *@
-        <div x-show="'@Model.Type' == 'Venue'" class="flex flex-col gap-1 relative">
+        <div x-show="'@Model.ResourceType' == 'Venue'" class="flex flex-col gap-1 relative">
             <p for="quantity" class="text-xs text-coffee-900">Quantity</p>
             <span class="p-2 text-coffee-700">
                 @Model.Quantity
@@ -126,7 +126,7 @@
 
     @* Type Information *@
     <div class="relative grid grid-cols-5 gap-3 p-5 border rounded-xl border-coffee-300">
-        @if (Model.Type == ResourceType.Venue)
+        @if (Model.ResourceType == ResourceType.Venue)
         {
             <span
                 class="absolute flex items-center gap-1 start-4 -top-3 font-medium text-sm text-pumpkin-600 bg-coffee-50 px-2">
@@ -191,7 +191,7 @@
             </div>
         }
 
-        else if (Model.Type == ResourceType.Equipment)
+        else if (Model.ResourceType == ResourceType.Equipment)
         {
             <span
                 class="absolute flex items-center gap-1 start-4 -top-3 font-medium text-sm text-pumpkin-600 bg-coffee-50 px-2">
@@ -226,7 +226,7 @@
                 </div>
             </div>
         }
-        else if (Model.Type == ResourceType.Furniture)
+        else if (Model.ResourceType == ResourceType.Furniture)
         {
             <span
                 class="absolute flex items-center gap-1 start-4 -top-3 font-medium text-sm text-pumpkin-600 bg-coffee-50 px-2">
@@ -256,7 +256,7 @@
             </div>
         }
 
-        else if (Model.Type == ResourceType.Catering)
+        else if (Model.ResourceType == ResourceType.Catering)
         {
             <span
                 class="absolute flex items-center gap-1 start-4 -top-3 font-medium text-sm text-pumpkin-600 bg-coffee-50 px-2">
@@ -278,7 +278,7 @@
             </div>
         }
 
-        else if (Model.Type == ResourceType.Personnel)
+        else if (Model.ResourceType == ResourceType.Personnel)
         {
             <span
                 class="absolute flex items-center gap-1 start-4 -top-3 font-medium text-sm text-pumpkin-600 bg-coffee-50 px-2">

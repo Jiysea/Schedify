@@ -1,10 +1,12 @@
+@model ResourceViewModel
+
 @{
     ViewData["Title"] = "Resources";
 }
 
 <partial name="~/Views/Admin/Partials/_SidebarPartial.cshtml" />
 
-<div x-data="{addResourceModal: false, viewResourceModal: false}" class="min-h-screen bg-charcoal-950 ms-[250px]">
+<div x-data="{createResourceModal: false, viewResourceModal: false}" class="min-h-screen bg-charcoal-950 ms-[250px]">
     <header>
         @* Sub Header (Resources, Search, Browse, By Event) *@
         <div class="flex flex-col items-center w-full p-4 border-b-2 gap-1 border-charcoal-900">
@@ -40,7 +42,7 @@
 
                 <div class="flex flex-1 items-center justify-end">
 
-                    <button type="button" x-on:click="addResourceModal = !addResourceModal;"
+                    <button type="button" x-on:click="createResourceModal = !createResourceModal;"
                         class="duration-200 ease-in-out flex items-center justify-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium bg-pumpkin-700 hover:bg-pumpkin-800 active:bg-pumpkin-900 text-pumpkin-50">
                         <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
                             fill="currentColor" viewBox="0 0 256 256">
@@ -48,9 +50,8 @@
                                 d="M228,128a12,12,0,0,1-12,12H140v76a12,12,0,0,1-24,0V140H40a12,12,0,0,1,0-24h76V40a12,12,0,0,1,24,0v76h76A12,12,0,0,1,228,128Z">
                             </path>
                         </svg>
-                        Add Resource
+                        Create Resource
                     </button>
-
 
                 </div>
             </div>
@@ -60,33 +61,37 @@
     <main class="flex items-center justify-center">
         <div id="resources-table"
             class=" overflow-auto h-[85dvh] max-h-[85%] text-charcoal-100 rounded-lg text-sm w-full scrollbar-thin scrollbar-track-charcoal-900 scrollbar-thumb-charcoal-700">
-            <table class="border-separate w-full text-sm text-left whitespace-nowrap">
-                <thead class="sticky top-0 left-0 uppercase z-20 bg-charcoal-950">
-                    <tr>
-                        <th class="py-3 ps-6 text-start border-b-2 border-charcoal-900">
+            <table class="border-collapse w-full text-sm text-left whitespace-nowrap">
+                <thead
+                    class="sticky top-0 left-0 uppercase z-20 bg-charcoal-950 border-b-2 border-charcoal-900 divide-y">
+                    <tr class="">
+                        <th class="py-3 ps-6 text-start">
                             #
                         </th>
-                        <th class="p-3 text-start border-b-2 border-charcoal-900">
+                        <th class="p-3 text-start">
                             Resource Name
                         </th>
-                        <th class="p-3 text-start border-b-2 border-charcoal-900">
+                        <th class="p-3 text-start">
                             Provider
                         </th>
-                        <th class="p-3 text-start border-b-2 border-charcoal-900">
+                        <th class="p-3 text-start">
                             Quantity
                         </th>
-                        <th class="p-3 text-start border-b-2 border-charcoal-900">
+                        <th class="p-3 text-start">
                             Type
                         </th>
-                        <th class="p-3 text-start border-b-2 border-charcoal-900">
+                        <th class="p-3 text-start">
 
                         </th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="">
                     @for (int i = 0; i < Model.Resources.Count; i++)
                     {
-                        <tr class="">
+                        <tr x-on:click="viewResourceModal = !viewResourceModal"
+                            hx-get="/admin/view-resource/@Model.Resources[i].Id" hx-target="#resourceViewContent"
+                            hx-swap="innerHTML"
+                            class="duration-200 ease-in-out cursor-pointer border-b-2 border-charcoal-900 hover:bg-charcoal-900 active:bg-charcoal-800">
                             <th scope="row" class="py-3 ps-6 shrink">
                                 @(i + 1)
                             </th>
@@ -108,16 +113,14 @@
                                 @Model.Resources[i].ProviderName
                             </td>
                             <td class="p-3">
-                                @Model.Resources[i].Quantity
+                                
                             </td>
                             <td class="p-3">
-                                @Model.Resources[i].Type
+                                @Model.Resources[i].ResourceType
                             </td>
                             <td class="flex items-center justify-start gap-2 p-3">
-                                <button type="button" 
-                                    x-on:click="viewResourceModal = !viewResourceModal"
-                                    hx-get="/admin/view-resource/@Model.Resources[i].Id"
-                                    hx-target="#resourceViewContent"
+                                <button type="button" x-on:click.stop="viewResourceModal = !viewResourceModal"
+                                    hx-get="/admin/view-resource/@Model.Resources[i].Id" hx-target="#resourceViewContent"
                                     hx-swap="innerHTML"
                                     class="text-center p-2 duration-200 ease-in-out rounded-md bg-coffee-700 hover:bg-coffee-800 active:bg-coffee-900 text-coffee-50">
 
@@ -136,9 +139,9 @@
         </div>
     </main>
 
-    @* Add Resource Modal *@
-    <partial name="~/Views/Admin/Partials/AddResourceModal.cshtml" />
+    @* Create Resource Modal *@
+    @await Html.PartialAsync("~/Views/Admin/Partials/CreateResourceModal.cshtml", Model.CreateResourceViewModel)
 
     @* View Resource Modal *@
-    <partial name="~/Views/Admin/Partials/ViewResourceModal.cshtml" />
+    @await Html.PartialAsync("~/Views/Admin/Partials/ViewResourceModal.cshtml", Model.ViewResourceViewModel)
 </div>

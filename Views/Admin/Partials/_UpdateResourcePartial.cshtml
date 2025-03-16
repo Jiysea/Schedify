@@ -1,4 +1,4 @@
-@model ResourceViewModel
+@model UpdateResourceViewModel
 
 @* Top Header *@
 <header class="flex items-center justify-between text-lg font-medium py-3 px-4">
@@ -46,7 +46,7 @@
                 @* Type of Resource *@
                 <div class="flex flex-col col-span-2 gap-1 relative">
                     <label for="edit-type" class="text-xs text-charcoal-300">Type of Resource</label>
-                    <select class="input-charcoal-dark p-2" id="edit-type" asp-for="Type" hx-get="/admin/resource-extra"
+                    <select class="input-charcoal-dark p-2" id="edit-type" asp-for="ResourceType" hx-get="/admin/resource-extra"
                         hx-target="#resource-edit-type" hx-swap="innerHTML" hx-trigger="change"
                         hx-vals='js:{"selectedOption": event.target.value}' x-on:change="
                     showQuantity = ($el.value != 'Venue');
@@ -181,7 +181,7 @@
             <div id="resource-edit-type"
                 class="relative grid grid-cols-5 gap-3 p-5 border-2 rounded-xl border-charcoal-700">
                 @await Html.PartialAsync("~/Views/Admin/Partials/_ResourceExtraPartial.cshtml", new
-                ResourceViewModel { Type = Model.Type })
+                CreateResourceViewModel { ResourceType = Model.ResourceType })
             </div>
         </div>
 

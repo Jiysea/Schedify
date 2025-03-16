@@ -33,14 +33,54 @@ public class ResourceService
             .ToDictionary(img => img.ResourceId!.Value, img => img.ImageFileName);
     }
 
-    public List<Resource> GetResourcesByType(ResourceType type, int newPage, int pageSize)
+    public List<Resource>? GetResourcesByType(ResourceType type, int newPage, int pageSize)
     {
-        return _context.Resources
-            .Where(r => r.Type == type && r.Quantity > 0)
-            .OrderByDescending(r => r.CreatedAt)
-            .Skip((newPage - 1) * pageSize)
-            .Take(pageSize)
-            .ToList();
+        if (type == ResourceType.Venue)
+        {
+            return _context.Resources
+                    .Include(r => r.ResourceVenue)
+                    .OrderByDescending(r => r.CreatedAt)
+                    .Skip((newPage - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+        }
+        else if (type == ResourceType.Equipment)
+        {
+            return _context.Resources
+                    .Include(r => r.ResourceEquipment)
+                    .OrderByDescending(r => r.CreatedAt)
+                    .Skip((newPage - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+        }
+        else if (type == ResourceType.Furniture)
+        {
+            return _context.Resources
+                    .Include(r => r.ResourceFurniture)
+                    .OrderByDescending(r => r.CreatedAt)
+                    .Skip((newPage - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+        }
+        else if (type == ResourceType.Catering)
+        {
+            return _context.Resources
+                    .Include(r => r.ResourceCatering)
+                    .OrderByDescending(r => r.CreatedAt)
+                    .Skip((newPage - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+        }
+        else if (type == ResourceType.Personnel)
+        {
+            return _context.Resources
+                    .Include(r => r.ResourcePersonnel)
+                    .OrderByDescending(r => r.CreatedAt)
+                    .Skip((newPage - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+        }
+        return null;
     }
 
     public Dictionary<Guid, string> GetResourceImageFromList(List<Resource> resources)
@@ -70,14 +110,14 @@ public class ResourceService
             DraftEvents = Events,
             SelectedEvent = Events.First().Name,
             CostType = resource.CostType,
-            Type = resource.Type,
-            QuantityFromResource = resource.Quantity,
-            CostFromResource = resource.Cost,
-            Shift = resource.Type == ResourceType.Personnel ? resource.Shift : null,
+            // Type = resource.Type,
+            // QuantityFromResource = resource.Quantity,
+            // CostFromResource = resource.Cost,
+            // Shift = resource.Type == ResourceType.Personnel ? resource.Shift : null,
         };
     }
 
-    public async Task<ResourceViewModel?> GetResourceByIdAsync(Guid Id)
+    public async Task<ViewResourceViewModel?> GetResourceByIdAsync(Guid Id)
     {
         var resource = await _context.Resources
             .Include(r => r.Image)
@@ -95,7 +135,7 @@ public class ResourceService
 
         if (resource.EventResources.Any() == true) isUsed = true;
 
-        return new ResourceViewModel
+        return new ViewResourceViewModel
         {
             IsUsed = isUsed,
             ImageFileName = resource.Image?.ImageFileName,
@@ -105,24 +145,24 @@ public class ResourceService
             ProviderEmail = resource.ProviderEmail,
             Name = resource.Name,
             Description = resource.Description,
-            Type = resource.Type,
+            ResourceType = resource.ResourceType,
             Cost = resource.Cost.ToString("N2"),
             CostType = resource.CostType,
-            Quantity = resource.Quantity,
-            Capacity = resource.Type == ResourceType.Venue ? resource.Capacity : 0,
-            Size = resource.Type == ResourceType.Venue ? (int.TryParse(resource.Size, out var num) ? num : 0).ToString("N0") : null,
-            AddressLine1 = resource.Type == ResourceType.Venue ? resource.AddressLine1 : null,
-            AddressLine2 = resource.Type == ResourceType.Venue ? resource.AddressLine2 : null,
-            CityMunicipality = resource.Type == ResourceType.Venue ? "Davao City" : null,
-            Province = resource.Type == ResourceType.Venue ? "Davao del Sur" : null,
-            Brand = resource.Type == ResourceType.Equipment ? resource.Brand : null,
-            Specifications = resource.Type == ResourceType.Equipment ? JsonSerializer.Deserialize<Dictionary<string, string>>(resource.Specifications!)! : [],
-            Material = resource.Type == ResourceType.Furniture ? resource.Material : null,
-            Dimensions = resource.Type == ResourceType.Furniture ? resource.Dimensions : null,
-            MenuItems = resource.Type == ResourceType.Catering ? resource.MenuItems : null,
-            Position = resource.Type == ResourceType.Personnel ? resource.Position : null,
-            Shift = resource.Type == ResourceType.Personnel ? resource.Shift : null,
-            Experience = resource.Type == ResourceType.Personnel ? resource.Experience : null,
+            // Quantity = resource.Quantity,
+            // Capacity = resource.Type == ResourceType.Venue ? resource.Capacity : 0,
+            // Size = resource.Type == ResourceType.Venue ? resource.Size : 0.00m,
+            // AddressLine1 = resource.Type == ResourceType.Venue ? resource.AddressLine1 : null,
+            // AddressLine2 = resource.Type == ResourceType.Venue ? resource.AddressLine2 : null,
+            // CityMunicipality = resource.Type == ResourceType.Venue ? "Davao City" : null,
+            // Province = resource.Type == ResourceType.Venue ? "Davao del Sur" : null,
+            // Brand = resource.Type == ResourceType.Equipment ? resource.Brand : null,
+            // Specifications = resource.Type == ResourceType.Equipment ? JsonSerializer.Deserialize<Dictionary<string, string>>(resource.Specifications!)! : [],
+            // Material = resource.Type == ResourceType.Furniture ? resource.Material : null,
+            // Dimensions = resource.Type == ResourceType.Furniture ? resource.Dimensions : null,
+            // MenuItems = resource.Type == ResourceType.Catering ? resource.MenuItems : null,
+            // Position = resource.Type == ResourceType.Personnel ? resource.Position : null,
+            // Shift = resource.Type == ResourceType.Personnel ? resource.Shift : null,
+            // Experience = resource.Type == ResourceType.Personnel ? resource.Experience : null,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
         };
@@ -148,24 +188,24 @@ public class ResourceService
             ProviderEmail = resource.ProviderEmail,
             Name = resource.Name,
             Description = resource.Description,
-            Type = resource.Type,
+            ResourceType = resource.ResourceType,
             Cost = resource.Cost.ToString("N2"),
             CostType = resource.CostType,
-            Quantity = resource.Quantity,
-            Capacity = resource.Type == ResourceType.Venue ? resource.Capacity : 0,
-            Size = resource.Type == ResourceType.Venue ? (int.TryParse(resource.Size, out var num) ? num : 0).ToString("N0") : null,
-            AddressLine1 = resource.Type == ResourceType.Venue ? resource.AddressLine1 : null,
-            AddressLine2 = resource.Type == ResourceType.Venue ? resource.AddressLine2 : null,
-            CityMunicipality = resource.Type == ResourceType.Venue ? resource.CityMunicipality : null,
-            Province = resource.Type == ResourceType.Venue ? resource.Province : null,
-            Brand = resource.Type == ResourceType.Equipment ? resource.Brand : null,
-            Specifications = resource.Type == ResourceType.Equipment ? JsonSerializer.Deserialize<Dictionary<string, string>>(resource.Specifications!)! : [],
-            Material = resource.Type == ResourceType.Furniture ? resource.Material : null,
-            Dimensions = resource.Type == ResourceType.Furniture ? resource.Dimensions : null,
-            MenuItems = resource.Type == ResourceType.Catering ? resource.MenuItems : null,
-            Position = resource.Type == ResourceType.Personnel ? resource.Position : null,
-            Shift = resource.Type == ResourceType.Personnel ? resource.Shift : null,
-            Experience = resource.Type == ResourceType.Personnel ? resource.Experience : null,
+            // Quantity = resource.Quantity,
+            // Capacity = resource.Type == ResourceType.Venue ? resource.Capacity : 0,
+            // Size = resource.Type == ResourceType.Venue ? resource.Size : 0.00m,
+            // AddressLine1 = resource.Type == ResourceType.Venue ? resource.AddressLine1 : null,
+            // AddressLine2 = resource.Type == ResourceType.Venue ? resource.AddressLine2 : null,
+            // CityMunicipality = resource.Type == ResourceType.Venue ? resource.CityMunicipality : null,
+            // Province = resource.Type == ResourceType.Venue ? resource.Province : null,
+            // Brand = resource.Type == ResourceType.Equipment ? resource.Brand : null,
+            // Specifications = resource.Type == ResourceType.Equipment ? JsonSerializer.Deserialize<Dictionary<string, string>>(resource.Specifications!)! : [],
+            // Material = resource.Type == ResourceType.Furniture ? resource.Material : null,
+            // Dimensions = resource.Type == ResourceType.Furniture ? resource.Dimensions : null,
+            // MenuItems = resource.Type == ResourceType.Catering ? resource.MenuItems : null,
+            // Position = resource.Type == ResourceType.Personnel ? resource.Position : null,
+            // Shift = resource.Type == ResourceType.Personnel ? resource.Shift : null,
+            // Experience = resource.Type == ResourceType.Personnel ? resource.Experience : null,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
         };
@@ -197,7 +237,7 @@ public class ResourceService
         return true;
     }
 
-    public async Task<(bool IsSuccess, Dictionary<string, string>? Error, Resource? Resource)> CreateResourceAsync(ResourceViewModel model)
+    public async Task<(bool IsSuccess, Dictionary<string, string>? Error, Resource? Resource)> CreateResourceAsync(CreateResourceViewModel model)
     {
         var validationErrors = ValidateResourceModel(model);
         if (validationErrors.Any())
@@ -211,7 +251,22 @@ public class ResourceService
             return (false, new Dictionary<string, string> { { "Authentication", "User must be authenticated." } }, null);
         }
 
-        var resource = MapViewModelToResource(model, user.Id);
+        var resource = new Resource
+        {
+            UserId = user.Id,
+            ProviderName = model.ProviderName,
+            ProviderPhoneNumber = model.ProviderPhoneNumber,
+            ProviderEmail = model.ProviderEmail,
+            Name = model.Name,
+            Description = model.Description,
+            ResourceType = model.ResourceType,
+            Cost = model.Cost,
+            CostType = model.CostType,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        object? typeResource = null;
 
         using var transaction = await _context.Database.BeginTransactionAsync();
         try
@@ -219,13 +274,105 @@ public class ResourceService
             _context.Resources.Add(resource);
             await _context.SaveChangesAsync();
 
+            switch (model.ResourceType)
+            {
+                case ResourceType.Venue:
+
+                    typeResource = new ResourceVenue
+                    {
+                        ResourceId = resource.Id,
+                        Capacity = model.Capacity,
+                        Size = model.Size,
+                        AddressLine1 = model.AddressLine1!,
+                        AddressLine2 = model.AddressLine2,
+                        CityMunicipality = "Davao City",
+                        Province = "Davao del Sur",
+                    };
+                    break;
+
+                case ResourceType.Equipment:
+
+                    typeResource = new ResourceEquipment
+                    {
+                        ResourceId = resource.Id,
+                        Quantity = model.Quantity,
+                        Brand = model.Brand,
+                        Specifications = JsonSerializer.Serialize(model.Specifications),
+                        Warranty = model.Warranty ?? "No Warranty",
+                    };
+                    break;
+
+                case ResourceType.Furniture:
+                    typeResource = new ResourceFurniture
+                    {
+                        ResourceId = resource.Id,
+                        Quantity = model.Quantity,
+                        Material = model.Material,
+                        OtherMaterial = model.OtherMaterial,
+                        Dimensions = model.Dimensions,
+                        Warranty = model.Warranty ?? "No Warranty",
+                    };
+                    break;
+
+                case ResourceType.Catering:
+                    typeResource = new ResourceCatering
+                    {
+                        ResourceId = resource.Id,
+                        GuestCapacity = model.GuestCapacity,
+                        MenuItems = JsonSerializer.Serialize(model.MenuItems),
+                    };
+                    break;
+
+                case ResourceType.Personnel:
+                    string experience = string.Empty;
+                    if (int.TryParse(model.Experience, out int result))
+                    {
+                        if (model.ExperienceType == "By Year")
+                        {
+                            if (result > 1)
+                            {
+                                experience = model.Experience + " years";
+                            }
+
+                            experience = model.Experience + " year";
+                        }
+                        else if (model.ExperienceType == "By Month")
+                        {
+                            if (result > 1)
+                            {
+                                experience = model.Experience + " months";
+                            }
+
+                            experience = model.Experience + " month";
+                        }
+
+                        experience = "None";
+                    }
+
+                    typeResource = new ResourcePersonnel
+                    {
+                        ResourceId = resource.Id,
+                        Position = model.Position!,
+                        ShiftStart = model.ShiftStart,
+                        ShiftEnd = model.ShiftEnd,
+                        Experience = experience,
+                    };
+                    break;
+            }
+
+            if (typeResource != null)
+            {
+                _context.Add(typeResource);
+                await _context.SaveChangesAsync();
+            }
+
             if (model.ImageFile != null)
             {
                 var imageResult = await SaveResourceImageAsync(model.ImageFile, resource.Id);
                 if (!imageResult.IsSuccess)
                 {
                     await transaction.RollbackAsync();
-                    return (false, new Dictionary<string, string> { { "ImageFile", imageResult.Error! } }, null);
+                    return (false, new Dictionary<string, string> { { "ImageFileError", imageResult.Error! } }, null);
                 }
             }
 
@@ -239,7 +386,7 @@ public class ResourceService
         }
     }
 
-    private Dictionary<string, string> ValidateResourceModel(ResourceViewModel model)
+    private Dictionary<string, string> ValidateResourceModel(CreateResourceViewModel model)
     {
         var errors = new Dictionary<string, string>();
 
@@ -248,11 +395,11 @@ public class ResourceService
             errors["ImageFile"] = "An image is required.";
         }
 
-        switch (model.Type)
+        switch (model.ResourceType)
         {
             case ResourceType.Venue:
                 if (string.IsNullOrWhiteSpace(model.AddressLine1)) errors["AddressLine1"] = "Address is required.";
-                if (string.IsNullOrWhiteSpace(model.Size)) errors["Size"] = "Size is required.";
+                if (model.Size <= 0) errors["Size"] = "Size must be at least 1.";
                 if (model.Capacity <= 0) errors["Capacity"] = "Capacity must be at least 1.";
                 break;
 
@@ -262,75 +409,26 @@ public class ResourceService
                 break;
 
             case ResourceType.Furniture:
-                if (string.IsNullOrWhiteSpace(model.Material)) errors["Material"] = "Material is required.";
-                if (string.IsNullOrWhiteSpace(model.Dimensions)) errors["Dimensions"] = "Dimensions are required.";
+                if (model.Material == FurnitureMaterial.Other && string.IsNullOrWhiteSpace(model.OtherMaterial)) errors["Material"] = "Material is required.";
                 break;
 
             case ResourceType.Catering:
-                if (string.IsNullOrWhiteSpace(model.MenuItems)) errors["MenuItems"] = "Menu Items are required.";
+                if (model.MenuItems == null || model.MenuItems.Count == 0) errors["MenuItems"] = "Menu Items are required.";
                 break;
 
             case ResourceType.Personnel:
                 if (string.IsNullOrWhiteSpace(model.Position)) errors["Position"] = "Position is required.";
-                if (string.IsNullOrWhiteSpace(model.ShiftAsString)) errors["ShiftAsString"] = "Shift is required.";
-                if (string.IsNullOrWhiteSpace(model.Experience)) errors["Experience"] = "Experience is required.";
                 break;
         }
 
         return errors;
     }
 
-    private Resource MapViewModelToResource(ResourceViewModel model, Guid userId)
+    private Resource? MapViewModelToResource(CreateResourceViewModel model, Guid userId)
     {
-        var resource = new Resource
-        {
-            UserId = userId,
-            ProviderName = model.ProviderName,
-            ProviderPhoneNumber = model.ProviderPhoneNumber,
-            ProviderEmail = model.ProviderEmail,
-            Name = model.Name,
-            Description = model.Description,
-            Type = model.Type,
-            Cost = model.CostAsDecimal,
-            CostType = model.CostType,
-            Quantity = model.Quantity,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
 
-        switch (model.Type)
-        {
-            case ResourceType.Venue:
-                resource.Capacity = model.Capacity;
-                resource.Size = model.Size;
-                resource.AddressLine1 = model.AddressLine1;
-                resource.AddressLine2 = model.AddressLine2;
-                resource.CityMunicipality = "Davao City";
-                resource.Province = "Davao del Sur";
-                break;
-
-            case ResourceType.Equipment:
-                resource.Brand = model.Brand;
-                resource.Specifications = JsonSerializer.Serialize(model.Specifications);
-                break;
-
-            case ResourceType.Furniture:
-                resource.Material = model.Material;
-                resource.Dimensions = model.Dimensions;
-                break;
-
-            case ResourceType.Catering:
-                resource.MenuItems = model.MenuItems;
-                break;
-
-            case ResourceType.Personnel:
-                resource.Position = model.Position;
-                resource.Shift = model.ShiftAsString;
-                resource.Experience = model.Experience;
-                break;
-        }
-
-        return resource;
+        return null;
+        // return resource;
     }
 
     private async Task<(bool IsSuccess, string? Error)> SaveResourceImageAsync(IFormFile imageFile, Guid resourceId)

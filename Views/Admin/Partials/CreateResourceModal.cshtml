@@ -1,15 +1,15 @@
-@model ResourceViewModel
+@model CreateResourceViewModel
 
-<div x-show="addResourceModal" x-transition.opacity
+<div x-show="createResourceModal" x-transition.opacity
     class="fixed inset-0 flex justify-center items-start bg-black/50 backdrop-blur-sm overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-charcoal-700 z-50 p-4">
 
     @* Box *@
-    <div x-data x-trap="addResourceModal" class="bg-charcoal-900 rounded-lg shadow-lg" @@keydown.escape = "addResourceModal = false;">
+    <div x-data x-trap="createResourceModal" class="bg-charcoal-900 rounded-lg shadow-lg" @@keydown.escape = "createResourceModal = false;">
 
                         @* Top Header *@
                         <header class="flex items-center justify-between text-lg font-medium py-3 px-4">
                             <h1 class="text-charcoal-50">Add New Resource</h1>
-                            <button x-on:click="addResourceModal = false"
+                            <button x-on:click="createResourceModal = false"
                                 class="flex items-center justify-center size-8 p-1 rounded-md text-charcoal-50 hover:bg-charcoal-800 active:bg-charcoal-700 hover:text-charcoal-50 active:text-charcoal-50 duration-200 ease-in-out">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
                                     viewBox="0 0 256 256">
@@ -43,7 +43,7 @@
                                         @* Type of Resource *@
                                         <div class="flex flex-col col-span-2 gap-1 relative">
                                             <label for="type" class="text-xs text-charcoal-300">Type of Resource</label>
-                                            <select class="input-charcoal-dark p-2" id="type" asp-for="Type"
+                                            <select class="input-charcoal-dark p-2" id="type" asp-for="ResourceType"
                                                 hx-get="/admin/resource-extra" hx-target="#resource-extra" hx-swap="innerHTML"
                                                 hx-trigger="change" hx-vals='js:{"selectedOption": event.target.value}' x-on:change="
                                                     showQuantity = ($el.value != 'Venue');
@@ -180,8 +180,8 @@
 
                                     <div id="resource-extra"
                                         class="relative grid grid-cols-5 gap-3 p-5 border-2 rounded-xl border-charcoal-700">
-                                        @await Html.PartialAsync("~/Views/Admin/Partials/_ResourceExtraPartial.cshtml", new
-                                        ResourceViewModel { Type = Model.Type })
+                                        @await Html.PartialAsync("~/Views/Admin/Partials/_CreateResourceExtraPartial.cshtml", new
+                                        CreateResourceViewModel { ResourceType = Model.ResourceType })
                     </div>
                 </div>
 

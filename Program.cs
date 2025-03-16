@@ -40,6 +40,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ResourceService>();
 builder.Services.AddScoped<EventService>();
+builder.Services.AddScoped<EventResourceService>();
 
 var app = builder.Build();
 
@@ -67,14 +68,14 @@ async Task CreateAdmin(UserManager<User> userManager, RoleManager<IdentityRole<G
     {
         var user = new User
         {
-            FirstName = "Admin",
-            MiddleName = null,
-            LastName = "Admin",
+            FirstName = "Vincent",
+            MiddleName = "Van",
+            LastName = "Gogh",
             ExtensionName = null,
             Birthdate = DateTime.UtcNow,
             Email = adminEmail,
             UserName = adminEmail,
-            PhoneNumber = "09123456789",
+            PhoneNumber = "+639123456789",
         };
 
         var result = await userManager.CreateAsync(user, "Password123"); // Change password

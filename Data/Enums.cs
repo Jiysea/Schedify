@@ -71,5 +71,14 @@ public enum FurnitureMaterial
     Metal,
     Plastic,
     Glass,
-    Fabric
+    Fabric,
+    Other
+}
+
+public enum AllocationStatus
+{
+    Available,
+    Pending,
+    Allocated,
+    Unavailable
 }

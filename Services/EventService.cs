@@ -27,11 +27,11 @@ public class EventService
             {
                 Event = e,
                 Resource = e.EventResources
-                    .Where(er => er.Resource.Type == ResourceType.Venue)
+                    .Where(er => er.Resource.ResourceType == ResourceType.Venue)
                     .Select(er => er.Resource)
                     .FirstOrDefault(),
                 Image = e.EventResources
-                    .Where(er => er.Resource.Type == ResourceType.Venue)
+                    .Where(er => er.Resource.ResourceType == ResourceType.Venue)
                     .Select(er => er.Resource.Image)
                     .FirstOrDefault(),
                 AttendeeCount = e.EventBookings.Count
@@ -268,7 +268,7 @@ public class EventService
 
         foreach (var eventResource in eventResources)
         {
-            if (eventResource.Resource.Type == ResourceType.Venue)
+            if (eventResource.Resource.ResourceType == ResourceType.Venue)
             {
                 return true;
             }
@@ -320,10 +320,6 @@ public class EventService
 
     public async Task<bool> OpenEventByIdAsync(Guid Id)
     {
-        Console.WriteLine(Id);
-        Console.WriteLine(Id);
-        Console.WriteLine(Id);
-        Console.WriteLine(Id);
         var _event = await _context.Events
             .FindAsync(Id);
 
@@ -428,7 +424,6 @@ public class EventService
 
             if (resource == null) return (false, new Dictionary<string, string> { { "NullError", "Resource not found." } }, null);
 
-            resource.Quantity -= model.QuantityFromForm;
             resource.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 

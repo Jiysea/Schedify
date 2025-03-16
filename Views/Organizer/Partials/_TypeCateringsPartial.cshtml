@@ -1,4 +1,4 @@
-@model OrganizerResourcesViewModel
+@model ResourceViewModel
 
 <nav hx-swap-oob="true" id="resources-nav">
     <partial name="~/Views/Organizer/Partials/_ResourceNav.cshtml" model="@("Caterings")" />
@@ -103,11 +103,10 @@
                             </p>
 
                             <div class="flex flex-col gap-2 ps-2 text-zinc-400">
-                                @if (evt.MenuItems != null)
+                                @if (true)
                                 {
-                                    var MenuItems = evt.MenuItems.Split(",").Select(x => x.Trim()).ToList();
 
-                                    @foreach (var item in MenuItems.Take(3))
+                                    @foreach (var item in Model.Resources)
                                     {
                                         <p class="flex items-center gap-2">
                                             <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
@@ -117,7 +116,7 @@
                                             @item
                                         </p>
                                     }
-                                    @if (MenuItems.Count > 3)
+                                    @if (true)
                                     {
                                         <p class="text-zinc-400">
                                             And more...

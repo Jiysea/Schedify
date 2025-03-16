@@ -17,7 +17,7 @@
 
 <main class="flex flex-col gap-10 p-5 relative">
 
-    <form hx-post="/organizer/add-event-resource" hx-swap="none" hx-vals='{"ResourceId": "@Model.ResourceId", "EventId": "@Model.EventId", "QuantityFromResource": @Model.QuantityFromResource, "CostFromResource": @Model.CostFromResource, "Type": "@Model.Type", "EventStartAt": "@Model.EventStartAt", "EventEndAt": "@Model.EventEndAt",  "CostType": "@Model.CostType"}'>
+    <form hx-post="/organizer/add-event-resource" hx-swap="none" hx-vals='{"ResourceId": "@Model.ResourceId", "EventId": "@Model.EventId", "QuantityFromResource": @Model.QuantityFromResource, "CostFromResource": @Model.CostFromResource, "Type": "@Model.ResourceType", "EventStartAt": "@Model.EventStartAt", "EventEndAt": "@Model.EventEndAt",  "CostType": "@Model.CostType"}'>
         @* Body *@
         <div class="flex flex-col gap-10">
 
@@ -50,7 +50,7 @@
             </div>
 
             <div class="relative flex flex-col gap-2 border border-coffee-300 rounded-lg p-5">
-                <p class="absolute start-4 -top-3 px-2 font-semibold text-sm bg-coffee-50 text-pumpkin-600">Add this @Model.Type to your
+                <p class="absolute start-4 -top-3 px-2 font-semibold text-sm bg-coffee-50 text-pumpkin-600">Add this @Model.ResourceType to your
                     event?</p>
 
                 @* Resource Information Body *@
@@ -85,23 +85,23 @@
                         </span>
                     </div>
 
-                    @if (Model.Type == ResourceType.Venue)
+                    @if (Model.ResourceType == ResourceType.Venue)
                     {
                         @* Address Line 1 *@
                         <div class="flex flex-col col-span-full gap-1 relative">
-                            <p for="costtype" class="text-xs text-coffee-900">Address Line @(Model.Resource.AddressLine2 == null ? "" : "1")</p>
+                            <p for="costtype" class="text-xs text-coffee-900">Address Line @(true ? "" : "1")</p>
                             <span class="p-2 text-sm text-coffee-700">
-                                @Model.Resource.AddressLine1
+                                
                             </span>
                         </div>
 
-                        @if (Model.Resource.AddressLine2 != null)
+                        @if (true)
                         {
                             @* Address Line 2 *@
                             <div class="flex flex-col col-span-full gap-1 relative">
                                 <p for="addressline2" class="text-xs text-coffee-900">Address Line 2</p>
                                 <span class="p-2 text-sm text-coffee-700">
-                                    Model.Resource.AddressLine2
+                                    
                                 </span>
                             </div>
                         }
@@ -110,7 +110,7 @@
                         <div class="flex flex-col col-span-2 gap-1 relative">
                             <p for="citymunicipality" class="text-xs text-coffee-900">City/Municipality</p>
                             <span class="p-2 text-sm text-coffee-700">
-                                @Model.Resource.CityMunicipality
+                                
                             </span>
                         </div>
 
@@ -118,7 +118,7 @@
                         <div class="flex flex-col col-span-2 gap-1 relative">
                             <p for="province" class="text-xs text-coffee-900">Province</p>
                             <span class="p-2 text-sm text-coffee-700">
-                                @Model.Resource.Province
+                                
                             </span>
                         </div>
 
@@ -126,7 +126,7 @@
                         <div class="flex flex-col col-span-2 gap-1 relative">
                             <p for="capacity" class="text-xs text-coffee-900">Capacity</p>
                             <span class="p-2 text-sm text-coffee-700">
-                                @Model.Resource.Capacity
+                                
                             </span>
                         </div>
 
@@ -134,21 +134,21 @@
                         <div class="flex flex-col col-span-2 gap-1 w-full relative">
                             <p for="size" class="text-xs text-coffee-900">Size</p>
                             <span class="p-2 text-sm text-coffee-700">
-                                @Model.Resource.Size ft&sup2;
+                                 ft&sup2;
                             </span>
                         </div>
                     }
-                    else if (Model.Type == ResourceType.Equipment)
+                    else if (Model.ResourceType == ResourceType.Equipment)
                     {
                         @* Brand *@
                         <div class="flex flex-col col-span-full gap-1 relative">
                             <p for="brand" class="text-xs text-coffee-900">Brand</p>
                             <span class="p-2 text-sm text-coffee-700">
-                                @Model.Resource.Brand
+                                
                             </span>
                         </div>
 
-                        var specifications = JsonSerializer.Deserialize<Dictionary<string, string>>(Model.Resource.Specifications!)!;
+                        var specifications = JsonSerializer.Deserialize<Dictionary<string, string>>(true!)!;
                             
                         @* Specifications *@
                         <div class="flex flex-col col-span-full gap-2 w-full relative">
@@ -165,13 +165,13 @@
                             </div>
                         </div>
                     }
-                    else if (Model.Type == ResourceType.Furniture)
+                    else if (Model.ResourceType == ResourceType.Furniture)
                     {
                         @* Material *@
                         <div class="flex flex-col col-span-2 gap-1 relative">
                             <p for="material" class="text-xs text-coffee-900">Material</p>
                             <span class="p-2 text-sm text-coffee-700">
-                                @Model.Resource.Material
+                                
                             </span>
                         </div>
 
@@ -179,27 +179,27 @@
                         <div class="flex flex-col col-span-2 gap-1 relative">
                             <p for="dimensions" class="text-xs text-coffee-900">Dimensions</p>
                             <span class="p-2 text-sm text-coffee-700">
-                                @Model.Resource.Dimensions
+                                
                             </span>
                         </div>
                     }
-                    else if (Model.Type == ResourceType.Catering)
+                    else if (Model.ResourceType == ResourceType.Catering)
                     {
                         @* Menu Items *@
                         <div class="flex flex-col col-span-full gap-1 relative">
                             <p for="menuitems" class="text-xs text-coffee-900">Menu Items</p>
                             <span class="p-2 text-sm text-coffee-700">
-                                @Model.Resource.MenuItems
+                                
                             </span>
                         </div>
                     }
-                    else if (Model.Type == ResourceType.Personnel)
+                    else if (Model.ResourceType == ResourceType.Personnel)
                     {
                         @* Position *@
                         <div class="flex flex-col col-span-2 gap-1 relative">
                             <p for="position" class="text-xs text-coffee-900">Position</p>
                             <span class="p-2 text-sm text-coffee-700">
-                                @Model.Resource.Position
+                                
                             </span>
                         </div>
 
@@ -207,7 +207,7 @@
                         <div class="flex flex-col col-span-2 gap-1 relative w-full">
                             <p for="shift" class="text-xs text-coffee-900">Preferred Shift</p>
                             <span class="p-2 text-sm text-coffee-700">
-                                @Model.Resource.Shift
+                                
                             </span>
                         </div>
 
@@ -215,7 +215,7 @@
                         <div class="flex flex-col col-span-full gap-1 relative">
                             <p for="experience" class="text-xs text-coffee-900">Experience</p>
                             <span class="p-2 text-sm text-coffee-700">
-                                @Model.Resource.Experience
+                                
                             </span>
                         </div>
                     }

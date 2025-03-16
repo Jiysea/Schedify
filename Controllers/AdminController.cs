@@ -4,14 +4,11 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using Schedify.Models;
 using Schedify.ViewModels;
 using Schedify.Data;
 using Schedify.Services;
-using System.Text.Json;
 
 namespace Schedify.Controllers;
-
 
 [Authorize(Roles = "Admin")]
 public class AdminController : Controller
@@ -50,43 +47,22 @@ public class AdminController : Controller
         return View(viewModel);
     }
 
-    [Route("admin/activity-logs")]
-    public ActionResult ActivityLogs() => View();
-
-    [Route("admin/profile")]
-    public ActionResult Profile() => View();
-
-    [Route("admin/resource-extra")]
+    [Route("admin/view-resource/{id}")]
     [HttpGet]
-    public IActionResult ResourceExtra(ResourceType selectedOption)
+    public async Task<IActionResult> ViewResource(Guid id)
     {
-        ResourceViewModel viewModel = selectedOption switch
+        var resource = await _resourceService.GetResourceByIdAsync(id);
+        
+        if (resource == null)
         {
-            ResourceType.Venue => new ResourceViewModel { Type = ResourceType.Venue },
-            ResourceType.Equipment => new ResourceViewModel { Type = ResourceType.Equipment },
-            ResourceType.Furniture => new ResourceViewModel { Type = ResourceType.Furniture },
-            ResourceType.Catering => new ResourceViewModel { Type = ResourceType.Catering },
-            ResourceType.Personnel => new ResourceViewModel { Type = ResourceType.Personnel },
-            _ => new ResourceViewModel { Type = ResourceType.Venue } // Default
-        };
-        return PartialView("~/Views/Admin/Partials/_ResourceExtraPartial.cshtml", viewModel);
-    }
-
-    [Route("admin/cost-types")]
-    [HttpGet]
-    public IActionResult GetCostTypes(string selectedOption)
-    {
-        if (Enum.TryParse<ResourceType>(selectedOption, out var resourceType))
-        {
-            return PartialView("~/Views/Admin/Partials/_CostTypeOptionsPartial.cshtml", resourceType);
+            return NotFound();
         }
-
-        return BadRequest();
+        return PartialView("~/Views/Admin/Partials/_ViewResourcePartial.cshtml", resource);
     }
 
     [Route("admin/create-resource")]
     [HttpPost]
-    public async Task<IActionResult> CreateResource(ResourceViewModel model)
+    public async Task<IActionResult> CreateResource(CreateResourceViewModel model)
     {
         var result = await _resourceService.CreateResourceAsync(model);
 
@@ -105,24 +81,6 @@ public class AdminController : Controller
         return Content(string.Empty);
     }
 
-    [Route("admin/view-resource/{id}")]
-    [HttpGet]
-    public async Task<IActionResult> ViewResource(Guid id)
-    {
-        var resource = await _resourceService.GetResourceByIdAsync(id);
-        
-        if (resource == null)
-        {
-            return NotFound();
-        }
-        Console.WriteLine(resource.IsUsed);
-        Console.WriteLine(resource.IsUsed);
-        Console.WriteLine(resource.IsUsed);
-        Console.WriteLine(resource.IsUsed);
-        Console.WriteLine(resource.IsUsed);
-        return PartialView("~/Views/Admin/Partials/_ViewResourcePartial.cshtml", resource);
-    }
-
     [Route("admin/delete-resource/{id}")]
     [HttpDelete]
     public async Task<IActionResult> DeleteResource(Guid id)
@@ -138,17 +96,52 @@ public class AdminController : Controller
     }
 
 
-    // [Route("admin/view-edit-resource/{id}")]
-    // [HttpGet]
-    // public async Task<IActionResult> EditResource(Guid id)
-    // {
-    //     var resource = await _resourceService.GetResourceByIdAsync(id);
+    [Route("admin/update-resource/{id}")]
+    [HttpGet]
+    public async Task<IActionResult> EditResource(Guid id)
+    {
+        var resource = await _resourceService.GetResourceByIdAsync(id);
 
-    //     if(resource == null)
-    //     {
-    //         return NotFound();
-    //     }
+        if(resource == null)
+        {
+            return NotFound();
+        }
 
-    //     return PartialView("~/Views/Admin/Partials/_EditResourcePartial.cshtml", resource);
-    // }
+        return PartialView("~/Views/Admin/Partials/_UpdateResourcePartial.cshtml", resource);
+    }
+
+     // Used in CreateResourceModal
+    [Route("admin/resource-extra")]
+    [HttpGet]
+    public IActionResult ResourceExtra(ResourceType selectedOption)
+    {
+        CreateResourceViewModel viewModel = selectedOption switch
+        {
+            ResourceType.Venue => new CreateResourceViewModel { ResourceType = ResourceType.Venue },
+            ResourceType.Equipment => new CreateResourceViewModel { ResourceType = ResourceType.Equipment },
+            ResourceType.Furniture => new CreateResourceViewModel { ResourceType = ResourceType.Furniture },
+            ResourceType.Catering => new CreateResourceViewModel { ResourceType = ResourceType.Catering },
+            ResourceType.Personnel => new CreateResourceViewModel { ResourceType = ResourceType.Personnel },
+            _ => new CreateResourceViewModel { ResourceType = ResourceType.Venue } // Default
+        };
+        return PartialView("~/Views/Admin/Partials/_CreateResourceExtraPartial.cshtml", viewModel);
+    }
+
+    [Route("admin/cost-types")]
+    [HttpGet]
+    public IActionResult GetCostTypes(string selectedOption)
+    {
+        if (Enum.TryParse<ResourceType>(selectedOption, out var resourceType))
+        {
+            return PartialView("~/Views/Admin/Partials/_CostTypeOptionsPartial.cshtml", resourceType);
+        }
+
+        return BadRequest();
+    }
+    
+    [Route("admin/activity-logs")]
+    public ActionResult ActivityLogs() => View();
+
+    [Route("admin/profile")]
+    public ActionResult Profile() => View();
 }

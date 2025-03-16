@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Schedify.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCerate : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -68,25 +68,9 @@ namespace Schedify.Migrations
                     ProviderEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
-                    Type = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
+                    ResourceType = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
                     Cost = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     CostType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
-                    Capacity = table.Column<int>(type: "int", nullable: false),
-                    Size = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AddressLine1 = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: true),
-                    AddressLine2 = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: true),
-                    CityMunicipality = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Province = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Brand = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Specifications = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Material = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Dimensions = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    MenuItems = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PriceItems = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Position = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Shift = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: true),
-                    Experience = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()")
                 },
@@ -277,8 +261,8 @@ namespace Schedify.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ResourceId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    ResourceId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ImageFileName = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
@@ -288,10 +272,120 @@ namespace Schedify.Migrations
                         name: "FK_Images_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Images_Resources_ResourceId",
+                        column: x => x.ResourceId,
+                        principalTable: "Resources",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ResourceCaterings",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ResourceId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    GuestCapacity = table.Column<int>(type: "int", nullable: false),
+                    MenuItems = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ResourceCaterings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ResourceCaterings_Resources_ResourceId",
+                        column: x => x.ResourceId,
+                        principalTable: "Resources",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ResourceEquipments",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ResourceId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    Brand = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Specifications = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Warranty = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ResourceEquipments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ResourceEquipments_Resources_ResourceId",
+                        column: x => x.ResourceId,
+                        principalTable: "Resources",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ResourceFurnitures",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ResourceId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    Material = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
+                    OtherMaterial = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Dimensions = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Warranty = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ResourceFurnitures", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ResourceFurnitures_Resources_ResourceId",
+                        column: x => x.ResourceId,
+                        principalTable: "Resources",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ResourcePersonnels",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ResourceId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Position = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ShiftStart = table.Column<TimeSpan>(type: "time", nullable: false),
+                    ShiftEnd = table.Column<TimeSpan>(type: "time", nullable: false),
+                    Experience = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ResourcePersonnels", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ResourcePersonnels_Resources_ResourceId",
+                        column: x => x.ResourceId,
+                        principalTable: "Resources",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ResourceVenues",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ResourceId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Capacity = table.Column<int>(type: "int", nullable: false),
+                    Size = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    AddressLine1 = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
+                    AddressLine2 = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: true),
+                    CityMunicipality = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Province = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ResourceVenues", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ResourceVenues_Resources_ResourceId",
                         column: x => x.ResourceId,
                         principalTable: "Resources",
                         principalColumn: "Id",
@@ -512,7 +606,8 @@ namespace Schedify.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Conversations_EventId",
                 table: "Conversations",
-                column: "EventId");
+                column: "EventId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_ConversationUsers_ConversationId",
@@ -562,12 +657,16 @@ namespace Schedify.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Images_ResourceId",
                 table: "Images",
-                column: "ResourceId");
+                column: "ResourceId",
+                unique: true,
+                filter: "[ResourceId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Images_UserId",
                 table: "Images",
-                column: "UserId");
+                column: "UserId",
+                unique: true,
+                filter: "[UserId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Messages_ConversationId",
@@ -578,6 +677,36 @@ namespace Schedify.Migrations
                 name: "IX_Messages_UserId",
                 table: "Messages",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ResourceCaterings_ResourceId",
+                table: "ResourceCaterings",
+                column: "ResourceId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ResourceEquipments_ResourceId",
+                table: "ResourceEquipments",
+                column: "ResourceId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ResourceFurnitures_ResourceId",
+                table: "ResourceFurnitures",
+                column: "ResourceId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ResourcePersonnels_ResourceId",
+                table: "ResourcePersonnels",
+                column: "ResourceId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ResourceVenues_ResourceId",
+                table: "ResourceVenues",
+                column: "ResourceId",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -623,13 +752,28 @@ namespace Schedify.Migrations
                 name: "Messages");
 
             migrationBuilder.DropTable(
+                name: "ResourceCaterings");
+
+            migrationBuilder.DropTable(
+                name: "ResourceEquipments");
+
+            migrationBuilder.DropTable(
+                name: "ResourceFurnitures");
+
+            migrationBuilder.DropTable(
+                name: "ResourcePersonnels");
+
+            migrationBuilder.DropTable(
+                name: "ResourceVenues");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Resources");
+                name: "Conversations");
 
             migrationBuilder.DropTable(
-                name: "Conversations");
+                name: "Resources");
 
             migrationBuilder.DropTable(
                 name: "Events");

@@ -24,6 +24,11 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
     public DbSet<Feedback> Feedbacks { get; set; }
     public DbSet<Message> Messages { get; set; }
     public DbSet<Resource> Resources { get; set; }
+    public DbSet<ResourceVenue> ResourceVenues { get; set; }
+    public DbSet<ResourceEquipment> ResourceEquipments { get; set; }
+    public DbSet<ResourceFurniture> ResourceFurnitures { get; set; }
+    public DbSet<ResourceCatering> ResourceCaterings { get; set; }
+    public DbSet<ResourcePersonnel> ResourcePersonnels { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -79,6 +84,41 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
             .WithOne(e => e.Image)
             .HasForeignKey<Image>(e => e.UserId)
             .IsRequired(false);
+
+        // Configure ResourceVenues -> Events relationship to restrict cascading delete.
+        modelBuilder.Entity<ResourceVenue>()
+            .HasOne(e => e.Resource)
+            .WithOne(e => e.ResourceVenue)
+            .HasForeignKey<ResourceVenue>(e => e.ResourceId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Configure ResourceEquipments -> Events relationship to restrict cascading delete.
+        modelBuilder.Entity<ResourceEquipment>()
+            .HasOne(e => e.Resource)
+            .WithOne(e => e.ResourceEquipment)
+            .HasForeignKey<ResourceEquipment>(e => e.ResourceId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Configure ResourceFurnitures -> Events relationship to restrict cascading delete.
+        modelBuilder.Entity<ResourceFurniture>()
+            .HasOne(e => e.Resource)
+            .WithOne(e => e.ResourceFurniture)
+            .HasForeignKey<ResourceFurniture>(e => e.ResourceId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Configure ResourceCaterings -> Events relationship to restrict cascading delete.
+        modelBuilder.Entity<ResourceCatering>()
+            .HasOne(e => e.Resource)
+            .WithOne(e => e.ResourceCatering)
+            .HasForeignKey<ResourceCatering>(e => e.ResourceId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Configure ResourcePersonnels -> Events relationship to restrict cascading delete.
+        modelBuilder.Entity<ResourcePersonnel>()
+            .HasOne(e => e.Resource)
+            .WithOne(e => e.ResourcePersonnel)
+            .HasForeignKey<ResourcePersonnel>(e => e.ResourceId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         // CreatedAt (ActivityLogs)
         modelBuilder.Entity<ActivityLog>()
@@ -201,10 +241,18 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
 
         // Enums (Resource)
         modelBuilder.Entity<Resource>()
-            .Property(e => e.Type)
+            .Property(e => e.ResourceType)
             .HasConversion(
                 v => v.ToString(),
                 v => (ResourceType)Enum.Parse(typeof(ResourceType), v))
+            .HasMaxLength(15);
+
+        // Enums (ResourceFurniture)
+        modelBuilder.Entity<ResourceFurniture>()
+            .Property(e => e.Material)
+            .HasConversion(
+                v => v.ToString(),
+                v => (FurnitureMaterial)Enum.Parse(typeof(FurnitureMaterial), v))
             .HasMaxLength(15);
 
         // Enums (ActivityLog)

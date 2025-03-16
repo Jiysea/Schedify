@@ -11,7 +11,7 @@ public class EventResourceViewModel
 
     // Get the cost type
     public string? CostType { get; set; }
-    public ResourceType Type { get; set; }
+    public ResourceType ResourceType { get; set; }
 
     // From Resource
     public Resource? Resource { get; set; }
@@ -68,7 +68,7 @@ public class EventResourceViewModel
                 return 0.00m;
             }
 
-            switch (Type)
+            switch (ResourceType)
             {
                 case ResourceType.Venue:
                     if (CostType == "Per Hour")

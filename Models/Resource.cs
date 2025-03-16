@@ -19,8 +19,9 @@ public class Resource
 
     [Required]
     public required string ProviderPhoneNumber { get; set; }
-    
+
     [Required]
+    [EmailAddress]
     public required string ProviderEmail { get; set; }
 
     [Required]
@@ -32,58 +33,15 @@ public class Resource
     [DefaultValue("No description")]
     public required string Description { get; set; }
 
-    public ResourceType Type { get; set; }
+    public ResourceType ResourceType { get; set; }
 
     [Required]
-    [DataType(DataType.Currency)]
     [Range(typeof(decimal), "0.01", "79228162514264337593543950335")]
-    [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = true)]
     [Column(TypeName = "decimal(18, 2)")]
     public required decimal Cost { get; set; }
 
     [Required(ErrorMessage = "This field is required.")]
     public required string CostType { get; set; }
-
-    [Required]
-    [Range(1, int.MaxValue, ErrorMessage = "Value must be at least 1.")]
-    public required int Quantity { get; set; }
-
-    [Range(1, int.MaxValue, ErrorMessage = "Value must be at least 1.")]
-    public int Capacity { get; set; }
-
-    public string? Size { get; set; }
-
-    [StringLength(150)]
-    public string? AddressLine1 { get; set; }
-
-    [StringLength(150)]
-    public string? AddressLine2 { get; set; }
-
-    [StringLength(50)]
-    public string? CityMunicipality { get; set; }
-
-    [StringLength(50)]
-    public string? Province { get; set; }
-
-    [DefaultValue("No Brand")]
-    public string? Brand { get; set; }
-
-    public string? Specifications { get; set; } // comma-separated key-value pairs
-
-    public string? Material { get; set; }
-
-    public string? Dimensions { get; set; }
-
-    public string? MenuItems { get; set; }
-
-    public string? Position { get; set; }
-
-    [StringLength(30)]
-    public string? Shift { get; set; }
-
-    [StringLength(30)]
-    [DefaultValue("None")]
-    public string? Experience { get; set; }
 
     [Column(TypeName = "datetime2")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -96,4 +54,9 @@ public class Resource
     // Dependents
     public ICollection<EventResource> EventResources { get; } = new List<EventResource>();
     public Image? Image { get; set; }
+    public ResourceVenue ResourceVenue { get; set; } = null!;
+    public ResourceEquipment ResourceEquipment { get; set; } = null!;
+    public ResourceFurniture ResourceFurniture { get; set; } = null!;
+    public ResourceCatering ResourceCatering { get; set; } = null!;
+    public ResourcePersonnel ResourcePersonnel { get; set; } = null!;
 }

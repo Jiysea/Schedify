@@ -84,7 +84,7 @@ public class OrganizerController : Controller
     [Route("organizer/view-event/{id}")]
     [HttpGet]
     public async Task<IActionResult> ViewEvent(Guid id)
-    {   
+    {
         var _event = await _eventService.GetEventByIdAsync(id);
 
         if (_event == null)
@@ -288,13 +288,13 @@ public class OrganizerController : Controller
         int newPage = 0; // Calculate new page number
 
         if (newPage < 1) newPage = 1; // Prevent negative pages
-        var totalCount = _context.Resources.Count(r => r.Type == ResourceType.Venue && r.Quantity > 0);
+        var totalCount = _context.Resources.Count(r => r.ResourceType == ResourceType.Venue);
         var resources = _resourceService.GetResourcesByType(ResourceType.Venue, newPage, pageSize);
 
         var model = new OrganizerResourcesViewModel
         {
-            Resources = resources,
-            ResourceImages = _resourceService.GetResourceImageFromList(resources),
+            Resources = resources!,
+            ResourceImages = _resourceService.GetResourceImageFromList(resources!),
             CurrentPage = newPage,
             PageSize = pageSize,
             TotalCount = totalCount
@@ -311,13 +311,13 @@ public class OrganizerController : Controller
         int newPage = currentPage + change; // Calculate new page number
 
         if (newPage < 1) newPage = 1; // Prevent negative pages
-        var totalCount = _context.Resources.Count(r => r.Type == type && r.Quantity > 0);
+        var totalCount = _context.Resources.Count(r => r.ResourceType == type);
         var resources = _resourceService.GetResourcesByType(type, newPage, pageSize);
 
         var viewModel = new OrganizerResourcesViewModel
         {
-            Resources = resources,
-            ResourceImages = _resourceService.GetResourceImageFromList(resources),
+            Resources = resources!,
+            ResourceImages = _resourceService.GetResourceImageFromList(resources!),
             CurrentPage = newPage,
             PageSize = pageSize,
             TotalCount = totalCount
@@ -346,7 +346,7 @@ public class OrganizerController : Controller
     {
         var DraftEvents = _eventService.GetEventsByOrganizerDraft(new DateTime(DateTime.UtcNow.Year, 1, 1, 0, 0, 0, DateTimeKind.Utc), DateTime.UtcNow.Date.AddHours(23).AddMinutes(59));
         var result = await _resourceService.GetResourceAndEvents(id, DraftEvents);
-    
+
         if (result == null)
         {
             return NotFound();
@@ -360,7 +360,7 @@ public class OrganizerController : Controller
     public async Task<IActionResult> AddToEventResource(EventResourceViewModel model)
     {
         Console.WriteLine(model.CostType);
-        Console.WriteLine(model.Type);
+        Console.WriteLine(model.ResourceType);
         Console.WriteLine(model.QuantityFromForm);
         Console.WriteLine(model.QuantityFromResource);
         Console.WriteLine(model.MaxQuantityReached);
@@ -421,10 +421,10 @@ public class OrganizerController : Controller
             EventStartAt = DraftEvents.First().StartAt,
             EventEndAt = DraftEvents.First().EndAt,
             CostType = resource.CostType,
-            Type = resource.Type,
-            QuantityFromResource = resource.Quantity,
+            ResourceType = resource.ResourceType,
+            // QuantityFromResource = resource.Quantity,
             CostFromResource = resource.Cost,
-            Shift = resource.Type == ResourceType.Personnel ? resource.Shift : null,
+            // Shift = resource.ResourceType == ResourceType.Personnel ? resource.Shift : null,
             QuantityFromForm = model.QuantityFromForm,
         };
 
@@ -459,10 +459,10 @@ public class OrganizerController : Controller
             EventEndAt = DraftEvents.First().EndAt,
             SelectedEvent = selectedEvent.Name,
             CostType = resource.CostType,
-            Type = resource.Type,
-            QuantityFromResource = resource.Quantity,
+            ResourceType = resource.ResourceType,
+            // QuantityFromResource = resource.Quantity,
             CostFromResource = resource.Cost,
-            Shift = resource.Type == ResourceType.Personnel ? resource.Shift : null,
+            // Shift = resource.ResourceType == ResourceType.Personnel ? resource.Shift : null,
             QuantityFromForm = model.QuantityFromForm,
         };
 
@@ -491,13 +491,13 @@ public class OrganizerController : Controller
             int newPage = 0; // Calculate new page number
 
             if (newPage < 1) newPage = 1; // Prevent negative pages
-            var totalCount = _context.Resources.Count(r => r.Type == ResourceType.Venue && r.Quantity > 0);
+            var totalCount = _context.Resources.Count(r => r.ResourceType == ResourceType.Venue);
             var resources = _resourceService.GetResourcesByType(ResourceType.Venue, newPage, pageSize);
 
             var model = new OrganizerResourcesViewModel
             {
-                Resources = resources,
-                ResourceImages = _resourceService.GetResourceImageFromList(resources),
+                Resources = resources!,
+                ResourceImages = _resourceService.GetResourceImageFromList(resources!),
                 CurrentPage = newPage,
                 PageSize = pageSize,
                 TotalCount = totalCount
@@ -517,13 +517,13 @@ public class OrganizerController : Controller
             int newPage = 0; // Calculate new page number
 
             if (newPage < 1) newPage = 1; // Prevent negative pages
-            var totalCount = _context.Resources.Count(r => r.Type == ResourceType.Equipment && r.Quantity > 0);
+            var totalCount = _context.Resources.Count(r => r.ResourceType == ResourceType.Equipment);
             var resources = _resourceService.GetResourcesByType(ResourceType.Equipment, newPage, pageSize);
 
             var model = new OrganizerResourcesViewModel
             {
-                Resources = resources,
-                ResourceImages = _resourceService.GetResourceImageFromList(resources),
+                Resources = resources!,
+                ResourceImages = _resourceService.GetResourceImageFromList(resources!),
                 CurrentPage = newPage,
                 PageSize = pageSize,
                 TotalCount = totalCount
@@ -545,13 +545,13 @@ public class OrganizerController : Controller
             int newPage = 0; // Calculate new page number
 
             if (newPage < 1) newPage = 1; // Prevent negative pages
-            var totalCount = _context.Resources.Count(r => r.Type == ResourceType.Furniture && r.Quantity > 0);
+            var totalCount = _context.Resources.Count(r => r.ResourceType == ResourceType.Furniture);
             var resources = _resourceService.GetResourcesByType(ResourceType.Furniture, newPage, pageSize);
 
             var model = new OrganizerResourcesViewModel
             {
-                Resources = resources,
-                ResourceImages = _resourceService.GetResourceImageFromList(resources),
+                Resources = resources!,
+                ResourceImages = _resourceService.GetResourceImageFromList(resources!),
                 CurrentPage = newPage,
                 PageSize = pageSize,
                 TotalCount = totalCount
@@ -573,13 +573,13 @@ public class OrganizerController : Controller
             int newPage = 0; // Calculate new page number
 
             if (newPage < 1) newPage = 1; // Prevent negative pages
-            var totalCount = _context.Resources.Count(r => r.Type == ResourceType.Catering && r.Quantity > 0);
+            var totalCount = _context.Resources.Count(r => r.ResourceType == ResourceType.Catering );
             var resources = _resourceService.GetResourcesByType(ResourceType.Catering, newPage, pageSize);
 
             var model = new OrganizerResourcesViewModel
             {
-                Resources = resources,
-                ResourceImages = _resourceService.GetResourceImageFromList(resources),
+                Resources = resources!,
+                ResourceImages = _resourceService.GetResourceImageFromList(resources!),
                 CurrentPage = newPage,
                 PageSize = pageSize,
                 TotalCount = totalCount
@@ -601,13 +601,13 @@ public class OrganizerController : Controller
             int newPage = 0; // Calculate new page number
 
             if (newPage < 1) newPage = 1; // Prevent negative pages
-            var totalCount = _context.Resources.Count(r => r.Type == ResourceType.Personnel && r.Quantity > 0);
+            var totalCount = _context.Resources.Count(r => r.ResourceType == ResourceType.Personnel);
             var resources = _resourceService.GetResourcesByType(ResourceType.Personnel, newPage, pageSize);
 
             var model = new OrganizerResourcesViewModel
             {
-                Resources = resources,
-                ResourceImages = _resourceService.GetResourceImageFromList(resources),
+                Resources = resources!,
+                ResourceImages = _resourceService.GetResourceImageFromList(resources!),
                 CurrentPage = newPage,
                 PageSize = pageSize,
                 TotalCount = totalCount
