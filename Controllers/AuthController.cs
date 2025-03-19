@@ -74,11 +74,26 @@ public class AuthController : Controller
     [HttpPost]
     public async Task<IActionResult> RegisterUser(RegisterViewModel model)
     {
-        Console.WriteLine(model.Birthdate);
+        // Phone Number custom validation
+        if(model.PhoneNumber.Length != 10)
+        {
+            ModelState.AddModelError("PhoneNumber", "Value must be 10 digits.");
+        }
+        else if(!model.PhoneNumber.StartsWith("9"))
+        {
+            ModelState.AddModelError("PhoneNumber", "Value must start with 9.");
+        }
+        else if(!model.PhoneNumber.All(char.IsDigit))
+        {
+            ModelState.AddModelError("PhoneNumber", "Value must be a number.");
+        }
+
         if (!ModelState.IsValid)
         {
             return PartialView("_ValidationMessages", ModelState);
         }
+
+        var PhoneNumber = string.Concat(["+63", model.PhoneNumber]);
 
         User user = new User
         {
@@ -89,7 +104,7 @@ public class AuthController : Controller
             Birthdate = model.Birthdate,
             Email = model.Email,
             UserName = model.Email,
-            PhoneNumber = model.PhoneNumber,
+            PhoneNumber = PhoneNumber,
         };
 
         var result = await _userManager.CreateAsync(user, model.Password);

@@ -1,0 +1,29 @@
+@model ResourceType
+
+@if (Model == ResourceType.Venue)
+{
+    <option selected>Per Hour</option>
+    <option>Per Day</option>
+    <option>Fixed Rate</option>
+}
+else if (Model == ResourceType.Equipment)
+{
+    <option selected>Per Unit</option>
+    <option>In Bulk</option>
+}
+else if (Model == ResourceType.Furniture)
+{
+    <option selected>Per Unit</option>
+    <option>In Bulk</option>
+}
+else if (Model == ResourceType.Catering)
+{
+    <option selected>Per Serving</option>
+    <option>In Bulk</option>
+}
+else if (Model == ResourceType.Personnel)
+{
+    <option selected>Per Hour</option>
+    <option>Per Day</option>
+    <option>Fixed Rate</option>
+}

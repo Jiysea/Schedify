@@ -23,7 +23,7 @@ public class ResourceService
 
     public List<Resource> GetResources()
     {
-        return _context.Resources.Include(r => r.EventResources).OrderByDescending(r => r.CreatedAt).ToList();
+        return _context.Resources.OrderByDescending(r => r.CreatedAt).ToList();
     }
 
     public Dictionary<Guid, string?> GetResourceImages()
@@ -33,95 +33,16 @@ public class ResourceService
             .ToDictionary(img => img.ResourceId!.Value, img => img.ImageFileName);
     }
 
-    public List<Resource>? GetResourcesByType(ResourceType type, int newPage, int pageSize)
+    public List<Resource>? GetResourcesByEventId(Guid Id)
     {
-        if (type == ResourceType.Venue)
-        {
-            return _context.Resources
-                    .Include(r => r.ResourceVenue)
-                    .OrderByDescending(r => r.CreatedAt)
-                    .Skip((newPage - 1) * pageSize)
-                    .Take(pageSize)
-                    .ToList();
-        }
-        else if (type == ResourceType.Equipment)
-        {
-            return _context.Resources
-                    .Include(r => r.ResourceEquipment)
-                    .OrderByDescending(r => r.CreatedAt)
-                    .Skip((newPage - 1) * pageSize)
-                    .Take(pageSize)
-                    .ToList();
-        }
-        else if (type == ResourceType.Furniture)
-        {
-            return _context.Resources
-                    .Include(r => r.ResourceFurniture)
-                    .OrderByDescending(r => r.CreatedAt)
-                    .Skip((newPage - 1) * pageSize)
-                    .Take(pageSize)
-                    .ToList();
-        }
-        else if (type == ResourceType.Catering)
-        {
-            return _context.Resources
-                    .Include(r => r.ResourceCatering)
-                    .OrderByDescending(r => r.CreatedAt)
-                    .Skip((newPage - 1) * pageSize)
-                    .Take(pageSize)
-                    .ToList();
-        }
-        else if (type == ResourceType.Personnel)
-        {
-            return _context.Resources
-                    .Include(r => r.ResourcePersonnel)
-                    .OrderByDescending(r => r.CreatedAt)
-                    .Skip((newPage - 1) * pageSize)
-                    .Take(pageSize)
-                    .ToList();
-        }
-        return null;
+        return _context.Resources.Where(r => r.EventId == Id).ToList();
     }
 
-    public Dictionary<Guid, string> GetResourceImageFromList(List<Resource> resources)
-    {
-        var resourceIds = resources.Select(e => e.Id).ToList();
-
-        return _context.Images
-            .Where(img => img.ResourceId.HasValue && resourceIds.Contains(img.ResourceId.Value))
-            .ToDictionary(img => img.ResourceId!.Value, img => img.ImageFileName!);
-    }
-
-    public async Task<EventResourceViewModel?> GetResourceAndEvents(Guid ResourceId, List<Event> Events)
+    public async Task<ViewResourceViewModel?> GetResourceByIdAsync(Guid? Id)
     {
         var resource = await _context.Resources
             .Include(r => r.Image)
-            .FirstOrDefaultAsync(r => r.Id == ResourceId);
-
-        if (resource == null) return null;
-
-        return new EventResourceViewModel
-        {
-            ResourceId = ResourceId,
-            EventId = Events.First().Id,
-            Resource = resource,
-            EventStartAt = Events.First().StartAt,
-            EventEndAt = Events.First().EndAt,
-            DraftEvents = Events,
-            SelectedEvent = Events.First().Name,
-            CostType = resource.CostType,
-            // Type = resource.Type,
-            // QuantityFromResource = resource.Quantity,
-            // CostFromResource = resource.Cost,
-            // Shift = resource.Type == ResourceType.Personnel ? resource.Shift : null,
-        };
-    }
-
-    public async Task<ViewResourceViewModel?> GetResourceByIdAsync(Guid Id)
-    {
-        var resource = await _context.Resources
-            .Include(r => r.Image)
-            .Include(r => r.EventResources)
+            .Include(r => r.Event)
             .FirstOrDefaultAsync(r => r.Id == Id);
 
         var imageFileName = await _context.Images
@@ -133,7 +54,7 @@ public class ResourceService
 
         bool isUsed = false;
 
-        if (resource.EventResources.Any() == true) isUsed = true;
+        // if (resource == true) isUsed = true;
 
         return new ViewResourceViewModel
         {
@@ -165,6 +86,90 @@ public class ResourceService
             // Experience = resource.Type == ResourceType.Personnel ? resource.Experience : null,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
+        };
+    }
+
+    // public List<Resource>? GetResourcesByType(ResourceType type)
+    // {
+    //     if (type == ResourceType.Venue)
+    //     {
+    //         return _context.Resources
+    //                 .Include(r => r.ResourceVenue)
+    //                 .OrderByDescending(r => r.CreatedAt)
+    //                 // .Skip((newPage - 1) * pageSize)
+    //                 // .Take(pageSize)
+    //                 .ToList();
+    //     }
+    //     else if (type == ResourceType.Equipment)
+    //     {
+    //         return _context.Resources
+    //                 .Include(r => r.ResourceEquipment)
+    //                 .OrderByDescending(r => r.CreatedAt)
+    //                 // .Skip((newPage - 1) * pageSize)
+    //                 // .Take(pageSize)
+    //                 .ToList();
+    //     }
+    //     else if (type == ResourceType.Furniture)
+    //     {
+    //         return _context.Resources
+    //                 .Include(r => r.ResourceFurniture)
+    //                 .OrderByDescending(r => r.CreatedAt)
+    //                 // .Skip((newPage - 1) * pageSize)
+    //                 // .Take(pageSize)
+    //                 .ToList();
+    //     }
+    //     else if (type == ResourceType.Catering)
+    //     {
+    //         return _context.Resources
+    //                 .Include(r => r.ResourceCatering)
+    //                 .OrderByDescending(r => r.CreatedAt)
+    //                 // .Skip((newPage - 1) * pageSize)
+    //                 // .Take(pageSize)
+    //                 .ToList();
+    //     }
+    //     else if (type == ResourceType.Personnel)
+    //     {
+    //         return _context.Resources
+    //                 .Include(r => r.ResourcePersonnel)
+    //                 .OrderByDescending(r => r.CreatedAt)
+    //                 // .Skip((newPage - 1) * pageSize)
+    //                 // .Take(pageSize)
+    //                 .ToList();
+    //     }
+    //     return null;
+    // }
+
+    public Dictionary<Guid, string?> GetResourceImageFromList(List<Resource> resources)
+    {
+        var resourceIds = resources.Select(e => e.Id).ToList();
+
+        return _context.Images
+            .Where(img => img.ResourceId.HasValue && resourceIds.Contains(img.ResourceId.Value))
+            .ToDictionary(img => img.ResourceId!.Value, img => img.ImageFileName);
+    }
+
+    public async Task<EventResourceViewModel?> GetResourceAndEvents(Guid ResourceId, List<Event> Events)
+    {
+        var resource = await _context.Resources
+            .Include(r => r.Image)
+            .FirstOrDefaultAsync(r => r.Id == ResourceId);
+
+        if (resource == null) return null;
+
+        return new EventResourceViewModel
+        {
+            ResourceId = ResourceId,
+            EventId = Events.First().Id,
+            Resource = resource,
+            EventStartAt = Events.First().StartAt,
+            EventEndAt = Events.First().EndAt,
+            DraftEvents = Events,
+            SelectedEvent = Events.First().Name,
+            CostType = resource.CostType,
+            // Type = resource.Type,
+            // QuantityFromResource = resource.Quantity,
+            // CostFromResource = resource.Cost,
+            // Shift = resource.Type == ResourceType.Personnel ? resource.Shift : null,
         };
     }
 
@@ -253,7 +258,7 @@ public class ResourceService
 
         var resource = new Resource
         {
-            UserId = user.Id,
+            EventId = user.Id,
             ProviderName = model.ProviderName,
             ProviderPhoneNumber = model.ProviderPhoneNumber,
             ProviderEmail = model.ProviderEmail,

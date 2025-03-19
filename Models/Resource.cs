@@ -10,8 +10,7 @@ public class Resource
 {
     [Key]
     public Guid Id { get; set; } = new Guid();
-
-    public Guid UserId { get; set; }
+    public Guid EventId { get; set; }
 
     [Required]
     [StringLength(250)]
@@ -52,7 +51,7 @@ public class Resource
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
     // Dependents
-    public ICollection<EventResource> EventResources { get; } = new List<EventResource>();
+    public Event Event { get; set; } = null!;
     public Image? Image { get; set; }
     public ResourceVenue ResourceVenue { get; set; } = null!;
     public ResourceEquipment ResourceEquipment { get; set; } = null!;

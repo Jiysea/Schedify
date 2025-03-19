@@ -10,7 +10,6 @@ public class Event
     public Guid Id { get; set; } = new Guid();
 
     public Guid UserId { get; set; }
-    public User User { get; set; } = null!;
 
     [Required]
     [StringLength(100)]
@@ -47,8 +46,9 @@ public class Event
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
     // Dependents
+    public User User { get; set; } = null!;
+    public ICollection<Resource> Resources { get; } = new List<Resource>();
     public ICollection<EventBooking> EventBookings { get; } = new List<EventBooking>();
     public Conversation Conversation { get; set; } = null!;
     public ICollection<Feedback> Feedbacks { get; } = new List<Feedback>();
-    public ICollection<EventResource> EventResources { get; } = new List<EventResource>();
 }

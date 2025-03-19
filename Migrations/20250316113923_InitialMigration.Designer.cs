@@ -12,7 +12,7 @@ using Schedify.Data;
 namespace Schedify.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250316105043_InitialMigration")]
+    [Migration("20250316113923_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -746,7 +746,7 @@ namespace Schedify.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("Birthdate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("date");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()

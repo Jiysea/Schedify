@@ -36,6 +36,15 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/login"; // Change this to your desired page
 });
 
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Set session timeout
+    options.Cookie.HttpOnly = true; // Prevents JavaScript access
+    options.Cookie.IsEssential = true; // Ensures session is stored even without consent
+});
+
+builder.Services.AddDistributedMemoryCache();
+
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ResourceService>();
@@ -153,7 +162,7 @@ void RedirectToUserHome(HttpContext context, ClaimsPrincipal user)
     }
 }
 
-
+app.UseSession();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 

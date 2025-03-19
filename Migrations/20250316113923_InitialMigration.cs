@@ -34,7 +34,7 @@ namespace Schedify.Migrations
                     MiddleName = table.Column<string>(type: "nvarchar(35)", maxLength: 35, nullable: true),
                     LastName = table.Column<string>(type: "nvarchar(35)", maxLength: 35, nullable: false),
                     ExtensionName = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    Birthdate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Birthdate = table.Column<DateTime>(type: "date", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),

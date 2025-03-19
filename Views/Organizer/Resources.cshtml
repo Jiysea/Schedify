@@ -1,22 +1,20 @@
-@model OrganizerResourcesViewModel
+@model ResourceViewModel
 
 @{
     ViewData["Title"] = "Resources";
 }
 
-<div class="min-h-screen bg-[#F9FBFA] ms-[250px]">
-    <partial name="~/Views/Organizer/Partials/_SidebarPartial.cshtml" />
-    <header class="flex flex-col items-center w-full">
+<partial name="~/Views/Organizer/Partials/_SidebarPartial.cshtml" />
 
-        @* Main Header (Search & Avatar) *@
-        <partial name="~/Views/Organizer/Partials/_TopbarPartial.cshtml" />
+<div x-data="{ viewResourceModal: false, createResourceModal: false }" class="min-h-screen bg-[#F9FBFA] ms-[250px]">
 
-    </header>
+    @* Main Header (Search & Avatar) *@
+    <partial name="~/Views/Organizer/Partials/_TopbarPartial.cshtml" />
 
-    <main x-data="{ viewResourceModal: false }" class="flex flex-col items-center w-full">
+    <header class="flex flex-col items-center w-full px-4 py-2 border-b-2 border-zinc-100">
 
         @* Sub Header (Resources, Search, Browse, By Event) *@
-        <div class="flex flex-col items-center w-full px-4 pt-4 border-b-2 gap-1 border-zinc-100">
+        <div class="flex flex-col items-center justify-center w-full h-[8vh] gap-1 ">
 
             <div class="flex items-center justify-between w-full gap-3">
                 <div class="flex items-center gap-3">
@@ -32,7 +30,7 @@
                 </div>
 
                 @* Search Bar *@
-                <div class="flex items-center gap-3">
+                @* <div class="flex items-center gap-3">
                     <span class="relative">
                         <input type="text" autocomplete="off"
                             class="peer duration-200 ease-in-out appearance-none w-56 text-sm outline-none ps-8 pe-3 py-1 rounded-md border-2 focus:ring-0 bg-white border-zinc-300 focus:border-coffee-500 text-zinc-500 focus:text-coffee-500 selection:text-coffee-50 selection:bg-coffee-700 placeholder-zinc-500"
@@ -45,84 +43,41 @@
                             </path>
                         </svg>
                     </span>
-                </div>
-
-                <div class="flex flex-1 items-center justify-end">
-
-                    <div x-data="{ toggle: true }"
-                        class="flex items-center justify-center gap-1.5 bg-zinc-200 rounded-md p-1.5">
-                        <button type="button" x-on:click="toggle = !toggle"
-                            class="select-none duration-200 ease-in-out text-sm font-medium rounded flex items-center justify-center gap-2 px-3 py-1"
-                            :class="{
-                                'bg-coffee-600 hover:bg-coffee-700 active:bg-coffee-900 text-coffee-50': toggle,
-                                'text-zinc-500 hover:bg-zinc-300 active:bg-zinc-100': !toggle
-                            }">
-                            Browse
-                        </button>
-
-                        <button type="menu" x-on:click="toggle = !toggle"
-                            class="select-none duration-200 ease-in-out text-sm font-medium rounded flex items-center justify-center gap-2 px-3 py-1"
-                            :class="{
-                                'bg-coffee-600 hover:bg-coffee-700 active:bg-coffee-900 text-coffee-50': !toggle,
-                                'text-zinc-500 hover:bg-zinc-300 active:bg-zinc-100': toggle
-                            }">
-                            By Event
-                        </button>
+                </div> *@
+                <div class="flex items-center justify-end gap-3">
+                    <div id="events-dropdown" class="flex items-center justify-end">
+                        @await Html.PartialAsync("~/Views/Organizer/Partials/_EventsDropdown.cshtml", Model)
                     </div>
+
+                    <button type="button" hx-get="/organizer/open-create-resource-modal/@Model.EventId" hx-swap="none"
+                        x-on:click="createResourceModal = !createResourceModal"
+                        class="flex items-center justify-center px-3 py-2 gap-2 text-sm font-medium rounded-md bg-coffee-600 hover:bg-coffee-700 active:bg-coffee-900 text-coffee-50">
+                        <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                            fill="currentColor" viewBox="0 0 256 256">
+                            <path
+                                d="M223.68,66.15,135.68,18a15.88,15.88,0,0,0-15.36,0l-88,48.17a16,16,0,0,0-8.32,14v95.64a16,16,0,0,0,8.32,14l88,48.17a15.88,15.88,0,0,0,15.36,0l88-48.17a16,16,0,0,0,8.32-14V80.18A16,16,0,0,0,223.68,66.15ZM128,32l80.34,44-29.77,16.3-80.35-44ZM128,120,47.66,76l33.9-18.56,80.34,44ZM40,90l80,43.78v85.79L40,175.82Zm176,85.78h0l-80,43.79V133.82l32-17.51V152a8,8,0,0,0,16,0V107.55L216,90v85.77Z">
+                            </path>
+                        </svg>
+                        Add Resource
+                    </button>
                 </div>
             </div>
 
-            <nav id="resources-nav">
+            @* <nav id="resources-nav">
                 <partial name="~/Views/Organizer/Partials/_ResourceNav.cshtml" model="@("Venues")" />
-            </nav>
+            </nav> *@
+        </div>
+    </header>
+
+    <main class="h-[80vh]">
+
+        <div id="resources-list"
+            class="space-y-3 p-4 overflow-y-auto h-full scrollbar-thin scrollbar-track-transparent scrollbar-thumb-coffee-700">
+            @await Html.PartialAsync("~/Views/Organizer/Partials/_ResourceListPartial.cshtml", Model)
         </div>
 
-        <div id="resource-content"
-            class="flex flex-col @(Model.Resources.Count > 0 ? "justify-start" : "justify-center") items-center overflow-y-auto max-h-[65vh] min-h-[65vh] w-full scrollbar-thin scrollbar-track-transparent scrollbar-thumb-coffee-700">
-            @await Html.PartialAsync("~/Views/Organizer/Partials/_TypeVenuesPartial.cshtml", Model)
-        </div>
-
-        @* Pagination *@
-        <footer id="resources-pagination" class="flex items-center justify-end mt-3">
-            @if (Model.Resources.Count > 0)
-            {
-                int start = (Model.CurrentPage - 1) * Model.PageSize + 1;
-                int end = Math.Min(Model.CurrentPage * Model.PageSize, Model.TotalCount);
-
-                <div
-                    class="text-sm flex items-center justify-center ps-2 py-1.5 border-2 rounded-lg bg-white border-zinc-300 divide-x-2 divide-zinc-300">
-                    <!-- Page Number -->
-                    <span class="text-zinc-500 px-3"><strong>@start-@end</strong> of @Model.TotalCount</span>
-
-                    <!-- Previous & Next buttons -->
-                    <span class="flex items-center justify-center gap-3 px-3">
-                        <button hx-get="/organizer/resources-change-page/-1?currentPage=@Model.CurrentPage"
-                            hx-target="#resources-container" hx-swap="outerHTML"
-                            class="duration-200 ease-in-out flex items-center size-7 rounded-md p-1 text-zinc-500 hover:bg-zinc-100 active:bg-zinc-200"
-                            @(Model.CurrentPage == 1 ? "disabled" : "")>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
-                                viewBox="0 0 256 256">
-                                <path
-                                    d="M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z">
-                                </path>
-                            </svg>
-                        </button>
-
-                        <button hx-get="/organizer/resources-change-page/1?currentPage=@Model.CurrentPage"
-                            hx-target="#resources-container" hx-swap="outerHTML"
-                            class="duration-200 ease-in-out flex items-center size-7 rounded-md p-1 text-zinc-500 hover:bg-zinc-100 active:bg-zinc-200"
-                            @(end >= Model.TotalCount ? "disabled" : "")>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
-                                viewBox="0 0 256 256">
-                                <path
-                                    d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z">
-                                </path>
-                            </svg>
-                        </button>
-                    </span>
-                </div>
-            }
-        </footer>
+        @* Create Resource Modal *@
+        @await Html.PartialAsync("~/Views/Organizer/Partials/CreateResourceModal.cshtml", Model.CreateResourceViewModel)
 
         @* View Resource Modal *@
         @await Html.PartialAsync("~/Views/Organizer/Partials/ViewResourceModal.cshtml", Model.ViewResourceViewModel)

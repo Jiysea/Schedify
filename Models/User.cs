@@ -22,7 +22,7 @@ public class User : IdentityUser<Guid>
     public string? ExtensionName { get; set; }
 
     [Required]
-    [Column(TypeName = "datetime2")]
+    [Column(TypeName = "date")]
     public required DateTime Birthdate { get; set; }
 
     [Column(TypeName = "datetime2")]

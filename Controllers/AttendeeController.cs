@@ -36,17 +36,17 @@ public class AttendeeController : Controller
         return View(model);
     }
 
-    [Route("attendee/view-event/{id}")]
-    [HttpGet]
-    public async Task<IActionResult> ViewEvent(Guid id)
-    {   
-        var _event = await _eventService.GetEventByIdAsync(id);
+    // [Route("attendee/view-event/{id}")]
+    // [HttpGet]
+    // public async Task<IActionResult> ViewEvent(Guid id)
+    // {   
+    //     var _event = await _eventService.GetEventByIdAsync(id);
 
-        if (_event == null)
-        {
-            return NotFound();
-        }
+    //     if (_event == null)
+    //     {
+    //         return NotFound();
+    //     }
 
-        return PartialView("~/Views/Attendee/Partials/_ViewEventPartial.cshtml", _event);
-    }
+    //     return PartialView("~/Views/Attendee/Partials/_ViewEventPartial.cshtml", _event);
+    // }
 }

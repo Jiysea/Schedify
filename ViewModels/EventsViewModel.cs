@@ -2,8 +2,9 @@ using Schedify.Models;
 
 namespace Schedify.ViewModels;
 
-public class OrganizerEventsViewModel
+public class EventsViewModel
 {
+
     public DateTime? StartDate { get; set; }
     public DateTime? EndDate { get; set; }
     public List<Event> DraftEvents { get; set; } = new List<Event>();
@@ -13,5 +14,8 @@ public class OrganizerEventsViewModel
     public ViewEventViewModel ViewEventViewModel { get; set; } = new ViewEventViewModel();
 
     // Dictionary to store EventId and the number of attendees for that event
-    public Dictionary<Guid, int> EventAttendeeCounts { get; set; } = new();
+    public Dictionary<Guid, int> EventAttendeeCounts { get; set; } = [];
+
+    // Check if there's already resources in DraftEvents
+    public Dictionary<Guid, bool> HasResources { get; set; } = [];
 }

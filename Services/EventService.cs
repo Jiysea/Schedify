@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Schedify.Data;
 using Schedify.Models;
@@ -18,6 +19,77 @@ public class EventService
         _environment = environment;
     }
 
+    public List<Event>? GetEvents()
+    {
+        return _context.Events
+            .Where(e => e.UserId == Guid.Parse(_userService.GetUserId()!))
+            .ToList();
+    }
+
+    public Event? GetEventById(Guid Id)
+    {
+        return _context.Events
+            .Where(e => e.UserId == Guid.Parse(_userService.GetUserId()!) && e.Id == Id)
+            .FirstOrDefault();
+    }
+
+    public async Task<Event?> GetEventByIdAsync(Guid Id)
+    {
+        return await _context.Events
+            .Where(e => e.UserId == Guid.Parse(_userService.GetUserId()!) && e.Id == Id)
+            .FirstOrDefaultAsync();
+    }
+
+    // public async Task<ViewEventViewModel?> GetEventByIdAsync(Guid Id)
+    // {
+    //     var _event = await _context.Events
+    //         .Include(e => e.Conversation)
+    //         .FirstOrDefaultAsync(e => e.Id == Id);
+
+    //     if (_event == null) return null;
+
+    //     bool hasVenue = IsEventHasVenue(_event.Id);
+
+    //     return new ViewEventViewModel()
+    //     {
+    //         Id = _event.Id,
+    //         Name = _event.Name,
+    //         Description = _event.Description,
+    //         StartAt = _event.StartAt,
+    //         EndAt = _event.EndAt,
+    //         Status = _event.Status,
+    //         EntryFee = _event.EntryFee.ToString("N2"),
+    //         CreatedAt = DateTime.UtcNow,
+    //         UpdatedAt = DateTime.UtcNow,
+    //         EventHasVenue = hasVenue,
+    //     };
+    // }
+
+    public bool IsEventHasVenue(Guid Id)
+    {
+        var resources = _context.Resources.Where(er => er.EventId == Id).ToList();
+
+        foreach (var resource in resources)
+        {
+            if (resource.ResourceType == ResourceType.Venue)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public async Task<List<Event>> GetEventsForDropdown()
+    {
+        var events = await _context.Events
+            .Where(e => e.UserId == Guid.Parse(_userService.GetUserId()!))
+            .OrderByDescending(e => e.CreatedAt)
+            .ToListAsync();
+
+        return events;
+    }
+
     public List<PublishedEventDto> GetEventsPublished()
     {
         var events = _context.Events
@@ -26,13 +98,12 @@ public class EventService
             .Select(e => new PublishedEventDto
             {
                 Event = e,
-                Resource = e.EventResources
-                    .Where(er => er.Resource.ResourceType == ResourceType.Venue)
-                    .Select(er => er.Resource)
+                Resource = e.Resources
+                    .Where(e => e.ResourceType == ResourceType.Venue)
                     .FirstOrDefault(),
-                Image = e.EventResources
-                    .Where(er => er.Resource.ResourceType == ResourceType.Venue)
-                    .Select(er => er.Resource.Image)
+                Image = e.Resources
+                    .Where(e => e.ResourceType == ResourceType.Venue)
+                    .Select(e => e.Image)
                     .FirstOrDefault(),
                 AttendeeCount = e.EventBookings.Count
             })
@@ -159,7 +230,7 @@ public class EventService
                 StartAt = model.StartAt,
                 EndAt = model.EndAt,
                 Status = model.Status,
-                EntryFee = model.EntryFeeDecimal,
+                EntryFee = model.EntryFee,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -237,45 +308,7 @@ public class EventService
         }
     }
 
-    public async Task<ViewEventViewModel?> GetEventByIdAsync(Guid Id)
-    {
-        var _event = await _context.Events
-            .Include(e => e.Conversation)
-            .FirstOrDefaultAsync(e => e.Id == Id);
 
-        if (_event == null) return null;
-
-        bool hasVenue = IsEventHasVenue(_event.Id);
-
-        return new ViewEventViewModel()
-        {
-            Id = _event.Id,
-            Name = _event.Name,
-            Description = _event.Description,
-            StartAt = _event.StartAt,
-            EndAt = _event.EndAt,
-            Status = _event.Status,
-            EntryFee = _event.EntryFee.ToString("N2"),
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
-            EventHasVenue = hasVenue,
-        };
-    }
-
-    public bool IsEventHasVenue(Guid Id)
-    {
-        var eventResources = _context.EventResources.Include(er => er.Resource).Where(er => er.EventId == Id).ToList();
-
-        foreach (var eventResource in eventResources)
-        {
-            if (eventResource.Resource.ResourceType == ResourceType.Venue)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
 
     public async Task<UpdateEventViewModel?> GetEditEventByIdAsync(Guid Id)
     {
@@ -409,44 +442,44 @@ public class EventService
         }
     }
 
-    public async Task<(bool IsSuccess, Dictionary<string, string>? Error, EventResource? EventResource)> AddToEventResourceAsync(EventResourceViewModel model)
-    {
-        using var transaction = await _context.Database.BeginTransactionAsync();
-        try
-        {
-            var user = await _userService.GetUserAsync();
-            if (user == null)
-            {
-                return (false, new Dictionary<string, string> { { "Authentication", "User must be authenticated." } }, null);
-            }
+    // public async Task<(bool IsSuccess, Dictionary<string, string>? Error, EventResource? EventResource)> AddToEventResourceAsync(EventResourceViewModel model)
+    // {
+    //     using var transaction = await _context.Database.BeginTransactionAsync();
+    //     try
+    //     {
+    //         var user = await _userService.GetUserAsync();
+    //         if (user == null)
+    //         {
+    //             return (false, new Dictionary<string, string> { { "Authentication", "User must be authenticated." } }, null);
+    //         }
 
-            var resource = await _context.Resources.FindAsync(model.ResourceId);
+    //         var resource = await _context.Resources.FindAsync(model.ResourceId);
 
-            if (resource == null) return (false, new Dictionary<string, string> { { "NullError", "Resource not found." } }, null);
+    //         if (resource == null) return (false, new Dictionary<string, string> { { "NullError", "Resource not found." } }, null);
 
-            resource.UpdatedAt = DateTime.UtcNow;
-            await _context.SaveChangesAsync();
+    //         resource.UpdatedAt = DateTime.UtcNow;
+    //         await _context.SaveChangesAsync();
 
-            var eventResource = new EventResource
-            {
-                ResourceId = resource.Id,
-                EventId = model.EventId,
-                TotalCost = model.TotalCost,
-                Quantity = model.QuantityFromForm,
-                AddedAt = DateTime.UtcNow,
-            };
+    //         var eventResource = new EventResource
+    //         {
+    //             ResourceId = resource.Id,
+    //             EventId = model.EventId,
+    //             TotalCost = model.TotalCost,
+    //             Quantity = model.QuantityFromForm,
+    //             AddedAt = DateTime.UtcNow,
+    //         };
 
-            _context.EventResources.Add(eventResource);
-            await _context.SaveChangesAsync();
+    //         _context.EventResources.Add(eventResource);
+    //         await _context.SaveChangesAsync();
 
-            await transaction.CommitAsync();
-            return (true, null, eventResource);
-        }
-        catch (Exception ex)
-        {
-            await transaction.RollbackAsync();
-            return (false, new Dictionary<string, string> { { "Exception", $"An error occurred: {ex.Message}" } }, null);
-        }
-    }
+    //         await transaction.CommitAsync();
+    //         return (true, null, eventResource);
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         await transaction.RollbackAsync();
+    //         return (false, new Dictionary<string, string> { { "Exception", $"An error occurred: {ex.Message}" } }, null);
+    //     }
+    // }
 
 }

@@ -21,16 +21,16 @@ public class CreateEventViewModel
 
     public EventStatus Status { get; set; } = EventStatus.Draft;
 
+    [MaxLength(7, ErrorMessage = "Value shouldn\'t exceed 6 digits.")]
     [Required(ErrorMessage = "This field is required.")]
-    public string EntryFee { get; set; } = null!;
+    public string EntryFeeString { get; set; } = null!;
 
-    [DataType(DataType.Currency)]
     [Range(typeof(decimal), "0.01", "999999")]
-    public decimal EntryFeeDecimal
+    public decimal EntryFee
     {
         get
         {
-            if (decimal.TryParse(EntryFee, NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands,
+            if (decimal.TryParse(EntryFeeString, NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands,
                 CultureInfo.InvariantCulture, out decimal parsedValue))
             {
                 return parsedValue;

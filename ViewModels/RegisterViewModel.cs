@@ -31,7 +31,6 @@ public class RegisterViewModel
     public required DateTime Birthdate { get; set; }
 
     [Required(ErrorMessage = "This field is required.")]
-    [DataType(DataType.PhoneNumber)]
     [Display(Name = "Phone Number")]
     public required string PhoneNumber { get; set; }
 

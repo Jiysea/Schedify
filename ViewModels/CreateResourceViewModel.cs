@@ -7,7 +7,8 @@ namespace Schedify.ViewModels;
 
 public class CreateResourceViewModel
 {
-
+    public Guid EventId { get; set; }
+    
     [AllowedExtensions([".jpg", ".jpeg", ".png"])]
     [MaxFileSize(5)]
     public IFormFile? ImageFile { get; set; }
@@ -76,7 +77,7 @@ public class CreateResourceViewModel
     [DefaultValue("No Brand")]
     public string? Brand { get; set; }
 
-    public Dictionary<string, string>? Specifications { get; set; }
+    public Dictionary<string, string>? Specifications { get; set; } = [];
 
     public FurnitureMaterial Material { get; set; }
     public string? OtherMaterial { get; set; }
@@ -112,7 +113,7 @@ public class CreateResourceViewModel
         }
     }
     public string? Experience { get; set; }
-    public string ExperienceType {get;set;} = "By Year";
+    public string ExperienceType { get; set; } = "By Year";
 
     public IEnumerable<ResourceType> ResourceTypes { get; set; } = Enum.GetValues<ResourceType>();
 }

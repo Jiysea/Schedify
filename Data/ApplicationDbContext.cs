@@ -16,7 +16,6 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
     public DbSet<Image> Images { get; set; }
     public DbSet<Event> Events { get; set; }
     public DbSet<EventBooking> EventBookings { get; set; }
-    public DbSet<EventResource> EventResources { get; set; }
     public DbSet<ActivityLog> ActivityLogs { get; set; }
     public DbSet<BillingAddress> BillingAddresses { get; set; }
     public DbSet<Conversation> Conversations { get; set; }
@@ -39,13 +38,6 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
         modelBuilder.Entity<EventBooking>()
             .HasOne(e => e.Event)
             .WithMany(e => e.EventBookings)
-            .HasForeignKey(e => e.EventId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        // Configure EventResources -> Events relationship to restrict cascading delete.
-        modelBuilder.Entity<EventResource>()
-            .HasOne(e => e.Event)
-            .WithMany(e => e.EventResources)
             .HasForeignKey(e => e.EventId)
             .OnDelete(DeleteBehavior.Restrict);
 
@@ -168,11 +160,6 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
         // UpdatedAt (EventBookings)
         modelBuilder.Entity<EventBooking>()
             .Property(u => u.UpdatedAt)
-            .HasDefaultValueSql("GETUTCDATE()");
-
-        // CreatedAt (EventResources)
-        modelBuilder.Entity<EventResource>()
-            .Property(u => u.AddedAt)
             .HasDefaultValueSql("GETUTCDATE()");
 
         // CreatedAt (Events)

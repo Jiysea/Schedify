@@ -2,9 +2,12 @@
 module.exports = {
     content: [
         "./Views/**/*.cshtml",
+        "./Views/Home/**/*.cshtml",
         "./Views/Auth/**/*.cshtml",
+        "./Views/Admin/**/*.cshtml",
+        "./Views/Organizer/**/*.cshtml",
+        "./Views/Attendee/**/*.cshtml",
         "./**/*.cshtml",
-        "./wwwroot/**/*.css",
     ],
     theme: {
         extend: {
