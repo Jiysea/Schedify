@@ -19,10 +19,11 @@ public class EventService
         _environment = environment;
     }
 
-    public List<Event>? GetEvents()
+    public List<Event>? GetEventsByUser()
     {
         return _context.Events
             .Where(e => e.UserId == Guid.Parse(_userService.GetUserId()!))
+            .OrderByDescending(e => e.CreatedAt)
             .ToList();
     }
 

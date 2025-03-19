@@ -49,7 +49,6 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ResourceService>();
 builder.Services.AddScoped<EventService>();
-builder.Services.AddScoped<EventResourceService>();
 
 var app = builder.Build();
 

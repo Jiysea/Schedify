@@ -5,7 +5,7 @@
 
 @if (isHtmxRequest)
 {
-    <div hx-swap-oob="outerHTML" id="events-dropdown" class="flex items-center justify-end">
+    <div hx-swap-oob="innerHTML" id="events-dropdown">
         @await Html.PartialAsync("~/Views/Organizer/Partials/_EventsDropdown.cshtml", Model)
     </div>
 }

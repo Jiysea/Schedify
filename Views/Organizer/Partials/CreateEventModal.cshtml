@@ -33,7 +33,8 @@
                     <div class="relative grid grid-cols-6 gap-3 p-5 border rounded-xl border-coffee-300">
                         <h3
                             class="select-none flex items-center gap-2 absolute start-4 -top-3 px-2 font-medium text-sm text-pumpkin-600 bg-coffee-50">
-                            <svg class="size-6" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256">
+                            <svg class="size-6" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                                fill="currentColor" viewBox="0 0 256 256">
                                 <path
                                     d="M88,112a8,8,0,0,1,8-8h80a8,8,0,0,1,0,16H96A8,8,0,0,1,88,112Zm8,40h80a8,8,0,0,0,0-16H96a8,8,0,0,0,0,16ZM232,64V184a24,24,0,0,1-24,24H32A24,24,0,0,1,8,184.11V88a8,8,0,0,1,16,0v96a8,8,0,0,0,16,0V64A16,16,0,0,1,56,48H216A16,16,0,0,1,232,64Zm-16,0H56V184a23.84,23.84,0,0,1-1.37,8H208a8,8,0,0,0,8-8Z">
                                 </path>
@@ -44,8 +45,8 @@
                         @* Event Name *@
                         <div class="flex flex-col col-span-full gap-1 relative">
                             <label for="name" class="text-xs text-coffee-900">Event Name</label>
-                            <input type="text" autocomplete="off" maxlength="100" autofocus class="input-coffee p-2" id="name"
-                                asp-for="Name" placeholder="Type event name here" />
+                            <input type="text" autocomplete="off" maxlength="100" autofocus class="input-coffee p-2"
+                                id="name" asp-for="Name" placeholder="Type event name here" />
 
                             <div id="validation-Name">
                             </div>
@@ -56,7 +57,7 @@
                             <label for="description" class="text-xs text-coffee-900">Description</label>
                             <textarea type="text" autocomplete="off" autofocus class="input-coffee p-2 scrollbar-thin"
                                 maxlength="500" rows="3" id="description" style="resize: none;" asp-for="Description"
-                                placeholder="Describe what kind of event this will be or how your attendees are going to enjoy this." ></textarea>
+                                placeholder="Describe what kind of event this will be or how your attendees are going to enjoy this."></textarea>
 
                             <div id="validation-Description">
                             </div>
@@ -66,20 +67,27 @@
                         <div class="flex flex-col col-span-2 gap-1 relative">
                             <label for="entryfeestring" class="text-xs text-coffee-900">Entry Fee</label>
                             <input type="text" x-mask:dynamic="$money($input)" autocomplete="off" autofocus
-                                class="input-coffee p-2" id="entryfeestring" asp-for="EntryFeeString" placeholder="Type fee here" />
+                                class="input-coffee p-2" id="entryfeestring" asp-for="EntryFeeString"
+                                placeholder="Type fee here" />
 
                             <div id="validation-EntryFeeString">
                             </div>
                         </div>
-    
+
                         @* Event Duration *@
                         <div class="flex flex-col col-span-4 gap-1 relative w-full">
                             <p for="shift" class="text-xs text-coffee-900">Event Duration</p>
                             <span class="flex items-center gap-2 w-full">
                                 <div class="flex flex-col gap-1">
                                     <div class="relative w-full">
-                                        <span class="absolute start-0 top-0 p-2 rounded-l-md text-xs border border-transparent bg-coffee-500 text-coffee-100 pointer-events-none">
-                                            <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256"><path d="M136,80v43.47l36.12,21.67a8,8,0,0,1-8.24,13.72l-40-24A8,8,0,0,1,120,128V80a8,8,0,0,1,16,0Zm88-24a8,8,0,0,0-8,8V82c-6.35-7.36-12.83-14.45-20.12-21.83a96,96,0,1,0-2,137.7,8,8,0,0,0-11-11.64A80,80,0,1,1,184.54,71.4C192.68,79.64,199.81,87.58,207,96H184a8,8,0,0,0,0,16h40a8,8,0,0,0,8-8V64A8,8,0,0,0,224,56Z"></path></svg>
+                                        <span
+                                            class="absolute start-0 top-0 p-2 rounded-l-md text-xs border border-transparent bg-coffee-500 text-coffee-100 pointer-events-none">
+                                            <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32"
+                                                height="32" fill="currentColor" viewBox="0 0 256 256">
+                                                <path
+                                                    d="M136,80v43.47l36.12,21.67a8,8,0,0,1-8.24,13.72l-40-24A8,8,0,0,1,120,128V80a8,8,0,0,1,16,0Zm88-24a8,8,0,0,0-8,8V82c-6.35-7.36-12.83-14.45-20.12-21.83a96,96,0,1,0-2,137.7,8,8,0,0,0-11-11.64A80,80,0,1,1,184.54,71.4C192.68,79.64,199.81,87.58,207,96H184a8,8,0,0,0,0,16h40a8,8,0,0,0,8-8V64A8,8,0,0,0,224,56Z">
+                                                </path>
+                                            </svg>
                                         </span>
                                         <input type="text" class="input-coffee ps-12 pe-2 py-2" id="startat"
                                             asp-for="StartAt" placeholder="Select a start time" />
@@ -88,12 +96,23 @@
                                     </div>
                                 </div>
                                 <div class="relative text-coffee-500">
-                                    <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"></path></svg>
+                                    <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                                        fill="currentColor" viewBox="0 0 256 256">
+                                        <path
+                                            d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z">
+                                        </path>
+                                    </svg>
                                 </div>
                                 <div class="flex flex-col gap-1">
                                     <div class="relative w-full">
-                                        <span class="absolute start-0 top-0 p-2 rounded-l-md text-xs border border-transparent bg-coffee-500 text-coffee-100 pointer-events-none">
-                                            <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256"><path d="M136,80v43.47l36.12,21.67a8,8,0,0,1-8.24,13.72l-40-24A8,8,0,0,1,120,128V80a8,8,0,0,1,16,0Zm-8-48A95.44,95.44,0,0,0,60.08,60.15C52.81,67.51,46.35,74.59,40,82V64a8,8,0,0,0-16,0v40a8,8,0,0,0,8,8H72a8,8,0,0,0,0-16H49c7.15-8.42,14.27-16.35,22.39-24.57a80,80,0,1,1,1.66,114.75,8,8,0,1,0-11,11.64A96,96,0,1,0,128,32Z"></path></svg>
+                                        <span
+                                            class="absolute start-0 top-0 p-2 rounded-l-md text-xs border border-transparent bg-coffee-500 text-coffee-100 pointer-events-none">
+                                            <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32"
+                                                height="32" fill="currentColor" viewBox="0 0 256 256">
+                                                <path
+                                                    d="M136,80v43.47l36.12,21.67a8,8,0,0,1-8.24,13.72l-40-24A8,8,0,0,1,120,128V80a8,8,0,0,1,16,0Zm-8-48A95.44,95.44,0,0,0,60.08,60.15C52.81,67.51,46.35,74.59,40,82V64a8,8,0,0,0-16,0v40a8,8,0,0,0,8,8H72a8,8,0,0,0,0-16H49c7.15-8.42,14.27-16.35,22.39-24.57a80,80,0,1,1,1.66,114.75,8,8,0,1,0-11,11.64A96,96,0,1,0,128,32Z">
+                                                </path>
+                                            </svg>
                                         </span>
                                         <input type="text" class="input-coffee ps-12 pe-2 py-2" id="endat"
                                             asp-for="EndAt" placeholder="Select an end time" />
@@ -103,30 +122,6 @@
                                 </div>
                             </span>
                         </div>
-
-                        <script>
-                            document.addEventListener("DOMContentLoaded", () => {
-                                let startPicker = flatpickr("#startat", {
-                                    enableTime: true,
-                                    dateFormat: "Y-m-d H:i",
-                                    defaultDate: new Date().fp_incr(1),
-                                    minDate: new Date().fp_incr(1), // Tomorrow
-                                    onChange: function (selectedDates) {
-                                        if (selectedDates.length > 0) {
-                                            endPicker.set("minDate", selectedDates[0]); // Set end date min to start date
-                                        }
-                                    }
-                                });
-
-                                let endPicker = flatpickr("#endat", {
-                                    enableTime: true,
-                                    dateFormat: "Y-m-d H:i",
-                                    minDate: new Date().fp_incr(1), // Tomorrow
-                                    defaultDate: new Date().fp_incr(1), // Tomorrow
-                                });
-                            });
-                        </script>
-
                     </div>
                 </div>
 
@@ -141,3 +136,28 @@
         </main>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        let startPicker = flatpickr("#startat", {
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+            appendTo: document.body,
+            defaultDate: new Date().fp_incr(1),
+            minDate: new Date().fp_incr(1), // Tomorrow
+            onChange: function (selectedDates) {
+                if (selectedDates.length > 0) {
+                    endPicker.set("minDate", selectedDates[0]); // Set end date min to start date
+                }
+            }
+        });
+
+        let endPicker = flatpickr("#endat", {
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+            appendTo: document.body,
+            minDate: new Date().fp_incr(1), // Tomorrow
+            defaultDate: new Date().fp_incr(1), // Tomorrow
+        });
+    });
+</script>

@@ -15,15 +15,16 @@ public class OrganizerController : Controller
     private readonly ApplicationDbContext _context;
     private readonly EventService _eventService;
     private readonly ResourceService _resourceService;
-    public OrganizerController(ApplicationDbContext context, EventService eventService, ResourceService resourceService)
+    private readonly UserService _userService;
+    public OrganizerController(ApplicationDbContext context, EventService eventService, ResourceService resourceService, UserService userService)
     {
         _context = context;
         _eventService = eventService;
         _resourceService = resourceService;
+        _userService = userService;
     }
 
-    [Route("organizer/events")]
-    [HttpGet]
+    [HttpGet("organizer/events")]
     public IActionResult Events(DateTime? startDate, DateTime? endDate)
     {
         // Set default values if not provided
@@ -62,8 +63,7 @@ public class OrganizerController : Controller
         return View(viewModel);
     }
 
-    [Route("organizer/view-event/{id}")]
-    [HttpGet]
+    [HttpGet("organizer/view-event/{id}")]
     public async Task<IActionResult> ViewEvent(Guid id)
     {
         var evt = await _eventService.GetEventByIdAsync(id);
@@ -89,8 +89,7 @@ public class OrganizerController : Controller
         return PartialView("~/Views/Organizer/Partials/_ViewEventPartial.cshtml", model);
     }
 
-    [Route("organizer/create-event")]
-    [HttpPost]
+    [HttpPost("organizer/create-event")]
     public async Task<IActionResult> CreateEvent(CreateEventViewModel model)
     {
         var result = await _eventService.CreateEventAsync(model);
@@ -115,8 +114,7 @@ public class OrganizerController : Controller
 
     }
 
-    [Route("organizer/show-update-event/{id}")]
-    [HttpGet]
+    [HttpGet("organizer/show-update-event/{id}")]
     public async Task<IActionResult> ShowUpdateEvent(Guid id)
     {
         var _event = await _eventService.GetEditEventByIdAsync(id);
@@ -136,8 +134,7 @@ public class OrganizerController : Controller
         return PartialView("~/Views/Organizer/Partials/_UpdateEventPartial.cshtml", _event);
     }
 
-    [Route("organizer/update-event")]
-    [HttpPost]
+    [HttpPost("organizer/update-event")]
     public async Task<IActionResult> UpdateEvent(UpdateEventViewModel model)
     {
         var result = await _eventService.UpdateEventAsync(model);
@@ -174,8 +171,7 @@ public class OrganizerController : Controller
         return Content(string.Empty);
     }
 
-    [Route("organizer/delete-event/{id}")]
-    [HttpDelete]
+    [HttpDelete("organizer/delete-event/{id}")]
     public async Task<IActionResult> DeleteResource(Guid id)
     {
         var success = await _eventService.DeleteEventAsync(id);
@@ -188,8 +184,7 @@ public class OrganizerController : Controller
         return Content(string.Empty);
     }
 
-    [Route("organizer/open-event/{id}")]
-    [HttpPatch]
+    [HttpPatch("organizer/open-event/{id}")]
     public async Task<IActionResult> OpenEvent(Guid id)
     {
         var success = await _eventService.OpenEventByIdAsync(id);
@@ -203,8 +198,7 @@ public class OrganizerController : Controller
         return Content(string.Empty);
     }
 
-    [Route("organizer/draft-event/{id}")]
-    [HttpPatch]
+    [HttpPatch("organizer/draft-event/{id}")]
     public async Task<IActionResult> DraftEvent(Guid id)
     {
         var success = await _eventService.DraftEventByIdAsync(id);
@@ -218,8 +212,7 @@ public class OrganizerController : Controller
         return Content(string.Empty);
     }
 
-    [Route("organizer/cancel-event/{id}")]
-    [HttpPatch]
+    [HttpPatch("organizer/cancel-event/{id}")]
     public async Task<IActionResult> CancelEvent(Guid id)
     {
         var success = await _eventService.CancelEventByIdAsync(id);
@@ -233,8 +226,7 @@ public class OrganizerController : Controller
         return Content(string.Empty);
     }
 
-    [Route("organizer/show-postpone-event/{id}")]
-    [HttpGet]
+    [HttpGet("organizer/show-postpone-event/{id}")]
     public async Task<IActionResult> ShowPostponeEvent(Guid id)
     {
         // Changing the status to "Postponed" is techincally an "Edit/Update"
@@ -255,8 +247,7 @@ public class OrganizerController : Controller
         return Content(string.Empty);
     }
 
-    [Route("organizer/postpone-event")]
-    [HttpPost]
+    [HttpPost("organizer/postpone-event")]
     public async Task<IActionResult> PostponeEvent(UpdateEventViewModel model)
     {
         var result = await _eventService.PostponeEventByIdAsync(model);
@@ -294,7 +285,6 @@ public class OrganizerController : Controller
         return Content(string.Empty);
     }
 
-
     // --------------------------------------------------------------------------------------
     // Resources
     // --------------------------------------------------------------------------------------
@@ -306,26 +296,26 @@ public class OrganizerController : Controller
         return Ok();
     }
 
-    [Route("organizer/resources")]
-    [HttpGet]
+    [HttpGet("organizer/resources")]
     public IActionResult Resources()
     {
         var eventIdString = HttpContext.Session.GetString("SelectedEventId");
-        Console.WriteLine(eventIdString);
+
         // int pageSize = 8; // Default page size
         // int newPage = 0; // Calculate new page number
 
         // if (newPage < 1) newPage = 1; // Prevent negative pages
         // var totalCount = _context.Resources.Count(r => r.ResourceType == ResourceType.Venue);
 
-        List<Event>? events = _eventService.GetEvents();
+        List<Event>? events = _eventService.GetEventsByUser();
+
         Event? evt = null;
 
         if (eventIdString != null)
         {
             evt = _eventService.GetEventById(Guid.Parse(eventIdString));
         }
-        else if (events != null || events!.Any() != false)
+        else if (events!.Any() != false)
         {
             evt = _eventService.GetEventById(events!.First().Id);
         }
@@ -335,10 +325,6 @@ public class OrganizerController : Controller
             Response.Headers.Append("HX-Redirect", Url.Action("Events", "Organizer"));
             return RedirectToAction("Events", "Organizer");
         }
-
-        Console.WriteLine(evt);
-        Console.WriteLine(evt);
-        Console.WriteLine(evt);
 
         var resources = _resourceService.GetResourcesByEventId(evt.Id);
 
@@ -363,14 +349,24 @@ public class OrganizerController : Controller
         var events = await _eventService.GetEventsForDropdown();
         var evt = _eventService.GetEventById(EventId);
 
+        if (evt == null)
+        {
+            Response.Headers.Append("HX-Redirect", Url.Action("Events", "Organizer"));
+            return RedirectToAction("Events", "Organizer");
+        }
+
+        var resources = _resourceService.GetResourcesByEventId(EventId);
+
         var model = new ResourceViewModel
         {
-
+            EventId = EventId,
             Events = events,
-            SelectedName = events.Any() ? events.First().Name : null
+            SelectedName = evt != null ? evt.Name : events.First().Name,
+            Resources = resources!,
+            ResourceImages = _resourceService.GetResourceImageFromList(resources!),
         };
 
-        return PartialView("~/Views/Organizer/Partials/_EventsDropdown.cshtml", model);
+        return PartialView("~/Views/Organizer/Partials/_ResourceListPartial.cshtml", model);
     }
 
     // ----------------------------------------------
@@ -407,12 +403,15 @@ public class OrganizerController : Controller
     [HttpGet("organizer/open-create-resource-modal/{EventId}")]
     public IActionResult OpenResourceModal(Guid EventId)
     {
-        // if (Enum.TryParse<ResourceType>(selectedOption, out var resourceType))
-        // {
-        //     return PartialView("_CostTypeOptionsPartial", resourceType);
-        // }
+        Console.WriteLine(EventId);
+        Console.WriteLine(EventId);
+        Console.WriteLine(EventId);
+        var model = new CreateResourceViewModel
+        {
 
-        return BadRequest();
+        };
+
+        return PartialView("~/Views/Organizer/Partials/CreateResourceModal.cshtml", model);
     }
 
     // ----------------------------------------------

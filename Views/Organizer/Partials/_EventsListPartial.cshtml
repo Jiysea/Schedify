@@ -46,8 +46,10 @@
                         @if (!Model.HasResources.GetValueOrDefault(evt.Id, false))
                         {
                             @* Has Resources? *@
-                            <span class="duration-200 ease-in-out flex items-center bg-amber-100 text-amber-500 group-hover:bg-amber-200 group-hover:text-amber-600 rounded-md font-semibold ps-1 pe-3 py-1">
-                                <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256">
+                            <span
+                                class="duration-200 ease-in-out flex items-center bg-amber-100 text-amber-500 group-hover:bg-amber-200 group-hover:text-amber-600 rounded-md font-semibold ps-1 pe-3 py-1">
+                                <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                                    viewBox="0 0 256 256">
                                     <path
                                         d="M148,200a20,20,0,1,1-20-20A20,20,0,0,1,148,200Zm-20-40a12,12,0,0,0,12-12V48a12,12,0,0,0-24,0V148A12,12,0,0,0,128,160Z">
                                     </path>
@@ -268,5 +270,14 @@
 
 @if (!Model.DraftEvents.Any() && !Model.PublishedEvents.Any() && !Model.ConcludedEvents.Any())
 {
-    <p class="size-full flex items-center justify-center">No events found for the selected date range.</p>
+    <div class="flex flex-col items-center justify-center size-full font-medium text-coffee-600">
+        <svg class="size-24" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+            viewBox="0 0 256 256">
+            <path
+                d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM157.66,170.34a8,8,0,0,1-11.32,11.32L128,163.31l-18.34,18.35a8,8,0,0,1-11.32-11.32L116.69,152,98.34,133.66a8,8,0,0,1,11.32-11.32L128,140.69l18.34-18.35a8,8,0,0,1,11.32,11.32L139.31,152ZM208,80H48V48H72v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24Z">
+            </path>
+        </svg>
+        <p class="text-base mt-4">No events found.</p>
+        <p class="text-sm text-coffee-500">Perhaps create a new one?</p>
+    </div>
 }
