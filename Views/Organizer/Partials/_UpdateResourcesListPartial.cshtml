@@ -12,6 +12,7 @@
     </div>
 }
 
+<div id="resources-list" hx-swap-oob="innerHTML">
 @if (Model.Resources.Any())
 {
     <div class="flex flex-col gap-3 size-full p-2 select-none">
@@ -668,3 +669,4 @@ else
         <p class="text-sm text-coffee-500">Try adding a new resource.</p>
     </div>
 }
+</div>

@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@inject IHttpContextAccessor HttpContextAccessor
+
+<!DOCTYPE html>
 
 <html lang="en" class="scrollbar-thin scrollbar-track-coffee-900 scrollbar-thumb-coffee-600">
 
@@ -8,14 +10,36 @@
     <title>@ViewData["Title"]</title>
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/css/output.css" />
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.17.2/dist/sweetalert2.min.css" rel="stylesheet">
 </head>
 
 <body class="font-poppins antialiased">
     @RenderBody()
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.17.2/dist/sweetalert2.all.min.js"></script>
     <script src="~/lib/htmx/htmx.min.js"></script>
-    @* <script src="~/lib/signalr/dist/browser/signalr.js"></script>
-    <script src="~/js/chat.js"></script> *@
+    <script src="~/lib/signalr/dist/browser/signalr.js"></script>
     <script src="~/dist/bundle.js"></script>
+    <script>
+        document.body.addEventListener("clearValidations", function (evt) {
+            if (evt.detail.value) {
+                document.querySelectorAll("[id^='validation-']").forEach(el => el.innerHTML = "");
+                document.querySelectorAll("[id^='edit-validation-']").forEach(el => el.innerHTML = "");
+            }
+        });
+
+        document.body.addEventListener("showSweetAlert", function (event) {
+            if (event.detail) {
+                Swal.fire({
+                    title: event.detail.title || "Success!",
+                    icon: event.detail.icon || "success",
+                    timer: event.detail.timer || 3000,
+                    timerProgressBar: true,
+                    showConfirmButton: false,
+                    allowOutsideClick: true
+                });
+            }
+        });
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 

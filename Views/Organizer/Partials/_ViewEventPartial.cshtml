@@ -31,6 +31,15 @@
                         </path>
                     </svg>
                     OPEN FOR BOOKING
+                    <svg class="htmx-indicator size-5 animate-spin" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"
+                        preserveAspectRatio="xMidYMid" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <g>
+                            <circle stroke-dasharray="164.93361431346415 56.97787143782138" r="35" stroke-width="10"
+                                stroke="currentColor" fill="none" cy="50" cx="50" transform="matrix(1,0,0,1,0,0)">
+                            </circle>
+                            <g></g>
+                        </g>
+                    </svg>
                 </button>
 
                 @if (!Model.EventHasVenue)
@@ -38,19 +47,19 @@
                     @* For OPEN FOR REGISTRATION button only *@
                     <div x-show="hover" x-transition.opacity x-anchor.bottom.offset.5="$refs.openEvent"
                         x-on:mouseover="hover = true;" x-on:mouseleave="hover = false"
-                        class="z-50 flex flex-col justify-center gap-1 bg-white rounded-md px-4 py-2 text-sm font-medium border border-zinc-300">
-                        <div class="flex items-center gap-1">
+                        class="z-50 bg-white rounded-md px-4 py-2 text-sm font-medium border border-zinc-300">
+                        <div class="">
                             You need to get a
-                            <span class="flex items-center gap-0.5 relative text-pumpkin-600">
+                            <span class="text-pumpkin-600">
                                 Venue
                             </span>
                             first before opening this event.
                         </div>
 
-                        <div class="flex items-center gap-1">
+                        <span class="inline-flex gap-1">
                             You can find venues in the
                             <a href="/organizer/resources"
-                                class="flex items-center gap-0.5 relative hover:underline hover:underline-offset-4 decoration-pumpkin-600 text-pumpkin-600">
+                                class="inline-flex hover:underline hover:underline-offset-4 decoration-pumpkin-600 text-pumpkin-600">
                                 <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
                                     fill="currentColor" viewBox="0 0 256 256">
                                     <path
@@ -58,8 +67,9 @@
                                     </path>
                                 </svg>
                                 Resources
-                            </a> page
-                        </div>
+                            </a>
+                            page.
+                        </span>
                     </div>
                 }
 
@@ -67,8 +77,10 @@
 
             <button
                 class="flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold duration-200 ease-in-out rounded-md text-coffee-50 bg-coffee-700 hover:bg-coffee-800 active:bg-coffee-700"
-                hx-post="/organizer/resources/set-event" hx-vals='{"eventId": "@Model.Id"}' hx-swap="none" hx-on:htmx:after-request="window.location.href='/organizer/resources'">
-                <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256">
+                hx-post="/organizer/resources/set-event" hx-vals='{"eventId": "@Model.Id"}' hx-swap="none"
+                hx-on:htmx:after-request="window.location.href='/organizer/resources'">
+                <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                    viewBox="0 0 256 256">
                     <path
                         d="M223.68,66.15,135.68,18a15.88,15.88,0,0,0-15.36,0l-88,48.17a16,16,0,0,0-8.32,14v95.64a16,16,0,0,0,8.32,14l88,48.17a15.88,15.88,0,0,0,15.36,0l88-48.17a16,16,0,0,0,8.32-14V80.18A16,16,0,0,0,223.68,66.15ZM128,32l80.34,44-29.77,16.3-80.35-44ZM128,120,47.66,76l33.9-18.56,80.34,44ZM40,90l80,43.78v85.79L40,175.82Zm176,85.78h0l-80,43.79V133.82l32-17.51V152a8,8,0,0,0,16,0V107.55L216,90v85.77Z">
                     </path>

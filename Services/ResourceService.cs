@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,12 +12,14 @@ namespace Schedify.Services;
 public class ResourceService
 {
     private readonly ApplicationDbContext _context;
+    private readonly EventService _eventService;
     private readonly UserService _userService;
     private readonly IWebHostEnvironment _environment;
 
-    public ResourceService(ApplicationDbContext context, UserService userService, IWebHostEnvironment environment)
+    public ResourceService(ApplicationDbContext context, EventService eventService, UserService userService, IWebHostEnvironment environment)
     {
         _context = context;
+        _eventService = eventService;
         _userService = userService;
         _environment = environment;
     }
@@ -33,111 +36,43 @@ public class ResourceService
             .ToDictionary(img => img.ResourceId!.Value, img => img.ImageFileName);
     }
 
-    public List<Resource>? GetResourcesByEventId(Guid Id)
+    public List<Resource>? GetResourcesByEventId(Guid EventId)
     {
-        return _context.Resources.Where(r => r.EventId == Id).ToList();
+        return _context.Resources.Where(r => r.EventId == EventId)
+            .Include(r => r.ResourceVenue)
+            .Include(r => r.ResourceEquipment)
+            .Include(r => r.ResourceFurniture)
+            .Include(r => r.ResourceCatering)
+            .Include(r => r.ResourcePersonnel)
+            .ToList();
     }
 
-    public async Task<ViewResourceViewModel?> GetResourceByIdAsync(Guid? Id)
+    public async Task<Resource?> GetResourceByIdAsync(Guid ResourceId)
     {
-        var resource = await _context.Resources
+        return await _context.Resources
             .Include(r => r.Image)
-            .Include(r => r.Event)
-            .FirstOrDefaultAsync(r => r.Id == Id);
-
-        var imageFileName = await _context.Images
-            .Where(img => img.ResourceId == Id)
-            .Select(img => img.ImageFileName)
-            .FirstOrDefaultAsync();
-
-        if (resource == null) return null;
-
-        bool isUsed = false;
-
-        // if (resource == true) isUsed = true;
-
-        return new ViewResourceViewModel
-        {
-            IsUsed = isUsed,
-            ImageFileName = resource.Image?.ImageFileName,
-            Id = resource.Id,
-            ProviderName = resource.ProviderName,
-            ProviderPhoneNumber = resource.ProviderPhoneNumber,
-            ProviderEmail = resource.ProviderEmail,
-            Name = resource.Name,
-            Description = resource.Description,
-            ResourceType = resource.ResourceType,
-            Cost = resource.Cost.ToString("N2"),
-            CostType = resource.CostType,
-            // Quantity = resource.Quantity,
-            // Capacity = resource.Type == ResourceType.Venue ? resource.Capacity : 0,
-            // Size = resource.Type == ResourceType.Venue ? resource.Size : 0.00m,
-            // AddressLine1 = resource.Type == ResourceType.Venue ? resource.AddressLine1 : null,
-            // AddressLine2 = resource.Type == ResourceType.Venue ? resource.AddressLine2 : null,
-            // CityMunicipality = resource.Type == ResourceType.Venue ? "Davao City" : null,
-            // Province = resource.Type == ResourceType.Venue ? "Davao del Sur" : null,
-            // Brand = resource.Type == ResourceType.Equipment ? resource.Brand : null,
-            // Specifications = resource.Type == ResourceType.Equipment ? JsonSerializer.Deserialize<Dictionary<string, string>>(resource.Specifications!)! : [],
-            // Material = resource.Type == ResourceType.Furniture ? resource.Material : null,
-            // Dimensions = resource.Type == ResourceType.Furniture ? resource.Dimensions : null,
-            // MenuItems = resource.Type == ResourceType.Catering ? resource.MenuItems : null,
-            // Position = resource.Type == ResourceType.Personnel ? resource.Position : null,
-            // Shift = resource.Type == ResourceType.Personnel ? resource.Shift : null,
-            // Experience = resource.Type == ResourceType.Personnel ? resource.Experience : null,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
-        };
+            .FirstOrDefaultAsync(r => r.Id == ResourceId);
     }
 
-    // public List<Resource>? GetResourcesByType(ResourceType type)
-    // {
-    //     if (type == ResourceType.Venue)
-    //     {
-    //         return _context.Resources
-    //                 .Include(r => r.ResourceVenue)
-    //                 .OrderByDescending(r => r.CreatedAt)
-    //                 // .Skip((newPage - 1) * pageSize)
-    //                 // .Take(pageSize)
-    //                 .ToList();
-    //     }
-    //     else if (type == ResourceType.Equipment)
-    //     {
-    //         return _context.Resources
-    //                 .Include(r => r.ResourceEquipment)
-    //                 .OrderByDescending(r => r.CreatedAt)
-    //                 // .Skip((newPage - 1) * pageSize)
-    //                 // .Take(pageSize)
-    //                 .ToList();
-    //     }
-    //     else if (type == ResourceType.Furniture)
-    //     {
-    //         return _context.Resources
-    //                 .Include(r => r.ResourceFurniture)
-    //                 .OrderByDescending(r => r.CreatedAt)
-    //                 // .Skip((newPage - 1) * pageSize)
-    //                 // .Take(pageSize)
-    //                 .ToList();
-    //     }
-    //     else if (type == ResourceType.Catering)
-    //     {
-    //         return _context.Resources
-    //                 .Include(r => r.ResourceCatering)
-    //                 .OrderByDescending(r => r.CreatedAt)
-    //                 // .Skip((newPage - 1) * pageSize)
-    //                 // .Take(pageSize)
-    //                 .ToList();
-    //     }
-    //     else if (type == ResourceType.Personnel)
-    //     {
-    //         return _context.Resources
-    //                 .Include(r => r.ResourcePersonnel)
-    //                 .OrderByDescending(r => r.CreatedAt)
-    //                 // .Skip((newPage - 1) * pageSize)
-    //                 // .Take(pageSize)
-    //                 .ToList();
-    //     }
-    //     return null;
-    // }
+    public async Task<Resource?> GetResourceByTypeAsync(Guid ResourceId, ResourceType ResourceType)
+    {
+        var query = _context.Resources
+                        .Include(r => r.Image)
+                        .AsQueryable(); // Start with a base query
+
+        // Dynamically include the correct related entity
+        query = ResourceType switch
+        {
+            ResourceType.Venue => query.Include(r => r.ResourceVenue),
+            ResourceType.Equipment => query.Include(r => r.ResourceEquipment),
+            ResourceType.Furniture => query.Include(r => r.ResourceFurniture),
+            ResourceType.Catering => query.Include(r => r.ResourceCatering),
+            ResourceType.Personnel => query.Include(r => r.ResourcePersonnel),
+            _ => query
+        };
+
+        return await query.FirstOrDefaultAsync(r => r.Id == ResourceId);
+    }
 
     public Dictionary<Guid, string?> GetResourceImageFromList(List<Resource> resources)
     {
@@ -173,50 +108,6 @@ public class ResourceService
         };
     }
 
-    public async Task<ViewResourceViewModel?> GetResourceByIdForOrganizersAsync(Guid Id)
-    {
-        var resource = await _context.Resources
-            .Include(r => r.Image)
-            .FirstOrDefaultAsync(r => r.Id == Id);
-
-        if (resource == null || resource.Image!.ImageFileName == null) return null;
-
-        // Check if the image exists in local storage
-        if (!File.Exists(Path.Combine(_environment.WebRootPath, "resources", resource.Image!.ImageFileName))) return null;
-
-        return new ViewResourceViewModel
-        {
-            ImageFileName = resource.Image!.ImageFileName,
-            Id = resource.Id,
-            ProviderName = resource.ProviderName,
-            ProviderPhoneNumber = resource.ProviderPhoneNumber,
-            ProviderEmail = resource.ProviderEmail,
-            Name = resource.Name,
-            Description = resource.Description,
-            ResourceType = resource.ResourceType,
-            Cost = resource.Cost.ToString("N2"),
-            CostType = resource.CostType,
-            // Quantity = resource.Quantity,
-            // Capacity = resource.Type == ResourceType.Venue ? resource.Capacity : 0,
-            // Size = resource.Type == ResourceType.Venue ? resource.Size : 0.00m,
-            // AddressLine1 = resource.Type == ResourceType.Venue ? resource.AddressLine1 : null,
-            // AddressLine2 = resource.Type == ResourceType.Venue ? resource.AddressLine2 : null,
-            // CityMunicipality = resource.Type == ResourceType.Venue ? resource.CityMunicipality : null,
-            // Province = resource.Type == ResourceType.Venue ? resource.Province : null,
-            // Brand = resource.Type == ResourceType.Equipment ? resource.Brand : null,
-            // Specifications = resource.Type == ResourceType.Equipment ? JsonSerializer.Deserialize<Dictionary<string, string>>(resource.Specifications!)! : [],
-            // Material = resource.Type == ResourceType.Furniture ? resource.Material : null,
-            // Dimensions = resource.Type == ResourceType.Furniture ? resource.Dimensions : null,
-            // MenuItems = resource.Type == ResourceType.Catering ? resource.MenuItems : null,
-            // Position = resource.Type == ResourceType.Personnel ? resource.Position : null,
-            // Shift = resource.Type == ResourceType.Personnel ? resource.Shift : null,
-            // Experience = resource.Type == ResourceType.Personnel ? resource.Experience : null,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
-        };
-    }
-
-
     public async Task<bool> DeleteResourceAsync(Guid Id)
     {
         var resource = await _context.Resources
@@ -242,7 +133,7 @@ public class ResourceService
         return true;
     }
 
-    public async Task<(bool IsSuccess, Dictionary<string, string>? Error, Resource? Resource)> CreateResourceAsync(CreateResourceViewModel model)
+    public async Task<(bool IsSuccess, Dictionary<string, string>? Error, Resource? Resource)> CreateResourceAsync(CreateResourceViewModel model, Guid EventId)
     {
         var validationErrors = ValidateResourceModel(model);
         if (validationErrors.Any())
@@ -256,9 +147,16 @@ public class ResourceService
             return (false, new Dictionary<string, string> { { "Authentication", "User must be authenticated." } }, null);
         }
 
+        var evt = _eventService.GetEventById(EventId);
+
+        if (evt!.UserId != user.Id)
+        {
+            return (false, new Dictionary<string, string> { { "Authorization", "Invalid user." } }, null);
+        }
+
         var resource = new Resource
         {
-            EventId = user.Id,
+            EventId = EventId,
             ProviderName = model.ProviderName,
             ProviderPhoneNumber = model.ProviderPhoneNumber,
             ProviderEmail = model.ProviderEmail,
@@ -278,6 +176,34 @@ public class ResourceService
         {
             _context.Resources.Add(resource);
             await _context.SaveChangesAsync();
+            DateTime WarrantyResult = DateTime.UtcNow;
+            string FinalWarranty = string.Empty;
+
+            if (!string.IsNullOrEmpty(model.Warranty))
+            {
+                if (int.TryParse(model.WarrantyDuration, out int WarrantyDuration))
+                {
+                    if (int.TryParse(model.Warranty, out int Warranty))
+                    {
+                        // If By Month
+                        if (WarrantyDuration == 2)
+                        {
+                            if (Warranty < 2)
+                                FinalWarranty = Warranty.ToString() + " month";
+                            else
+                                FinalWarranty = Warranty.ToString() + " months";
+                        }
+                        if (Warranty < 2)
+                            FinalWarranty = Warranty.ToString() + " year";
+                        else
+                            FinalWarranty = Warranty.ToString() + " years";
+                    }
+                    else
+                        return (false, new Dictionary<string, string> { { "Warranty", "Invalid warranty." } }, null);
+                }
+                else
+                    return (false, new Dictionary<string, string> { { "Warranty", "Invalid warranty." } }, null);
+            }
 
             switch (model.ResourceType)
             {
@@ -297,17 +223,22 @@ public class ResourceService
 
                 case ResourceType.Equipment:
 
+                    WarrantyResult = GetWarranty(FinalWarranty);
+
                     typeResource = new ResourceEquipment
                     {
                         ResourceId = resource.Id,
                         Quantity = model.Quantity,
                         Brand = model.Brand,
                         Specifications = JsonSerializer.Serialize(model.Specifications),
-                        Warranty = model.Warranty ?? "No Warranty",
+                        Warranty = !string.IsNullOrEmpty(model.Warranty) ? WarrantyResult : DateTime.UtcNow,
                     };
                     break;
 
                 case ResourceType.Furniture:
+
+                    WarrantyResult = GetWarranty(FinalWarranty);
+
                     typeResource = new ResourceFurniture
                     {
                         ResourceId = resource.Id,
@@ -315,7 +246,7 @@ public class ResourceService
                         Material = model.Material,
                         OtherMaterial = model.OtherMaterial,
                         Dimensions = model.Dimensions,
-                        Warranty = model.Warranty ?? "No Warranty",
+                        Warranty = !string.IsNullOrEmpty(model.Warranty) ? WarrantyResult : DateTime.UtcNow,
                     };
                     break;
 
@@ -332,26 +263,40 @@ public class ResourceService
                     string experience = string.Empty;
                     if (int.TryParse(model.Experience, out int result))
                     {
-                        if (model.ExperienceType == "By Year")
+                        if (int.TryParse(model.ExperienceType, out int resultType))
                         {
-                            if (result > 1)
+                            if (resultType == 1)
                             {
-                                experience = model.Experience + " years";
-                            }
+                                if (result > 1)
+                                {
+                                    experience = model.Experience + " years";
+                                }
 
-                            experience = model.Experience + " year";
+                                experience = model.Experience + " year";
+                            }
+                            else if (resultType == 2)
+                            {
+                                if (result > 1)
+                                {
+                                    experience = model.Experience + " months";
+                                }
+
+                                experience = model.Experience + " month";
+                            }
+                            else
+                            {
+                                experience = "None";
+
+                            }
                         }
-                        else if (model.ExperienceType == "By Month")
+                        else
                         {
-                            if (result > 1)
-                            {
-                                experience = model.Experience + " months";
-                            }
-
-                            experience = model.Experience + " month";
+                            return (false, new Dictionary<string, string> { { "Experience", "Invalid experience." } }, null);
                         }
-
-                        experience = "None";
+                    }
+                    else
+                    {
+                        return (false, new Dictionary<string, string> { { "Experience", "Invalid experience." } }, null);
                     }
 
                     typeResource = new ResourcePersonnel
@@ -429,13 +374,6 @@ public class ResourceService
         return errors;
     }
 
-    private Resource? MapViewModelToResource(CreateResourceViewModel model, Guid userId)
-    {
-
-        return null;
-        // return resource;
-    }
-
     private async Task<(bool IsSuccess, string? Error)> SaveResourceImageAsync(IFormFile imageFile, Guid resourceId)
     {
         try
@@ -470,5 +408,36 @@ public class ResourceService
         {
             return (false, $"Image saving failed: {ex.Message}");
         }
+    }
+
+    // Methods
+    private DateTime GetWarranty(string FinalWarranty)
+    {
+        var match = Regex.Match(FinalWarranty, @"(\d+)\s*(year|years|month|months)", RegexOptions.IgnoreCase);
+        DateTime today = DateTime.Today;
+        DateTime WarrantyResult = DateTime.UtcNow;
+
+        if (match.Success)
+        {
+            int value = int.Parse(match.Groups[1].Value);
+            string unit = match.Groups[2].Value.ToLower();
+
+            switch (unit)
+            {
+                case "year":
+                case "years":
+                    WarrantyResult = today.AddYears(value);
+                    break;
+                case "month":
+                case "months":
+                    WarrantyResult = today.AddMonths(value);
+                    break;
+                default:
+                    WarrantyResult = today;
+                    break;
+            }
+        }
+
+        return WarrantyResult;
     }
 }

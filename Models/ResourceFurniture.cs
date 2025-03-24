@@ -17,5 +17,7 @@ public class ResourceFurniture
     public FurnitureMaterial Material { get; set; }
     public string? OtherMaterial { get; set; }
     public string? Dimensions { get; set; }
-    public string? Warranty { get; set; } // comma-separated key-value pairs
+
+    [Column(TypeName = "date")]
+    public DateTime Warranty { get; set; } // comma-separated key-value pairs
 }

@@ -14,7 +14,7 @@
     <partial name="~/Views/Organizer/Partials/_TopbarPartial.cshtml" />
 
     <header class="flex flex-col items-center w-full px-4 py-2 border-b-2 border-zinc-100">
-        
+
         @* Sub Header (My Events, Date Range, Filter, & Create New Event Button) *@
         <div class="flex items-center w-full h-[8vh] gap-3">
             <div class="flex items-center gap-3">
@@ -82,20 +82,22 @@
 
             @await Html.PartialAsync("~/Views/Organizer/Partials/_EventsListPartial.cshtml", Model)
         </div>
+
+        <div id="all-modals">
+            @* Create Events *@ 
+            @await Html.PartialAsync("~/Views/Organizer/Partials/CreateEventModal.cshtml", Model.CreateEventViewModel)
+
+            @* View, Update & Delete Events *@
+            @await Html.PartialAsync("~/Views/Organizer/Partials/ViewEventModal.cshtml", Model.ViewEventViewModel)
+        </div>
     </main>
 
-    @* View, Update & Delete Events *@
-    @await Html.PartialAsync("~/Views/Organizer/Partials/ViewEventModal.cshtml", Model.ViewEventViewModel)
-
-    @* Create Events *@ 
-    @await Html.PartialAsync("~/Views/Organizer/Partials/CreateEventModal.cshtml", Model.CreateEventViewModel)
 
 </div>
 
 @section Scripts {
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-
             let startPicker = flatpickr("#startDate", {
                 dateFormat: "m-d-Y",
                 defaultDate: "@firstFormatted",
@@ -127,6 +129,39 @@
             }
             if (endDateValue) {
                 startPicker.set("maxDate", endDateValue);
+            }
+        });
+    </script>
+
+    <script>
+        document.body.addEventListener("htmx:afterSwap", () => {
+            // Check if the new content includes the modal
+            if (event.target.id === "all-modals") {
+                console.log("Reinitializing Flatpickr...");
+                initializeFlatpickr(); // Reinitialize Flatpickr
+            }
+
+            function initializeFlatpickr() {
+                let startPicker = flatpickr("#startat", {
+                    enableTime: true,
+                    dateFormat: "Y-m-d H:i",
+                    appendTo: document.body,
+                    defaultDate: new Date().fp_incr(1),
+                    minDate: new Date().fp_incr(1), // Tomorrow
+                    onChange: function (selectedDates) {
+                        if (selectedDates.length > 0) {
+                            endPicker.set("minDate", selectedDates[0]); // Set end date min to start date
+                        }
+                    }
+                });
+
+                let endPicker = flatpickr("#endat", {
+                    enableTime: true,
+                    dateFormat: "Y-m-d H:i",
+                    appendTo: document.body,
+                    minDate: new Date().fp_incr(1), // Tomorrow
+                    defaultDate: new Date().fp_incr(1), // Tomorrow
+                });
             }
         });
     </script>

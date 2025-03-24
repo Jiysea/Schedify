@@ -4,8 +4,8 @@
     class="fixed inset-0 flex justify-center items-start bg-black/50 backdrop-blur-sm overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-coffee-700 z-50 p-4">
 
     @* White Box *@
-    <div x-data x-trap.noscroll="createEventModal" @@keydown.escape="createEventModal = false;"
-        class="bg-coffee-50 rounded-lg shadow-lg">
+    <div x-data x-trap.noscroll="createEventModal" @@keydown.escape="createEventModal = false;" 
+        @@close-modal.camel="createEventModal = false;" class="bg-coffee-50 rounded-lg shadow-lg">
 
         @* Top Header *@
         <header class="flex items-center justify-between text-lg font-medium py-3 px-4">
@@ -24,7 +24,7 @@
         <hr class="w-full border-coffee-100">
 
         <main class="">
-            <form action="post" hx-post="/organizer/create-event" hx-swap="none">
+            <form id="create-event-modal" action="post" hx-post="/organizer/create-event" hx-swap="none">
 
                 @* Body *@
                 <div class="flex flex-col gap-10 px-6 py-10">
@@ -89,7 +89,7 @@
                                                 </path>
                                             </svg>
                                         </span>
-                                        <input type="text" class="input-coffee ps-12 pe-2 py-2" id="startat"
+                                        <input type="text" class="input-coffee ps-12 pe-2 py-2 cursor-pointer" id="startat"
                                             asp-for="StartAt" placeholder="Select a start time" />
                                     </div>
                                     <div id="validation-StartAt">
@@ -114,7 +114,7 @@
                                                 </path>
                                             </svg>
                                         </span>
-                                        <input type="text" class="input-coffee ps-12 pe-2 py-2" id="endat"
+                                        <input type="text" class="input-coffee ps-12 pe-2 py-2 cursor-pointer" id="endat"
                                             asp-for="EndAt" placeholder="Select an end time" />
                                     </div>
                                     <div id="validation-EndAt">
@@ -126,10 +126,21 @@
                 </div>
 
                 @* Footer *@
-                <div class="mt-4 flex items-center justify-center gap-2 w-full py-3 px-4">
+                <div class="mt-4 flex items-center justify-center gap-2 w-full py-3 px-4"   >
                     <button type="submit"
                         class="duration-200 ease-in-out text-sm py-2 w-full font-medium text-coffee-50 bg-coffee-700 hover:bg-coffee-800 active:bg-coffee-900 rounded-md">
                         SAVE
+                        
+                        <svg class="htmx-indicator size-5 animate-spin" xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 100 100" preserveAspectRatio="xMidYMid"
+                            xmlns:xlink="http://www.w3.org/1999/xlink">
+                            <g>
+                                <circle stroke-dasharray="164.93361431346415 56.97787143782138" r="35" stroke-width="10"
+                                    stroke="currentColor" fill="none" cy="50" cx="50" transform="matrix(1,0,0,1,0,0)">
+                                </circle>
+                                <g></g>
+                            </g>
+                        </svg>
                     </button>
                 </div>
             </form>

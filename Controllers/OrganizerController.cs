@@ -1,8 +1,9 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.AspNetCore.SignalR;
 using Schedify.Data;
+using Schedify.Hubs;
 using Schedify.Models;
 using Schedify.Services;
 using Schedify.ViewModels;
@@ -13,47 +14,37 @@ namespace Schedify.Controllers;
 public class OrganizerController : Controller
 {
     private readonly ApplicationDbContext _context;
+    private readonly IHubContext<AlertHub> _hubContext;
     private readonly EventService _eventService;
     private readonly ResourceService _resourceService;
     private readonly UserService _userService;
-    public OrganizerController(ApplicationDbContext context, EventService eventService, ResourceService resourceService, UserService userService)
+    public OrganizerController(ApplicationDbContext context, EventService eventService, ResourceService resourceService, UserService userService, IHubContext<AlertHub> hubContext)
     {
         _context = context;
         _eventService = eventService;
         _resourceService = resourceService;
         _userService = userService;
+        _hubContext = hubContext;
+    }
+
+    [HttpPost("organizer/save-connection-id")]
+    public IActionResult SaveConnectionId(string connectionId)
+    {
+        string? userId = _userService.GetUserId();
+
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized();
+        }
+
+        AlertHub.SaveConnectionId(userId, connectionId); // Save user’s connection ID somewhere
+        return Ok();
     }
 
     [HttpGet("organizer/events")]
     public IActionResult Events(DateTime? startDate, DateTime? endDate)
     {
-        // Set default values if not provided
-        startDate ??= new DateTime(DateTime.UtcNow.Year, 1, 1, 0, 0, 0, DateTimeKind.Utc); // Jan 1st, 00:00 UTC
-        endDate ??= DateTime.UtcNow.Date.AddHours(23).AddMinutes(59); // Today at 23:59 UTC
-
-        var DraftEvents = _eventService.GetEventsByOrganizerDraft(startDate, endDate?.AddHours(23).AddMinutes(59));
-        var PublishedEvents = _eventService.GetEventsByOrganizerPublished(startDate, endDate?.AddHours(23).AddMinutes(59));
-        var ConcludedEvents = _eventService.GetEventsByOrganizerConcluded(startDate, endDate?.AddHours(23).AddMinutes(59));
-
-        var pAttendeeCount = _eventService.GetAttendeeCounts(PublishedEvents);
-        var cAttendeeCount = _eventService.GetAttendeeCounts(ConcludedEvents);
-        var MergedAttendeeCounts = pAttendeeCount.Concat(cAttendeeCount)
-            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value); // kvp == key-value pair
-
-        var hasResources = _context.Events
-            .ToDictionary(
-                e => e.Id,
-                e => e.Resources.Any()
-            );
-
-        var viewModel = new EventsViewModel
-        {
-            DraftEvents = DraftEvents,
-            PublishedEvents = PublishedEvents,
-            ConcludedEvents = ConcludedEvents,
-            EventAttendeeCounts = MergedAttendeeCounts,
-            HasResources = hasResources
-        };
+        var viewModel = GetEventsViewModel(startDate, endDate);
 
         if (Request.Headers["HX-Request"].Any())
         {
@@ -109,9 +100,14 @@ public class OrganizerController : Controller
             return PartialView("_ValidationMessages", ModelState);
         }
 
-        Response.Headers.Append("HX-Redirect", Url.Action("Events", "Organizer"));
-        return Content(string.Empty);
+        ModelState.Clear();
+        var viewModel = GetEventsViewModel(null, null);
 
+        // Define the SweetAlert event in the HX-Trigger header
+        var sweetAlertJson = "{\"closeModal\": true, \"clearValidations\": true, \"showSweetAlert\": { \"title\": \"Successfully created an event!\", \"icon\": \"success\", \"timer\": 3000 }}";
+
+        Response.Headers.Append("HX-Trigger", sweetAlertJson);
+        return PartialView("~/Views/Organizer/Partials/_UpdateEventsListPartial.cshtml", viewModel);
     }
 
     [HttpGet("organizer/show-update-event/{id}")]
@@ -167,8 +163,14 @@ public class OrganizerController : Controller
             return PartialView("_ValidationEditMessages", ModelState);
         }
 
-        Response.Headers.Append("HX-Redirect", Url.Action("Events", "Organizer"));
-        return Content(string.Empty);
+        ModelState.Clear();
+        var viewModel = GetEventsViewModel(null, null);
+
+        // Define the SweetAlert event in the HX-Trigger header
+        var sweetAlertJson = "{\"closeModal\": true, \"clearValidations\": true, \"showSweetAlert\": { \"title\": \"Successfully updated an event!\", \"icon\": \"success\", \"timer\": 3000 }}";
+
+        Response.Headers.Append("HX-Trigger", sweetAlertJson);
+        return PartialView("~/Views/Organizer/Partials/_UpdateEventsListPartial.cshtml", viewModel);
     }
 
     [HttpDelete("organizer/delete-event/{id}")]
@@ -301,16 +303,11 @@ public class OrganizerController : Controller
     {
         var eventIdString = HttpContext.Session.GetString("SelectedEventId");
 
-        // int pageSize = 8; // Default page size
-        // int newPage = 0; // Calculate new page number
-
-        // if (newPage < 1) newPage = 1; // Prevent negative pages
-        // var totalCount = _context.Resources.Count(r => r.ResourceType == ResourceType.Venue);
-
         List<Event>? events = _eventService.GetEventsByUser();
 
         Event? evt = null;
 
+        // Get the Event Id to pass to the hidden input
         if (eventIdString != null)
         {
             evt = _eventService.GetEventById(Guid.Parse(eventIdString));
@@ -320,6 +317,7 @@ public class OrganizerController : Controller
             evt = _eventService.GetEventById(events!.First().Id);
         }
 
+        // if there's no event, redirect to Events page
         if (evt == null)
         {
             Response.Headers.Append("HX-Redirect", Url.Action("Events", "Organizer"));
@@ -335,9 +333,6 @@ public class OrganizerController : Controller
             SelectedName = evt.Name,
             Resources = resources!,
             ResourceImages = _resourceService.GetResourceImageFromList(resources!),
-            // CurrentPage = newPage,
-            // PageSize = pageSize,
-            // TotalCount = totalCount
         };
 
         return View(model);
@@ -373,7 +368,19 @@ public class OrganizerController : Controller
     // Create Resource Modal requests
     // ----------------------------------------------
 
-    // Used in CreateResourceModal
+    // called when opening the CreateResourceModal
+    [HttpGet("organizer/open-create-resource-modal/{EventId}")]
+    public IActionResult OpenResourceModal(Guid EventId)
+    {
+        var model = new CreateResourceViewModel
+        {
+            EventId = EventId
+        };
+
+        return PartialView("~/Views/Organizer/Partials/CreateResourceModal.cshtml", model);
+    }
+
+    // used in CreateResourceModal
     [HttpGet("organizer/select-resource-type")]
     public IActionResult ResourceExtra(ResourceType selectedOption)
     {
@@ -389,6 +396,30 @@ public class OrganizerController : Controller
         return PartialView("_SelectResourceTypePartial", viewModel);
     }
 
+    // if Furniture is the resource type
+    [HttpGet("organizer/select-furniture-material")]
+    public IActionResult SelectFurnitureMaterial(FurnitureMaterial selectedOption)
+    {
+        CreateResourceViewModel viewModel = selectedOption switch
+        {
+            FurnitureMaterial.Wood => new CreateResourceViewModel { Material = FurnitureMaterial.Wood },
+            FurnitureMaterial.Metal => new CreateResourceViewModel { Material = FurnitureMaterial.Metal },
+            FurnitureMaterial.Plastic => new CreateResourceViewModel { Material = FurnitureMaterial.Plastic },
+            FurnitureMaterial.Glass => new CreateResourceViewModel { Material = FurnitureMaterial.Glass },
+            FurnitureMaterial.Fabric => new CreateResourceViewModel { Material = FurnitureMaterial.Fabric },
+            FurnitureMaterial.Other => new CreateResourceViewModel { Material = FurnitureMaterial.Other },
+            _ => new CreateResourceViewModel { Material = FurnitureMaterial.Wood } // Default
+        };
+
+        if (selectedOption == FurnitureMaterial.Other)
+            viewModel.IsOtherMaterial = true;
+        else
+            viewModel.IsOtherMaterial = false;
+
+        viewModel.ResourceType = ResourceType.Furniture;
+        return PartialView("_SelectResourceTypePartial", viewModel);
+    }
+
     [HttpGet("organizer/cost-types")]
     public IActionResult GetCostTypes(string selectedOption)
     {
@@ -400,22 +431,76 @@ public class OrganizerController : Controller
         return BadRequest();
     }
 
-    [HttpGet("organizer/open-create-resource-modal/{EventId}")]
-    public IActionResult OpenResourceModal(Guid EventId)
+    [HttpPost("organizer/create-resource")]
+    public async Task<IActionResult> CreateResource(Guid EventId, CreateResourceViewModel model)
     {
-        Console.WriteLine(EventId);
-        Console.WriteLine(EventId);
-        Console.WriteLine(EventId);
-        var model = new CreateResourceViewModel
-        {
+        var result = await _resourceService.CreateResourceAsync(model, EventId);
 
+        if (!result.IsSuccess)
+        {
+            // Split error messages and add them to ModelState
+            foreach (var error in result.Error!)
+            {
+                ModelState.AddModelError(error.Key, error.Value);
+            }
+
+            return PartialView("_ValidationMessages", ModelState);
+        }
+
+        // Once everything is clear with no errors, it's time to hx-swap
+        ModelState.Clear();
+        List<Event>? events = _eventService.GetEventsByUser();
+
+        Event? evt = _eventService.GetEventById(EventId);
+
+        // if there's no event, redirect to Events page
+        if (evt == null)
+        {
+            Response.Headers.Append("HX-Redirect", Url.Action("Events", "Organizer"));
+            return RedirectToAction("Events", "Organizer");
+        }
+
+        var resources = _resourceService.GetResourcesByEventId(EventId);
+
+        var viewModel = new ResourceViewModel
+        {
+            EventId = EventId,
+            Events = events!,
+            SelectedName = evt.Name,
+            Resources = resources!,
+            ResourceImages = _resourceService.GetResourceImageFromList(resources!),
         };
 
-        return PartialView("~/Views/Organizer/Partials/CreateResourceModal.cshtml", model);
+        // Define the SweetAlert event in the HX-Trigger header
+        var sweetAlertJson = "{\"closeModal\": true, \"clearValidations\": true, \"showSweetAlert\": { \"title\": \"Successfully added a resource!\", \"icon\": \"success\", \"timer\": 3000 }}";
+        Response.Headers.Append("HX-Trigger", sweetAlertJson);
+        return PartialView("~/Views/Organizer/Partials/_UpdateResourcesListPartial.cshtml", viewModel);
     }
 
     // ----------------------------------------------
     // Create Resource Modal requests
+    // ----------------------------------------------
+
+    // ----------------------------------------------
+    // View Resource Modal requests
+    // ----------------------------------------------
+
+    [HttpGet("organizer/view-resource/{ResourceId}")]
+    public async Task<IActionResult> ViewResource(Guid ResourceId)
+    {
+        var resource = await _resourceService.GetResourceByIdAsync(ResourceId);
+        if (resource == null) return NotFound();
+
+        var resourceWithType = await _resourceService.GetResourceByTypeAsync(ResourceId, resource.ResourceType);
+        if (resourceWithType == null) return NotFound();
+
+        var viewModel = GetViewResourceViewModel(resourceWithType);
+
+        return PartialView("~/Views/Organizer/Partials/_ViewResourcePartial.cshtml", viewModel);
+    }
+
+    // ----------------------------------------------
+    // View Resource Modal requests
     // ----------------------------------------------
 
     // [Route("organizer/resource-change-page/{change}")]
@@ -441,300 +526,6 @@ public class OrganizerController : Controller
     //     return View("~/Views/Organizer/Resources.cshtml");
     // }
 
-    // [Route("organizer/view-resource/{id}")]
-    // [HttpGet]
-    // public async Task<IActionResult> ViewResource(Guid id)
-    // {
-    //     var resource = await _resourceService.GetResourceByIdForOrganizersAsync(id);
-
-    //     if (resource == null)
-    //     {
-    //         return NotFound();
-    //     }
-
-    //     return PartialView("~/Views/Organizer/Partials/_ViewResourcePartial.cshtml", resource);
-    // }
-
-    // [Route("organizer/show-add-event-resource/{id}")]
-    // [HttpGet]
-    // public async Task<IActionResult> ShowAddToEventResource(Guid id)
-    // {
-    //     var DraftEvents = _eventService.GetEventsByOrganizerDraft(new DateTime(DateTime.UtcNow.Year, 1, 1, 0, 0, 0, DateTimeKind.Utc), DateTime.UtcNow.Date.AddHours(23).AddMinutes(59));
-    //     var result = await _resourceService.GetResourceAndEvents(id, DraftEvents);
-
-    //     if (result == null)
-    //     {
-    //         return NotFound();
-    //     }
-
-    //     return PartialView("~/Views/Organizer/Partials/_AddToEventResourcePartial.cshtml", result);
-    // }
-
-    // [Route("organizer/add-event-resource")]
-    // [HttpPost]
-    // public async Task<IActionResult> AddToEventResource(EventResourceViewModel model)
-    // {
-    //     Console.WriteLine(model.CostType);
-    //     Console.WriteLine(model.ResourceType);
-    //     Console.WriteLine(model.QuantityFromForm);
-    //     Console.WriteLine(model.QuantityFromResource);
-    //     Console.WriteLine(model.MaxQuantityReached);
-    //     Console.WriteLine(model.TotalCost);
-    //     Console.WriteLine(model.CostFromResource);
-    //     if (!ModelState.IsValid)
-    //     {
-    //         foreach (var state in ModelState)
-    //         {
-    //             foreach (var error in state.Value.Errors)
-    //             {
-    //                 Console.WriteLine(error.ErrorMessage);
-    //             }
-    //         }
-    //         return PartialView("_ValidationMessages", ModelState);
-    //     }
-
-    //     var result = await _eventService.AddToEventResourceAsync(model);
-
-    //     if (!result.IsSuccess)
-    //     {
-    //         // Split error messages and add them to ModelState
-    //         foreach (var error in result.Error!)
-    //         {
-    //             ModelState.AddModelError(error.Key, error.Value);
-    //             if (error.Key == "Authentication")
-    //             {
-    //                 Response.Headers.Append("HX-Redirect", Url.Action("Login", "Auth"));
-    //             }
-    //         }
-
-    //         return PartialView("_ValidationMessages", ModelState);
-    //     }
-
-    //     Response.Headers.Append("HX-Redirect", Url.Action("Resources", "Organizer"));
-    //     return Content(string.Empty);
-    // }
-
-    // [Route("organizer/update-total-cost")]
-    // [HttpPost]
-    // public async Task<IActionResult> UpdateTotalCost(EventResourceViewModel model)
-    // {
-    //     var DraftEvents = _eventService.GetEventsByOrganizerDraft(new DateTime(DateTime.UtcNow.Year, 1, 1, 0, 0, 0, DateTimeKind.Utc), DateTime.UtcNow.Date.AddHours(23).AddMinutes(59));
-    //     var resource = await _context.Resources
-    //         .Include(r => r.Image)
-    //         .FirstOrDefaultAsync(r => r.Id == model.ResourceId);
-
-    //     if (resource == null)
-    //     {
-    //         return NotFound();
-    //     }
-
-    //     var updatedModel = new EventResourceViewModel
-    //     {
-    //         ResourceId = model.ResourceId,
-    //         Resource = resource,
-    //         DraftEvents = DraftEvents,
-    //         EventStartAt = DraftEvents.First().StartAt,
-    //         EventEndAt = DraftEvents.First().EndAt,
-    //         CostType = resource.CostType,
-    //         ResourceType = resource.ResourceType,
-    //         // QuantityFromResource = resource.Quantity,
-    //         CostFromResource = resource.Cost,
-    //         // Shift = resource.ResourceType == ResourceType.Personnel ? resource.Shift : null,
-    //         QuantityFromForm = model.QuantityFromForm,
-    //     };
-
-    //     return PartialView("~/Views/Organizer/Partials/_TotalCostUpdatePartial.cshtml", updatedModel.TotalCost);
-    // }
-
-    // [Route("organizer/update-selected-event")]
-    // [HttpPost]
-    // public async Task<IActionResult> UpdateSelectedEvent(Guid EventId, EventResourceViewModel model)
-    // {
-    //     var DraftEvents = _eventService.GetEventsByOrganizerDraft(new DateTime(DateTime.UtcNow.Year, 1, 1, 0, 0, 0, DateTimeKind.Utc), DateTime.UtcNow.Date.AddHours(23).AddMinutes(59));
-    //     var selectedEvent = await _context.Events.FindAsync(EventId);
-
-    //     if (selectedEvent == null) return NotFound();
-
-    //     var resource = await _context.Resources
-    //         .Include(r => r.Image)
-    //         .FirstOrDefaultAsync(r => r.Id == model.ResourceId);
-
-    //     if (resource == null)
-    //     {
-    //         return NotFound();
-    //     }
-
-    //     var updatedModel = new EventResourceViewModel
-    //     {
-    //         EventId = EventId,
-    //         ResourceId = model.ResourceId,
-    //         Resource = resource,
-    //         DraftEvents = DraftEvents,
-    //         EventStartAt = DraftEvents.First().StartAt,
-    //         EventEndAt = DraftEvents.First().EndAt,
-    //         SelectedEvent = selectedEvent.Name,
-    //         CostType = resource.CostType,
-    //         ResourceType = resource.ResourceType,
-    //         // QuantityFromResource = resource.Quantity,
-    //         CostFromResource = resource.Cost,
-    //         // Shift = resource.ResourceType == ResourceType.Personnel ? resource.Shift : null,
-    //         QuantityFromForm = model.QuantityFromForm,
-    //     };
-
-    //     return PartialView("~/Views/Organizer/Partials/_AddToEventResourcePartial.cshtml", updatedModel);
-    // }
-
-    // [Route("organizer/by-events")]
-    // public IActionResult ByEvents()
-    // {
-
-    //     if (Request.Headers["HX-Request"] == "true")
-    //     {
-    //         return PartialView("~/Views/Organizer/Partials/_CateringsPartial.cshtml", new { });
-    //     }
-
-    //     return RedirectToAction("Resources", "Organizer");
-
-    // }
-
-    // [Route("organizer/venues")]
-    // public IActionResult Venues()
-    // {
-    //     if (Request.Headers["HX-Request"] == "true")
-    //     {
-    //         int pageSize = 8; // Default page size
-    //         int newPage = 0; // Calculate new page number
-
-    //         if (newPage < 1) newPage = 1; // Prevent negative pages
-    //         var totalCount = _context.Resources.Count(r => r.ResourceType == ResourceType.Venue);
-    //         var resources = _resourceService.GetResourcesByType(ResourceType.Venue, newPage, pageSize);
-
-    //         var model = new ResourceViewModel
-    //         {
-    //             Resources = resources!,
-    //             ResourceImages = _resourceService.GetResourceImageFromList(resources!),
-    //             CurrentPage = newPage,
-    //             PageSize = pageSize,
-    //             TotalCount = totalCount
-    //         };
-    //         return PartialView("~/Views/Organizer/Partials/_TypeVenuesPartial.cshtml", model);
-    //     }
-
-    //     return RedirectToAction("Resources", "Organizer");
-    // }
-
-    // [Route("organizer/equipments")]
-    // public IActionResult Equipments()
-    // {
-    //     if (Request.Headers["HX-Request"] == "true")
-    //     {
-    //         int pageSize = 8; // Default page size
-    //         int newPage = 0; // Calculate new page number
-
-    //         if (newPage < 1) newPage = 1; // Prevent negative pages
-    //         var totalCount = _context.Resources.Count(r => r.ResourceType == ResourceType.Equipment);
-    //         var resources = _resourceService.GetResourcesByType(ResourceType.Equipment, newPage, pageSize);
-
-    //         var model = new ResourceViewModel
-    //         {
-    //             Resources = resources!,
-    //             ResourceImages = _resourceService.GetResourceImageFromList(resources!),
-    //             CurrentPage = newPage,
-    //             PageSize = pageSize,
-    //             TotalCount = totalCount
-    //         };
-    //         return PartialView("~/Views/Organizer/Partials/_TypeEquipmentsPartial.cshtml", model);
-    //     }
-
-    //     return RedirectToAction("Resources", "Organizer");
-
-    // }
-
-    // [Route("organizer/furnitures")]
-    // public IActionResult Furnitures()
-    // {
-
-    //     if (Request.Headers["HX-Request"] == "true")
-    //     {
-    //         int pageSize = 8; // Default page size
-    //         int newPage = 0; // Calculate new page number
-
-    //         if (newPage < 1) newPage = 1; // Prevent negative pages
-    //         var totalCount = _context.Resources.Count(r => r.ResourceType == ResourceType.Furniture);
-    //         var resources = _resourceService.GetResourcesByType(ResourceType.Furniture, newPage, pageSize);
-
-    //         var model = new ResourceViewModel
-    //         {
-    //             Resources = resources!,
-    //             ResourceImages = _resourceService.GetResourceImageFromList(resources!),
-    //             CurrentPage = newPage,
-    //             PageSize = pageSize,
-    //             TotalCount = totalCount
-    //         };
-    //         return PartialView("~/Views/Organizer/Partials/_TypeFurnituresPartial.cshtml", model);
-    //     }
-
-    //     return RedirectToAction("Resources", "Organizer");
-
-    // }
-
-    // [Route("organizer/caterings")]
-    // public IActionResult Caterings()
-    // {
-
-    //     if (Request.Headers["HX-Request"] == "true")
-    //     {
-    //         int pageSize = 8; // Default page size
-    //         int newPage = 0; // Calculate new page number
-
-    //         if (newPage < 1) newPage = 1; // Prevent negative pages
-    //         var totalCount = _context.Resources.Count(r => r.ResourceType == ResourceType.Catering);
-    //         var resources = _resourceService.GetResourcesByType(ResourceType.Catering, newPage, pageSize);
-
-    //         var model = new ResourceViewModel
-    //         {
-    //             Resources = resources!,
-    //             ResourceImages = _resourceService.GetResourceImageFromList(resources!),
-    //             CurrentPage = newPage,
-    //             PageSize = pageSize,
-    //             TotalCount = totalCount
-    //         };
-    //         return PartialView("~/Views/Organizer/Partials/_TypeCateringsPartial.cshtml", model);
-    //     }
-
-    //     return RedirectToAction("Resources", "Organizer");
-
-    // }
-
-    // [Route("organizer/personnels")]
-    // public IActionResult Personnels()
-    // {
-
-    //     if (Request.Headers["HX-Request"] == "true")
-    //     {
-    //         int pageSize = 8; // Default page size
-    //         int newPage = 0; // Calculate new page number
-
-    //         if (newPage < 1) newPage = 1; // Prevent negative pages
-    //         var totalCount = _context.Resources.Count(r => r.ResourceType == ResourceType.Personnel);
-    //         var resources = _resourceService.GetResourcesByType(ResourceType.Personnel, newPage, pageSize);
-
-    //         var model = new ResourceViewModel
-    //         {
-    //             Resources = resources!,
-    //             ResourceImages = _resourceService.GetResourceImageFromList(resources!),
-    //             CurrentPage = newPage,
-    //             PageSize = pageSize,
-    //             TotalCount = totalCount
-    //         };
-    //         return PartialView("~/Views/Organizer/Partials/_TypePersonnelsPartial.cshtml", model);
-    //     }
-
-    //     return RedirectToAction("Resources", "Organizer");
-
-    // }
-
-
     // --------------------------------------------------------------------------------------
     // Feedbacks
     // --------------------------------------------------------------------------------------
@@ -747,4 +538,101 @@ public class OrganizerController : Controller
     [Route("organizer/stats")]
     [HttpGet]
     public IActionResult Stats() => View();
+
+    // --------------------------------------------------------------------------------------
+    // Private Methods
+    // --------------------------------------------------------------------------------------
+
+    private EventsViewModel GetEventsViewModel(DateTime? startDate, DateTime? endDate)
+    {
+        // Set default values if not provided
+        startDate ??= new DateTime(DateTime.UtcNow.Year, 1, 1, 0, 0, 0, DateTimeKind.Utc); // Jan 1st, 00:00 UTC
+        endDate ??= DateTime.UtcNow.Date.AddHours(23).AddMinutes(59); // Today at 23:59 UTC
+
+        var DraftEvents = _eventService.GetEventsByOrganizerDraft(startDate, endDate?.AddHours(23).AddMinutes(59));
+        var PublishedEvents = _eventService.GetEventsByOrganizerPublished(startDate, endDate?.AddHours(23).AddMinutes(59));
+        var ConcludedEvents = _eventService.GetEventsByOrganizerConcluded(startDate, endDate?.AddHours(23).AddMinutes(59));
+
+        var pAttendeeCount = _eventService.GetAttendeeCounts(PublishedEvents);
+        var cAttendeeCount = _eventService.GetAttendeeCounts(ConcludedEvents);
+        var MergedAttendeeCounts = pAttendeeCount.Concat(cAttendeeCount)
+            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value); // kvp == key-value pair
+
+        var hasResources = _context.Events
+            .ToDictionary(
+                e => e.Id,
+                e => e.Resources.Any()
+            );
+
+        var viewModel = new EventsViewModel
+        {
+            DraftEvents = DraftEvents,
+            PublishedEvents = PublishedEvents,
+            ConcludedEvents = ConcludedEvents,
+            EventAttendeeCounts = MergedAttendeeCounts,
+            HasResources = hasResources
+        };
+
+        return viewModel;
+    }
+
+    private ViewResourceViewModel? GetViewResourceViewModel(Resource? resource)
+    {
+        if (resource == null) return null;
+        
+        var viewModel = new ViewResourceViewModel
+        {
+            Id = resource.Id,
+            ImageFileName = resource.Image!.ImageFileName,
+            ProviderName = resource.ProviderName,
+            ProviderEmail = resource.ProviderEmail,
+            ProviderPhoneNumber = resource.ProviderPhoneNumber,
+            Name = resource.Name,
+            Description = resource.Description,
+            ResourceType = resource.ResourceType,
+            Cost = resource.Cost,
+            CostType = resource.CostType,
+            CreatedAt = resource.CreatedAt,
+            UpdatedAt = resource.UpdatedAt,
+        };
+
+        if (resource.ResourceType == ResourceType.Venue)
+        {
+            viewModel.Capacity = resource.ResourceVenue.Capacity;
+            viewModel.Size = resource.ResourceVenue.Size;
+            viewModel.AddressLine1 = resource.ResourceVenue.AddressLine1;
+            viewModel.AddressLine2 = resource.ResourceVenue.AddressLine2;
+            viewModel.CityMunicipality = resource.ResourceVenue.CityMunicipality;
+            viewModel.Province = resource.ResourceVenue.Province;
+        }
+        else if (resource.ResourceType == ResourceType.Equipment)
+        {
+            viewModel.Quantity = resource.ResourceEquipment.Quantity;
+            viewModel.Brand = resource.ResourceEquipment.Brand;
+            viewModel.Warranty = resource.ResourceEquipment.Warranty;
+            viewModel.Specifications = JsonSerializer.Deserialize<Dictionary<string, string>>(resource.ResourceEquipment.Specifications!)!;
+        }
+        else if (resource.ResourceType == ResourceType.Furniture)
+        {
+            viewModel.Quantity = resource.ResourceFurniture.Quantity;
+            viewModel.Material = resource.ResourceFurniture.Material;
+            viewModel.OtherMaterial = resource.ResourceFurniture.OtherMaterial;
+            viewModel.Dimensions = resource.ResourceFurniture.Dimensions;
+            viewModel.Warranty = resource.ResourceFurniture.Warranty;
+        }
+        else if (resource.ResourceType == ResourceType.Catering)
+        {
+            viewModel.GuestCapacity = resource.ResourceCatering.GuestCapacity;
+            viewModel.MenuItems = JsonSerializer.Deserialize<List<string>>(resource.ResourceCatering.MenuItems);
+        }
+        else if (resource.ResourceType == ResourceType.Personnel)
+        {
+            viewModel.Position = resource.ResourcePersonnel.Position;
+            viewModel.ShiftStart = resource.ResourcePersonnel.ShiftStart;
+            viewModel.ShiftEnd = resource.ResourcePersonnel.ShiftEnd;
+            viewModel.Experience = resource.ResourcePersonnel.Experience;
+        }
+
+        return viewModel;
+    }
 }

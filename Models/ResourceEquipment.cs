@@ -21,5 +21,6 @@ public class ResourceEquipment
     [DefaultValue("No Specifications")]
     public string? Specifications { get; set; } // comma-separated key-value pairs
 
-    public string? Warranty { get; set; }
+    [Column(TypeName = "date")]
+    public DateTime Warranty { get; set; }
 }

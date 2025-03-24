@@ -15,314 +15,348 @@
 
 <hr class="w-full border-coffee-100">
 
-<main class="flex flex-col gap-10 p-6 relative">
+<main class="grid grid-cols-2 gap-5 p-6 relative">
 
-    @* Resource Image *@
-    <div class="flex items-center justify-center w-full py-6 min-h-72 max-h-72">
-        <img src="/resources/@Model.ImageFileName" alt="Resource Image" class="h-72 object-cover rounded-md">
+    <div class="flex flex-col gap-5">
+        @* Resource Image *@
+        <div class="flex items-center justify-center w-full h-96 py-6">
+            <img src="/resources/@Model.ImageFileName" alt="Resource Image" class="w-full h-96 object-cover rounded-md">
+        </div>
+
+        @* Buttons *@
+        <div class="relative flex items-center w-full gap-3">
+
+            <button type="button"
+                class="w-full flex items-center justify-center gap-2 p-2 text-sm duration-200 ease-in-out rounded-md text-coffee-50 bg-coffee-700 hover:bg-coffee-800 active:bg-coffee-700"
+                hx-get="/organizer/show-update-resource/@Model.Id" hx-swap="innerHTML"
+                hx-target="#viewEventModalContent">
+                <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                    viewBox="0 0 256 256">
+                    <path
+                        d="M227.32,73.37,182.63,28.69a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H216a8,8,0,0,0,0-16H115.32l112-112A16,16,0,0,0,227.32,73.37ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.69,147.32,64l24-24L216,84.69Z">
+                    </path>
+                </svg>
+                Edit
+            </button>
+
+            <button type="button" hx-delete="/organizer/delete-resource/@Model.Id"
+                hx-confirm="Are you sure you want to delete this event?" hx-swap="none"
+                class="w-full flex items-center justify-center gap-2 p-2 text-sm duration-200 ease-in-out rounded-md bg-red-700 hover:bg-red-800 active:bg-red-900 text-red-50">
+                <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                    viewBox="0 0 256 256">
+                    <path
+                        d="M216,48H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM192,208H64V64H192ZM80,24a8,8,0,0,1,8-8h80a8,8,0,0,1,0,16H88A8,8,0,0,1,80,24Z">
+                    </path>
+                </svg>
+                Delete
+            </button>
+
+        </div>
     </div>
 
-    @* Type of Resource *@
-    <div class="relative grid grid-cols-2 gap-3 p-5 border rounded-xl border-coffee-300">
-        <h3
-            class="absolute flex items-center gap-1 start-4 -top-3 font-medium text-sm text-pumpkin-600 bg-coffee-50 px-2">
-            <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
-                viewBox="0 0 256 256">
-                <path
-                    d="M223.68,66.15,135.68,18a15.88,15.88,0,0,0-15.36,0l-88,48.17a16,16,0,0,0-8.32,14v95.64a16,16,0,0,0,8.32,14l88,48.17a15.88,15.88,0,0,0,15.36,0l88-48.17a16,16,0,0,0,8.32-14V80.18A16,16,0,0,0,223.68,66.15ZM128,32l80.34,44-29.77,16.3-80.35-44ZM128,120,47.66,76l33.9-18.56,80.34,44ZM40,90l80,43.78v85.79L40,175.82Zm176,85.78h0l-80,43.79V133.82l32-17.51V152a8,8,0,0,0,16,0V107.55L216,90v85.77Z">
-                </path>
-            </svg>
-            Resource Information
-        </h3>
-
+    <div
+        class="flex flex-col gap-10 h-[76.5vh] overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-coffee-700 p-2">
         @* Type of Resource *@
-        <div class="flex flex-col col-span-2 gap-1 relative">
-            <p for="type" class="text-xs text-coffee-900">Type of Resource</p>
-            <span class="p-2 text-coffee-700">
-                @Model.ResourceType
-            </span>
-        </div>
-
-        @* Provider Name *@
-        <div class="flex flex-col col-span-2 gap-1 relative">
-            <p for="name" class="text-xs text-coffee-900">Provider Name</p>
-            <span class="p-2 text-coffee-700">
-                @Model.ProviderName
-            </span>
-        </div>
-
-        @* Provider Phone Number *@
-        <div class="flex flex-col gap-1 relative">
-            <p for="name" class="text-xs text-coffee-900">Provider Phone Number</p>
-            <span class="p-2 text-coffee-700">
-                @Model.ProviderPhoneNumber
-            </span>
-        </div>
-
-        @* Provider Email *@
-        <div class="flex flex-col gap-1 relative">
-            <p for="name" class="text-xs text-coffee-900">Provider Email</p>
-            <span class="p-2 text-coffee-700">
-                @Model.ProviderEmail
-            </span>
-        </div>
-    </div>
-
-    @* General Information *@
-    <div class="relative grid grid-cols-5 gap-3 p-5 border rounded-xl border-coffee-300">
-        <span
-            class="absolute flex items-center gap-1 start-4 -top-3 font-medium text-sm text-pumpkin-600 bg-coffee-50 px-2">
-            <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
-                viewBox="0 0 256 256">
-                <path
-                    d="M213.66,66.34l-40-40A8,8,0,0,0,168,24H88A16,16,0,0,0,72,40V56H56A16,16,0,0,0,40,72V216a16,16,0,0,0,16,16H168a16,16,0,0,0,16-16V200h16a16,16,0,0,0,16-16V72A8,8,0,0,0,213.66,66.34ZM168,216H56V72h76.69L168,107.31v84.53c0,.06,0,.11,0,.16s0,.1,0,.16V216Zm32-32H184V104a8,8,0,0,0-2.34-5.66l-40-40A8,8,0,0,0,136,56H88V40h76.69L200,75.31Zm-56-32a8,8,0,0,1-8,8H88a8,8,0,0,1,0-16h48A8,8,0,0,1,144,152Zm0,32a8,8,0,0,1-8,8H88a8,8,0,0,1,0-16h48A8,8,0,0,1,144,184Z">
-                </path>
-            </svg>
-            General Information
-        </span>
-
-        @* Resource Name *@
-        <div class="flex flex-col col-span-full gap-1 relative">
-            <p for="name" class="text-xs text-coffee-900">Resource Name</p>
-            <span class="p-2 text-coffee-700">
-                @Model.Name
-            </span>
-        </div>
-
-        @* Cost *@
-        <div class="flex flex-col col-span-2 gap-1 relative">
-            <p for="cost" class="text-xs text-coffee-900">Cost</p>
-            <span class="p-2 text-coffee-700">
-                @Model.Cost
-            </span>
-        </div>
-
-        @* Cost Type *@
-        <div class="flex flex-col gap-1 relative" :class="{
-                'col-span-2': ('@Model.ResourceType' == 'Venue'),
-            }">
-            <p for="costtype" class="text-xs text-coffee-900">Type of Cost</p>
-            <span class="p-2 text-coffee-700">
-                @Model.CostType
-            </span>
-        </div>
-
-        @* Quantity *@
-        <div x-show="'@Model.ResourceType' == 'Venue'" class="flex flex-col gap-1 relative">
-            <p for="quantity" class="text-xs text-coffee-900">Quantity</p>
-            <span class="p-2 text-coffee-700">
-                @Model.Quantity
-            </span>
-        </div>
-
-        @* Descriptions *@
-        <div class="col-span-full flex flex-col gap-1 relative w-full">
-            <p for="description" class="text-xs text-coffee-900">Description</p>
-            <span class="p-2 text-coffee-700">
-                @Model.Description
-            </span>
-        </div>
-    </div>
-
-    @* Type Information *@
-    <div class="relative grid grid-cols-5 gap-3 p-5 border rounded-xl border-coffee-300">
-        @if (Model.ResourceType == ResourceType.Venue)
-        {
+        <div class="relative grid grid-cols-2 gap-3 p-5 border rounded-xl border-coffee-300">
             <span
-                class="absolute flex items-center gap-1 start-4 -top-3 font-medium text-sm text-pumpkin-600 bg-coffee-50 px-2">
+                class="absolute flex items-center gap-2 start-4 -top-3 font-medium text-sm text-pumpkin-600 bg-coffee-50 px-2">
                 <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
                     viewBox="0 0 256 256">
                     <path
-                        d="M112,80a16,16,0,1,1,16,16A16,16,0,0,1,112,80ZM64,80a64,64,0,0,1,128,0c0,59.95-57.58,93.54-60,94.95a8,8,0,0,1-7.94,0C121.58,173.54,64,140,64,80Zm16,0c0,42.2,35.84,70.21,48,78.5,12.15-8.28,48-36.3,48-78.5a48,48,0,0,0-96,0Zm122.77,67.63a8,8,0,0,0-5.54,15C213.74,168.74,224,176.92,224,184c0,13.36-36.52,32-96,32s-96-18.64-96-32c0-7.08,10.26-15.26,26.77-21.36a8,8,0,0,0-5.54-15C29.22,156.49,16,169.41,16,184c0,31.18,57.71,48,112,48s112-16.82,112-48C240,169.41,226.78,156.49,202.77,147.63Z">
+                        d="M223.68,66.15,135.68,18a15.88,15.88,0,0,0-15.36,0l-88,48.17a16,16,0,0,0-8.32,14v95.64a16,16,0,0,0,8.32,14l88,48.17a15.88,15.88,0,0,0,15.36,0l88-48.17a16,16,0,0,0,8.32-14V80.18A16,16,0,0,0,223.68,66.15ZM128,32l80.34,44-29.77,16.3-80.35-44ZM128,120,47.66,76l33.9-18.56,80.34,44ZM40,90l80,43.78v85.79L40,175.82Zm176,85.78h0l-80,43.79V133.82l32-17.51V152a8,8,0,0,0,16,0V107.55L216,90v85.77Z">
                     </path>
                 </svg>
-                Venue Information
+                Resource Information
             </span>
 
-            @* Address Line 1 *@
+            @* Type of Resource *@
+            <div class="flex flex-col col-span-2 gap-1 relative">
+                <p for="type" class="text-xs text-coffee-900">Type of Resource</p>
+                <span class="p-2 text-coffee-700">
+                    @Model.ResourceType
+                </span>
+            </div>
+
+            @* Provider Name *@
+            <div class="flex flex-col col-span-2 gap-1 relative">
+                <p for="name" class="text-xs text-coffee-900">Provider Name</p>
+                <span class="p-2 text-coffee-700">
+                    @Model.ProviderName
+                </span>
+            </div>
+
+            @* Provider Phone Number *@
+            <div class="flex flex-col gap-1 relative">
+                <p for="name" class="text-xs text-coffee-900">Provider Phone Number</p>
+                <span class="p-2 text-coffee-700">
+                    @Model.ProviderPhoneNumber
+                </span>
+            </div>
+
+            @* Provider Email *@
+            <div class="flex flex-col gap-1 relative">
+                <p for="name" class="text-xs text-coffee-900">Provider Email</p>
+                <span class="p-2 text-coffee-700">
+                    @Model.ProviderEmail
+                </span>
+            </div>
+        </div>
+
+        @* General Information *@
+        <div class="relative grid grid-cols-5 gap-3 p-5 border rounded-xl border-coffee-300">
+            <span
+                class="absolute flex items-center gap-2 start-4 -top-3 font-medium text-sm text-pumpkin-600 bg-coffee-50 px-2">
+                <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                    viewBox="0 0 256 256">
+                    <path
+                        d="M213.66,66.34l-40-40A8,8,0,0,0,168,24H88A16,16,0,0,0,72,40V56H56A16,16,0,0,0,40,72V216a16,16,0,0,0,16,16H168a16,16,0,0,0,16-16V200h16a16,16,0,0,0,16-16V72A8,8,0,0,0,213.66,66.34ZM168,216H56V72h76.69L168,107.31v84.53c0,.06,0,.11,0,.16s0,.1,0,.16V216Zm32-32H184V104a8,8,0,0,0-2.34-5.66l-40-40A8,8,0,0,0,136,56H88V40h76.69L200,75.31Zm-56-32a8,8,0,0,1-8,8H88a8,8,0,0,1,0-16h48A8,8,0,0,1,144,152Zm0,32a8,8,0,0,1-8,8H88a8,8,0,0,1,0-16h48A8,8,0,0,1,144,184Z">
+                    </path>
+                </svg>
+                General Information
+            </span>
+
+            @* Resource Name *@
             <div class="flex flex-col col-span-full gap-1 relative">
-                <p for="addressline1" class="text-xs text-coffee-900">Address Line @(Model.AddressLine2 != null ? "1" : "")</p>
-                <span class="p-2 text-coffee-900">
+                <p for="name" class="text-xs text-coffee-900">Resource Name</p>
+                <span class="p-2 text-coffee-700">
+                    @Model.Name
+                </span>
+            </div>
+
+            @* Cost *@
+            <div class="flex flex-col col-span-2 gap-1 relative">
+                <p for="cost" class="text-xs text-coffee-900">Cost</p>
+                <span class="p-2 text-coffee-700">
+                    @Model.Cost
+                </span>
+            </div>
+
+            @* Cost Type *@
+            <div class="flex flex-col gap-1 relative" :class="{
+                'col-span-2': ('@Model.ResourceType' == 'Venue'),
+            }">
+                <p for="costtype" class="text-xs text-coffee-900">Type of Cost</p>
+                <span class="p-2 text-coffee-700">
+                    @Model.CostType
+                </span>
+            </div>
+
+            @* Quantity *@
+            <div x-show="'@Model.ResourceType' == 'Venue'" class="flex flex-col gap-1 relative">
+                <p for="quantity" class="text-xs text-coffee-900">Quantity</p>
+                <span class="p-2 text-coffee-700">
+                    @Model.Quantity
+                </span>
+            </div>
+
+            @* Descriptions *@
+            <div class="col-span-full flex flex-col gap-1 relative w-full">
+                <p for="description" class="text-xs text-coffee-900">Description</p>
+                <span class="p-2 text-coffee-700">
+                    @Model.Description
+                </span>
+            </div>
+        </div>
+
+        @* Type Information *@
+        <div class="relative grid grid-cols-5 gap-3 p-5 border rounded-xl border-coffee-300">
+            @if (Model.ResourceType == ResourceType.Venue)
+            {
+                <span
+                    class="absolute flex items-center gap-2 start-4 -top-3 font-medium text-sm text-pumpkin-600 bg-coffee-50 px-2">
+                    <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                        viewBox="0 0 256 256">
+                        <path
+                            d="M112,80a16,16,0,1,1,16,16A16,16,0,0,1,112,80ZM64,80a64,64,0,0,1,128,0c0,59.95-57.58,93.54-60,94.95a8,8,0,0,1-7.94,0C121.58,173.54,64,140,64,80Zm16,0c0,42.2,35.84,70.21,48,78.5,12.15-8.28,48-36.3,48-78.5a48,48,0,0,0-96,0Zm122.77,67.63a8,8,0,0,0-5.54,15C213.74,168.74,224,176.92,224,184c0,13.36-36.52,32-96,32s-96-18.64-96-32c0-7.08,10.26-15.26,26.77-21.36a8,8,0,0,0-5.54-15C29.22,156.49,16,169.41,16,184c0,31.18,57.71,48,112,48s112-16.82,112-48C240,169.41,226.78,156.49,202.77,147.63Z">
+                        </path>
+                    </svg>
+                    Venue Information
+                </span>
+
+                @* Address Line 1 *@
+                <div class="flex flex-col col-span-full gap-1 relative">
+                    <p for="addressline1" class="text-xs text-coffee-900">Address Line @(Model.AddressLine2 != null ? "1" :
+                        "")
+                </p>
+                <span class="p-2 text-coffee-700">
                     @Model.AddressLine1
                 </span>
             </div>
 
             @if (Model.AddressLine2 != null)
-            {
-                @* Address Line 2 *@
-                <div class="flex flex-col col-span-full gap-1 relative">
-                    <p for="addressline2" class="text-xs text-coffee-900">Address Line 2</p>
+                {
+                    @* Address Line 2 *@
+                    <div class="flex flex-col col-span-full gap-1 relative">
+                        <p for="addressline2" class="text-xs text-coffee-900">Address Line 2</p>
+                        <span class="p-2 text-coffee-700">
+                            @Model.AddressLine2
+                        </span>
+                    </div>
+                }
+
+                @* City/Municipality *@
+                <div class="flex flex-col col-span-2 gap-1 relative">
+                    <p for="citymunicipality" class="text-xs text-coffee-900">City/Municipality</p>
                     <span class="p-2 text-coffee-700">
-                        Model.AddressLine2
+                        @Model.CityMunicipality
+                    </span>
+                </div>
+
+                @* Province *@
+                <div class="flex flex-col col-span-3 gap-1 relative">
+                    <p for="province" class="text-xs text-coffee-900">Province</p>
+                    <span class="p-2 text-coffee-700">
+                        @Model.Province
+                    </span>
+                </div>
+
+                @* Capacity *@
+                <div class="flex flex-col col-span-2 gap-1 relative">
+                    <p for="capacity" class="text-xs text-coffee-900">Capacity</p>
+                    <span class="p-2 text-coffee-700">
+                        @Model.Capacity
+                    </span>
+                </div>
+
+                @* Size *@
+                <div class="flex flex-col gap-1 w-full relative">
+                    <p for="size" class="text-xs text-coffee-900">Size</p>
+                    <span class="flex items-center w-full p-2 text-coffee-700">
+                        @Model.Size ft&sup2;
                     </span>
                 </div>
             }
 
-            @* City/Municipality *@
-            <div class="flex flex-col col-span-2 gap-1 relative">
-                <p for="citymunicipality" class="text-xs text-coffee-900">City/Municipality</p>
-                <span class="p-2 text-coffee-700">
-                    @Model.CityMunicipality
+            else if (Model.ResourceType == ResourceType.Equipment)
+            {
+                <span
+                    class="absolute flex items-center gap-2 start-4 -top-3 font-medium text-sm text-pumpkin-600 bg-coffee-50 px-2">
+                    <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                        viewBox="0 0 256 256">
+                        <path
+                            d="M224,64H176V56a24,24,0,0,0-24-24H104A24,24,0,0,0,80,56v8H32A16,16,0,0,0,16,80V192a16,16,0,0,0,16,16H224a16,16,0,0,0,16-16V80A16,16,0,0,0,224,64ZM96,56a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96ZM224,80v32H192v-8a8,8,0,0,0-16,0v8H80v-8a8,8,0,0,0-16,0v8H32V80Zm0,112H32V128H64v8a8,8,0,0,0,16,0v-8h96v8a8,8,0,0,0,16,0v-8h32v64Z">
+                        </path>
+                    </svg>
+                    Equipment Information
                 </span>
-            </div>
 
-            @* Province *@
-            <div class="flex flex-col col-span-3 gap-1 relative">
-                <p for="province" class="text-xs text-coffee-900">Province</p>
-                <span class="p-2 text-coffee-700">
-                    @Model.Province
-                </span>
-            </div>
-
-            @* Capacity *@
-            <div class="flex flex-col col-span-2 gap-1 relative">
-                <p for="capacity" class="text-xs text-coffee-900">Capacity</p>
-                <span class="p-2 text-coffee-700">
-                    @Model.Capacity
-                </span>
-            </div>
-
-            @* Size *@
-            <div class="flex flex-col gap-1 w-full relative">
-                <p for="size" class="text-xs text-coffee-900">Size</p>
-                <span class="p-2 text-coffee-700">
-                    @Model.Size ft&sup2;
-                </span>
-            </div>
-        }
-
-        else if (Model.ResourceType == ResourceType.Equipment)
-        {
-            <span
-                class="absolute flex items-center gap-1 start-4 -top-3 font-medium text-sm text-pumpkin-600 bg-coffee-50 px-2">
-                <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
-                    viewBox="0 0 256 256">
-                    <path
-                        d="M224,64H176V56a24,24,0,0,0-24-24H104A24,24,0,0,0,80,56v8H32A16,16,0,0,0,16,80V192a16,16,0,0,0,16,16H224a16,16,0,0,0,16-16V80A16,16,0,0,0,224,64ZM96,56a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96ZM224,80v32H192v-8a8,8,0,0,0-16,0v8H80v-8a8,8,0,0,0-16,0v8H32V80Zm0,112H32V128H64v8a8,8,0,0,0,16,0v-8h96v8a8,8,0,0,0,16,0v-8h32v64Z">
-                    </path>
-                </svg>
-                Equipment Information
-            </span>
-
-            @* Brand *@
-            <div class="flex flex-col col-span-full gap-1 relative">
-                <p for="brand" class="text-xs text-coffee-900">Brand</p>
-                <span class="p-2 text-coffee-700">
-                    @Model.Brand
-                </span>
-            </div>
-
-            @* Specifications *@
-            <div class="flex flex-col col-span-full gap-2 w-full relative">
-                <p for="specificationtype" class="text-xs text-coffee-900">Specification Type</p>
-                <div class="p-6 border rounded-xl border-coffee-300 text-coffee-700">
-                    @foreach (var spec in Model.Specifications)
-                    {
-                        <div class="flex items-center gap-1">
-                            <span class="text-coffee-900">@spec.Key:</span>
-                            <span class="text-coffee-700">@spec.Value</span>
-                        </div>
-                    }
+                @* Brand *@
+                <div class="flex flex-col col-span-full gap-1 relative">
+                    <p for="brand" class="text-xs text-coffee-900">Brand</p>
+                    <span class="p-2 text-coffee-700">
+                        @Model.Brand
+                    </span>
                 </div>
-            </div>
-        }
-        else if (Model.ResourceType == ResourceType.Furniture)
-        {
-            <span
-                class="absolute flex items-center gap-1 start-4 -top-3 font-medium text-sm text-pumpkin-600 bg-coffee-50 px-2">
-                <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
-                    viewBox="0 0 256 256">
-                    <path
-                        d="M208,136H176V104h16a16,16,0,0,0,16-16V40a16,16,0,0,0-16-16H64A16,16,0,0,0,48,40V88a16,16,0,0,0,16,16H80v32H48a16,16,0,0,0-16,16v16a16,16,0,0,0,16,16h8v40a8,8,0,0,0,16,0V184H184v40a8,8,0,0,0,16,0V184h8a16,16,0,0,0,16-16V152A16,16,0,0,0,208,136ZM64,40H192V88H64Zm32,64h64v32H96Zm112,64H48V152H208v16Z">
-                    </path>
-                </svg>
-                Furniture Information
-            </span>
 
-            @* Material *@
-            <div class="flex flex-col col-span-3 gap-1 relative">
-                <p for="material" class="text-xs text-coffee-900">Material</p>
-                <span class="p-2 text-coffee-700">
-                    @Model.Material
+                @* Specifications *@
+                <div class="flex flex-col col-span-full gap-2 w-full relative">
+                    <p for="specificationtype" class="text-xs text-coffee-900">Specification Type</p>
+                    <div class="p-6 border rounded-xl border-coffee-300 text-coffee-700">
+                        @foreach (var spec in Model.Specifications)
+                        {
+                            <div class="flex items-center gap-1">
+                                <span class="text-coffee-900">@spec.Key:</span>
+                                <span class="text-coffee-700">@spec.Value</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            else if (Model.ResourceType == ResourceType.Furniture)
+            {
+                <span
+                    class="absolute flex items-center gap-2 start-4 -top-3 font-medium text-sm text-pumpkin-600 bg-coffee-50 px-2">
+                    <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                        viewBox="0 0 256 256">
+                        <path
+                            d="M208,136H176V104h16a16,16,0,0,0,16-16V40a16,16,0,0,0-16-16H64A16,16,0,0,0,48,40V88a16,16,0,0,0,16,16H80v32H48a16,16,0,0,0-16,16v16a16,16,0,0,0,16,16h8v40a8,8,0,0,0,16,0V184H184v40a8,8,0,0,0,16,0V184h8a16,16,0,0,0,16-16V152A16,16,0,0,0,208,136ZM64,40H192V88H64Zm32,64h64v32H96Zm112,64H48V152H208v16Z">
+                        </path>
+                    </svg>
+                    Furniture Information
                 </span>
-            </div>
 
-            @* Dimensions *@
-            <div class="flex flex-col col-span-2 gap-1 relative">
-                <p for="dimensions" class="text-xs text-coffee-900">Dimensions</p>
-                <span class="p-2 text-coffee-700">
-                    @Model.Dimensions
+                @* Material *@
+                <div class="flex flex-col col-span-3 gap-1 relative">
+                    <p for="material" class="text-xs text-coffee-900">Material</p>
+                    <span class="p-2 text-coffee-700">
+                        @Model.Material
+                    </span>
+                </div>
+
+                @* Dimensions *@
+                <div class="flex flex-col col-span-2 gap-1 relative">
+                    <p for="dimensions" class="text-xs text-coffee-900">Dimensions</p>
+                    <span class="p-2 text-coffee-700">
+                        @Model.Dimensions
+                    </span>
+                </div>
+            }
+
+            else if (Model.ResourceType == ResourceType.Catering)
+            {
+                <span
+                    class="absolute flex items-center gap-2 start-4 -top-3 font-medium text-sm text-pumpkin-600 bg-coffee-50 px-2">
+                    <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                        viewBox="0 0 256 256">
+                        <path
+                            d="M72,88V40a8,8,0,0,1,16,0V88a8,8,0,0,1-16,0ZM216,40V224a8,8,0,0,1-16,0V176H152a8,8,0,0,1-8-8,268.75,268.75,0,0,1,7.22-56.88c9.78-40.49,28.32-67.63,53.63-78.47A8,8,0,0,1,216,40ZM200,53.9c-32.17,24.57-38.47,84.42-39.7,106.1H200ZM119.89,38.69a8,8,0,1,0-15.78,2.63L112,88.63a32,32,0,0,1-64,0l7.88-47.31a8,8,0,1,0-15.78-2.63l-8,48A8.17,8.17,0,0,0,32,88a48.07,48.07,0,0,0,40,47.32V224a8,8,0,0,0,16,0V135.32A48.07,48.07,0,0,0,128,88a8.17,8.17,0,0,0-.11-1.31Z">
+                        </path>
+                    </svg>
+                    Catering Information
                 </span>
-            </div>
-        }
 
-        else if (Model.ResourceType == ResourceType.Catering)
-        {
-            <span
-                class="absolute flex items-center gap-1 start-4 -top-3 font-medium text-sm text-pumpkin-600 bg-coffee-50 px-2">
-                <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
-                    viewBox="0 0 256 256">
-                    <path
-                        d="M72,88V40a8,8,0,0,1,16,0V88a8,8,0,0,1-16,0ZM216,40V224a8,8,0,0,1-16,0V176H152a8,8,0,0,1-8-8,268.75,268.75,0,0,1,7.22-56.88c9.78-40.49,28.32-67.63,53.63-78.47A8,8,0,0,1,216,40ZM200,53.9c-32.17,24.57-38.47,84.42-39.7,106.1H200ZM119.89,38.69a8,8,0,1,0-15.78,2.63L112,88.63a32,32,0,0,1-64,0l7.88-47.31a8,8,0,1,0-15.78-2.63l-8,48A8.17,8.17,0,0,0,32,88a48.07,48.07,0,0,0,40,47.32V224a8,8,0,0,0,16,0V135.32A48.07,48.07,0,0,0,128,88a8.17,8.17,0,0,0-.11-1.31Z">
-                    </path>
-                </svg>
-                Catering Information
-            </span>
+                @* Menu Items *@
+                <div class="flex flex-col col-span-full gap-1 w-full relative">
+                    <p for="menuitems" class="text-xs text-coffee-900">Menu Items</p>
+                    <div class="p-6 border rounded-xl border-coffee-300 text-coffee-700">
+                        @foreach (var menu in Model.MenuItems!)
+                        {
+                            <div class="flex items-center gap-1">
+                                <span class="text-coffee-700">@menu</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
 
-            @* Menu Items *@
-            <div class="flex flex-col col-span-full gap-1 relative">
-                <p for="menuitems" class="text-xs text-coffee-900">Menu Items</p>
-                <span class="p-2 text-coffee-700">
-                    @Model.MenuItems
+            else if (Model.ResourceType == ResourceType.Personnel)
+            {
+                <span
+                    class="absolute flex items-center gap-2 start-4 -top-3 font-medium text-sm text-pumpkin-600 bg-coffee-50 px-2">
+                    <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                        viewBox="0 0 256 256">
+                        <path
+                            d="M152,80a32,32,0,1,0-32-32A32,32,0,0,0,152,80Zm0-48a16,16,0,1,1-16,16A16,16,0,0,1,152,32Zm48,112v88a8,8,0,0,1-16,0V151.66c-25.75-2.25-34.35-15.52-42-27.36-2.85-4.39-5.56-8.57-9.13-12.19l-13.4,30.81,37.2,26.57A8,8,0,0,1,160,176v56a8,8,0,0,1-16,0V180.12l-31.07-22.2L79.34,235.19A8,8,0,0,1,72,240a7.84,7.84,0,0,1-3.19-.67,8,8,0,0,1-4.14-10.52L122.19,96.5a8,8,0,0,1,11-3.92,40.92,40.92,0,0,1,8,5.47c6.37,5.52,10.51,11.91,14.16,17.55,7.68,11.84,13.22,20.4,36.6,20.4A8,8,0,0,1,200,144ZM72,152a8,8,0,0,0,7.35-4.85l24-56a8,8,0,0,0-4.2-10.5l-28-12a8,8,0,0,0-10.5,4.2l-24,56a8,8,0,0,0,4.2,10.5l28,12A8,8,0,0,0,72,152ZM54.51,127.8,72.2,86.5l13.3,5.7L67.8,133.49Z">
+                        </path>
+                    </svg>
+                    Personnel Information
                 </span>
-            </div>
-        }
 
-        else if (Model.ResourceType == ResourceType.Personnel)
-        {
-            <span
-                class="absolute flex items-center gap-1 start-4 -top-3 font-medium text-sm text-pumpkin-600 bg-coffee-50 px-2">
-                <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
-                    viewBox="0 0 256 256">
-                    <path
-                        d="M152,80a32,32,0,1,0-32-32A32,32,0,0,0,152,80Zm0-48a16,16,0,1,1-16,16A16,16,0,0,1,152,32Zm48,112v88a8,8,0,0,1-16,0V151.66c-25.75-2.25-34.35-15.52-42-27.36-2.85-4.39-5.56-8.57-9.13-12.19l-13.4,30.81,37.2,26.57A8,8,0,0,1,160,176v56a8,8,0,0,1-16,0V180.12l-31.07-22.2L79.34,235.19A8,8,0,0,1,72,240a7.84,7.84,0,0,1-3.19-.67,8,8,0,0,1-4.14-10.52L122.19,96.5a8,8,0,0,1,11-3.92,40.92,40.92,0,0,1,8,5.47c6.37,5.52,10.51,11.91,14.16,17.55,7.68,11.84,13.22,20.4,36.6,20.4A8,8,0,0,1,200,144ZM72,152a8,8,0,0,0,7.35-4.85l24-56a8,8,0,0,0-4.2-10.5l-28-12a8,8,0,0,0-10.5,4.2l-24,56a8,8,0,0,0,4.2,10.5l28,12A8,8,0,0,0,72,152ZM54.51,127.8,72.2,86.5l13.3,5.7L67.8,133.49Z">
-                    </path>
-                </svg>
-                Personnel Information
-            </span>
+                @* Position *@
+                <div class="flex flex-col col-span-2 gap-1 relative">
+                    <p for="position" class="text-xs text-coffee-900">Position</p>
+                    <span class="p-2 text-coffee-700">
+                        @Model.Position
+                    </span>
+                </div>
 
-            @* Position *@
-            <div class="flex flex-col col-span-2 gap-1 relative">
-                <p for="position" class="text-xs text-coffee-900">Position</p>
-                <span class="p-2 text-coffee-700">
-                    @Model.Position
-                </span>
-            </div>
+                @* Preferred Shift *@
+                <div class="flex flex-col col-span-3 gap-1 relative w-full">
+                    <p for="shift" class="text-xs text-coffee-900">Preferred Shift</p>
+                    <span class="p-2 text-coffee-700">
+                        @Model.ShiftStart
+                    </span>
+                </div>
 
-            @* Preferred Shift *@
-            <div class="flex flex-col col-span-3 gap-1 relative w-full">
-                <p for="shift" class="text-xs text-coffee-900">Preferred Shift</p>
-                <span class="p-2 text-coffee-700">
-                    @Model.Shift
-                </span>
-            </div>
-
-            @* Experience *@
-            <div class="flex flex-col col-span-full gap-1 relative">
-                <p for="experience" class="text-xs text-coffee-900">Experience</p>
-                <span class="p-2 text-coffee-700">
-                    @Model.Experience
-                </span>
-            </div>
-        }
+                @* Experience *@
+                <div class="flex flex-col col-span-full gap-1 relative">
+                    <p for="experience" class="text-xs text-coffee-900">Experience</p>
+                    <span class="p-2 text-coffee-700">
+                        @Model.Experience
+                    </span>
+                </div>
+            }
+        </div>
     </div>
 
-    <div class="relative flex items-center w-full">
-        <button type="button"
-            class="flex items-center justify-center w-full p-2 font-medium text-sm duration-200 ease-in-out rounded-md text-coffee-50 bg-coffee-700 hover:bg-coffee-800 active:bg-coffee-700"
-            hx-get="/organizer/show-add-event-resource/@Model.Id" hx-swap="innerHTML"
-            hx-target="#viewResourceModalContent">
-            ADD TO RESOURCE
-        </button>
-    </div>
 </main>

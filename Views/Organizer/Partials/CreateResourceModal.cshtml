@@ -1,11 +1,11 @@
 @model CreateResourceViewModel
 
-<div x-cloak x-show="createResourceModal" x-transition.opacity
+<div id="createResourceModal" x-cloak x-show="createResourceModal" x-transition.opacity
     class="fixed inset-0 flex justify-center items-start bg-black/50 backdrop-blur-sm overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-charcoal-700 z-50 p-4">
 
     @* Box *@
     <div x-data x-trap="createResourceModal" class="bg-coffee-50 rounded-lg shadow-lg"
-        @@keydown.escape = "createResourceModal = false" >
+        @@close-modal.camel="createResourceModal = false;" @@keydown.escape = "createResourceModal = false" >
 
         @* Top Header *@
         <header class="flex items-center justify-between text-lg font-medium py-3 px-4">
@@ -127,7 +127,7 @@
                         @* Resource Name *@
                         <div class="flex flex-col col-span-2 gap-1 relative">
                             <label for="name" class="text-xs text-coffee-700">Resource Name</label>
-                            <input type="text" autofocus class="input-coffee p-2" id="name" asp-for="Name"
+                            <input type="text" class="input-coffee p-2" id="name" asp-for="Name"
                                 placeholder="Type name here" />
                             <div id="validation-Name">
                             </div>
@@ -135,10 +135,10 @@
 
                         @* Cost *@
                         <div class="flex flex-col gap-1 relative">
-                            <label for="cost" class="text-xs text-coffee-700">Cost</label>
-                            <input type="text" x-mask:dynamic="$money($input)" class="input-coffee p-2" id="cost"
-                                asp-for="Cost" placeholder="Type cost here" />
-                            <div id="validation-Cost">
+                            <label for="costasstring" class="text-xs text-coffee-700">Cost</label>
+                            <input type="text" x-mask:dynamic="$money($input)" class="input-coffee p-2" id="costasstring"
+                                asp-for="CostAsString" placeholder="Type cost here" />
+                            <div id="validation-CostAsString">
                             </div>
                         </div>
 

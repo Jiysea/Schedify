@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Schedify.Attributes;
 
 namespace Schedify.ViewModels;
@@ -8,7 +9,7 @@ namespace Schedify.ViewModels;
 public class CreateResourceViewModel
 {
     public Guid EventId { get; set; }
-    
+
     [AllowedExtensions([".jpg", ".jpeg", ".png"])]
     [MaxFileSize(5)]
     public IFormFile? ImageFile { get; set; }
@@ -50,6 +51,7 @@ public class CreateResourceViewModel
             }
             return 0; // Or throw an error if necessary
         }
+
     }
 
     [Required(ErrorMessage = "This field is required.")]
@@ -84,10 +86,11 @@ public class CreateResourceViewModel
 
     public string? Dimensions { get; set; }
     public string? Warranty { get; set; }
+    public string WarrantyDuration { get; set; } = null!;
 
     [RequiredRange([ResourceType.Catering])]
-    public int GuestCapacity { get; set; } = 1;
-    public Dictionary<string, string>? MenuItems { get; set; } // Dictionary <string, string>
+    public int GuestCapacity { get; set; }
+    public List<string>? MenuItems { get; set; } // List<string>
 
     public string? Position { get; set; }
     public string? ShiftStartString { get; set; }
@@ -97,8 +100,8 @@ public class CreateResourceViewModel
     {
         get
         {
-            return TimeSpan.TryParseExact(ShiftStartString, @"hh\:mm", null, out TimeSpan shiftTime)
-                ? shiftTime
+            return DateTime.TryParseExact(ShiftStartString, "h:mm tt", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime shiftDateTime)
+                ? shiftDateTime.TimeOfDay
                 : TimeSpan.Zero; // Default to 00:00 if parsing fails
         }
     }
@@ -107,13 +110,15 @@ public class CreateResourceViewModel
     {
         get
         {
-            return TimeSpan.TryParseExact(ShiftEndString, @"hh\:mm", null, out TimeSpan shiftTime)
-                ? shiftTime
+            return DateTime.TryParseExact(ShiftEndString, "h:mm tt", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime shiftDateTime)
+                ? shiftDateTime.TimeOfDay
                 : TimeSpan.Zero; // Default to 00:00 if parsing fails
         }
     }
     public string? Experience { get; set; }
-    public string ExperienceType { get; set; } = "By Year";
+    public string ExperienceType { get; set; } = "1";
 
     public IEnumerable<ResourceType> ResourceTypes { get; set; } = Enum.GetValues<ResourceType>();
+    public IEnumerable<FurnitureMaterial> FurnitureMaterials { get; set; } = Enum.GetValues<FurnitureMaterial>();
+    public bool IsOtherMaterial = false;
 }

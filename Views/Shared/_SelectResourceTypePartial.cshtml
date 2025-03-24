@@ -91,15 +91,33 @@ else if (Model.ResourceType == ResourceType.Equipment)
     </span>
 
     @* Brand *@
-    <div class="flex flex-col col-span-3 gap-1 relative">
+    <div class="flex flex-col col-span-2 gap-1 relative">
         <label for="brand" class="text-xs text-coffee-700">Brand</label>
         <input type="text" class="input-coffee p-2" id="brand" asp-for="Brand" placeholder="Type brand here" />
         <div id="validation-Brand">
         </div>
     </div>
 
-    @* Quantity *@
+    @* Warranty *@
     <div class="flex flex-col col-span-2 gap-1 relative">
+        <label for="warranty" class="text-xs text-coffee-700">Warranty</label>
+        <span class="flex items-center justify-between relative gap-3">
+            <input type="number" class="input-coffee z-10 p-2" id="warranty" asp-for="Warranty"
+                placeholder="Type number of year or month" />
+            <span class="absolute size-full rounded-md start-0 top-0 p-2 bg-coffee-500 z-0"></span>
+            <select
+                class="z-10 cursor-pointer px-2 py-1.5 text-sm rounded-md focus:outline-none border bg-coffee-200 border-coffee-500 text-coffee-950"
+                id="warrantyduration" asp-for="WarrantyDuration">
+                <option value="1" selected>By Year</option>
+                <option value="2">By Month</option>
+            </select>
+        </span>
+        <div id="validation-Warranty">
+        </div>
+    </div>
+
+    @* Quantity *@
+    <div class="flex flex-col gap-1 relative">
         <label for="quantity" class="text-xs text-coffee-700">Quantity</label>
         <input type="number" inputmode="numeric" class="input-coffee p-2" name="quantity" value="1" id="quantity"
             asp-for="Quantity" placeholder="Type quantity here" />
@@ -137,15 +155,21 @@ else if (Model.ResourceType == ResourceType.Equipment)
             <span class="text-xs text-coffee-700">Specifications Listed:</span>
             <div
                 class="flex flex-wrap items-center justify-center gap-3 overflow-auto min-h-[70px] max-h-40 border border-coffee-300 rounded-md p-4 scrollbar-thin scrollbar-track-coffee-50 scrollbar-thumb-coffee-700">
-                
+
+                <span x-show="Object.keys(specs).length === 0" class="text-sm text-coffee-500">
+                    No specifications added yet.
+                </span>
+
                 <template x-for="[key, value] in Object.entries(specs)" :key="key">
                     <div
-                        class="flex items-center justify-between text-sm text-charcoal-50 bg-charcoal-700 p-2 rounded-md w-full break-words">
+                        class="duration-200 ease-in-out flex items-center justify-between text-sm text-coffee-700 bg-coffee-200 border border-transparent hover:border-coffee-500 px-2 py-1.5 rounded-md w-full break-words">
                         <span class="flex items-center gap-2 max-w-full">
                             <span class="font-semibold break-all" x-text="key"></span>:
                             <span class="break-words" x-text="value"></span>
                         </span>
-                        <button type="button" class="mt-2 md:mt-0 self-start md:self-auto" x-on:click="delete specs[key]">
+                        <button type="button"
+                            class="duration-200 ease-in-out rounded-md hover:bg-coffee-500 active:bg-coffee-700 text-coffee-900 active:text-coffee-50 p-1"
+                            x-on:click="delete specs[key]">
                             <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
                                 fill="currentColor" viewBox="0 0 256 256">
                                 <path
@@ -179,21 +203,61 @@ else if (Model.ResourceType == ResourceType.Furniture)
         Furniture Information
     </span>
 
-    @* Material *@
-    <div class="flex flex-col col-span-3 gap-1 relative">
+    <div class="flex flex-col @(Model.IsOtherMaterial ? "col-span-3" : "col-span-full") gap-1 relative">
         <label for="material" class="text-xs text-coffee-700">Material</label>
-        <input type="text" class="input-coffee p-2" id="material" asp-for="Material"
-            placeholder="ex. Metal, Wood, Plastic, etc." />
+        <select class="input-coffee p-2" id="material" asp-for="Material" hx-get="/organizer/select-furniture-material"
+            hx-target="#resource-type" hx-swap="innerHTML" hx-trigger="change"
+            hx-vals='js:{"selectedOption": event.target.value}' asp-items="@(new SelectList(Model.FurnitureMaterials))">
+        </select>
         <div id="validation-Material">
         </div>
     </div>
 
-    @* Dimensions *@
+    if (Model.IsOtherMaterial)
+    {
+        @* Other Material *@
+        <div class="flex flex-col col-span-2 gap-1 relative">
+            <label for="othermaterial" class="text-xs text-coffee-700">Other Material</label>
+            <input type="text" class="input-coffee p-2" id="othermaterial" asp-for="OtherMaterial"
+                placeholder="Type its specific material" />
+            <div id="validation-OtherMaterial">
+            </div>
+        </div>
+    }
+
+    @* Quantity *@
     <div class="flex flex-col col-span-2 gap-1 relative">
+        <label for="quantity" class="text-xs text-coffee-700">Quantity</label>
+        <input type="number" inputmode="numeric" class="input-coffee p-2" name="quantity" value="1" id="quantity"
+            asp-for="Quantity" placeholder="Type quantity here" />
+        <div id="validation-Quantity">
+        </div>
+    </div>
+
+    @* Dimensions *@
+    <div class="flex flex-col col-span-3 gap-1 relative">
         <label for="dimensions" class="text-xs text-coffee-700">Dimensions</label>
         <input type="text" class="input-coffee p-2" id="dimensions" asp-for="Dimensions"
             placeholder="ex. 6ft x 3ft x 30in, 1920x1080px, etc." />
         <div id="validation-Dimensions">
+        </div>
+    </div>
+
+    @* Warranty *@
+    <div class="flex flex-col col-span-3 gap-1 relative">
+        <label for="warranty" class="text-xs text-coffee-700">Warranty</label>
+        <span class="flex items-center justify-between relative gap-3">
+            <input type="number" class="input-coffee z-10 p-2" id="warranty" asp-for="Warranty"
+                placeholder="Type number of year or month" />
+            <span class="absolute size-full rounded-md start-0 top-0 p-2 bg-coffee-500 z-0"></span>
+            <select
+                class="z-10 cursor-pointer px-2 py-1.5 text-sm rounded-md focus:outline-none border bg-coffee-200 border-coffee-500 text-coffee-950"
+                id="warrantyduration" asp-for="WarrantyDuration">
+                <option value="1" selected>By Year</option>
+                <option value="2">By Month</option>
+            </select>
+        </span>
+        <div id="validation-Warranty">
         </div>
     </div>
 }
@@ -210,10 +274,66 @@ else if (Model.ResourceType == ResourceType.Catering)
         Catering Information
     </span>
 
-    @* Menu Items *@
-    <div class="flex flex-col col-span-full gap-1 relative">
-        <label for="menuitems" class="text-xs text-coffee-700">Menu Items</label>
-        <input type="text" class="input-coffee p-2" id="menuitems" asp-for="MenuItems" placeholder="Type menu items here" />
+    <div class="col-span-full grid grid-cols-5 gap-3"
+        x-data="{ menuItems: @Json.Serialize(Model.MenuItems ?? new List<string>()), newItem: '' }">
+        @* Guest Capacity *@
+        <div class="flex flex-col col-span-2 gap-1 relative">
+            <label for="guestcapacity" class="text-xs text-coffee-700">Guest Capacity</label>
+            <input type="number" inputmode="numeric" class="input-coffee p-2" name="guestcapacity" value="1"
+                id="guestcapacity" asp-for="GuestCapacity" placeholder="Type guest capacity here" />
+            <div id="validation-GuestCapacity">
+            </div>
+        </div>
+
+        @* Menu Items *@
+        <div class="flex flex-col col-span-3 gap-1 relative">
+
+            <label for="menuitems" class="text-xs text-coffee-700">Menu Items</label>
+
+            <div class="flex items-center gap-2">
+                <input type="text" class="input-coffee p-2 w-full" id="menuitems" x-model="newItem"
+                    placeholder="Type menu items here" />
+                <button type="button"
+                    class="px-3 py-2 text-sm font-semibold bg-coffee-600 hover:bg-coffee-700 active:bg-coffee-900 text-white rounded-md"
+                    x-on:click="if(newItem.trim() !== '') { menuItems.push(newItem.trim()); newItem = ''; }">
+                    Add
+                </button>
+            </div>
+        </div>
+
+        @* List of Menu Items *@
+        <div class="flex flex-col gap-1 col-span-full">
+            <p class="Foods Listed:"></p>
+            <div
+                class="flex flex-wrap items-center justify-center col-span-full gap-3 overflow-auto min-h-[70px] max-h-40 border border-coffee-300 rounded-md p-4 scrollbar-thin scrollbar-track-coffee-50 scrollbar-thumb-coffee-700">
+
+                <!-- Placeholder when no items exist -->
+                <span x-show="menuItems.length === 0" class="text-sm text-coffee-500">
+                    No menu items added yet.
+                </span>
+
+                <template x-for="(item, index) in menuItems" :key="index">
+                    <div
+                        class="duration-200 ease-in-out flex items-center justify-between text-sm text-coffee-700 bg-coffee-200 border border-transparent hover:border-coffee-500 px-2 py-1.5 rounded-md w-full break-words">
+                        <span x-text="item"></span>
+                        <button type="button" x-on:click="menuItems.splice(index, 1)"
+                            class="duration-200 ease-in-out rounded-md hover:bg-coffee-500 active:bg-coffee-700 text-coffee-900 hover:text-coffee-50 active:text-coffee-50 p-1">
+                            <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                                fill="currentColor" viewBox="0 0 256 256">
+                                <path
+                                    d="M208.49,191.51a12,12,0,0,1-17,17L128,145,64.49,208.49a12,12,0,0,1-17-17L111,128,47.51,64.49a12,12,0,0,1,17-17L128,111l63.51-63.52a12,12,0,0,1,17,17L145,128Z">
+                                </path>
+                            </svg>
+                        </button>
+                    </div>
+                </template>
+            </div>
+
+            <!-- Hidden Inputs for Model Binding -->
+            <template x-for="(item, index) in menuItems" :key="index">
+                <input type="hidden" :name="'MenuItems[' + index + ']'" :value="item" />
+            </template>
+        </div>
     </div>
 }
 
@@ -237,9 +357,9 @@ else if (Model.ResourceType == ResourceType.Personnel)
         </div>
     </div>
 
-    @* Preferred Shift *@
+    @* Shift *@
     <div class="flex flex-col col-span-3 gap-1 relative w-full">
-        <p for="shift" class="text-xs text-coffee-700">Preferred Shift</p>
+        <p for="shift" class="text-xs text-coffee-700">Shift</p>
         <span class="flex items-center gap-2 w-full">
             <span class="flex items-start gap-2 w-full">
                 <label for="shiftfromdate" class="text-coffee-700 text-xs">From</label>
@@ -259,26 +379,58 @@ else if (Model.ResourceType == ResourceType.Personnel)
     @* Experience *@
     <div class="flex flex-col col-span-full gap-1 relative">
         <label for="experience" class="text-xs text-coffee-700">Experience</label>
-        <input type="text" class="input-coffee p-2" id="experience" asp-for="Experience"
-            placeholder="Type experience here" />
+        <span class="relative flex items-center gap-3">
+            <input type="number" inputmode="numeric" class="input-coffee p-2" id="experience" asp-for="Experience"
+                placeholder="Type number of year or month" />
+            <select class="input-coffee p-2" id="experiencetype" asp-for="ExperienceType">
+                <option value="1" selected>By Year</option>
+                <option value="2">By Month</option>
+            </select>
+        </span>
         <div id="validation-Experience">
         </div>
     </div>
 
     <script>
         document.addEventListener("htmx:afterSettle", () => {
-            flatpickr("#shiftfromdate", {
+            const shiftFromInstance = flatpickr("#shiftfromdate", {
                 enableTime: true,
                 dateFormat: "h:i K",
                 defaultDate: "00:00",
                 noCalendar: true,
+                onChange: function (selectedDates, dateStr) {
+                    const shiftToInstance = document.querySelector("#shifttodate")._flatpickr;
+                    if (shiftToInstance) {
+                        let fromDate = shiftFromInstance.parseDate(dateStr, "h:i K");
+                        let toDate = shiftToInstance.selectedDates[0];
+
+                        if (!toDate || fromDate >= toDate) {
+                            let adjustedDate = new Date(fromDate);
+                            adjustedDate.setHours(fromDate.getHours() + 1);
+                            shiftToInstance.setDate(adjustedDate);
+                        }
+                    }
+                }
             });
 
-            flatpickr("#shifttodate", {
+            const shiftToInstance = flatpickr("#shifttodate", {
                 enableTime: true,
                 dateFormat: "h:i K",
-                defaultDate: "00:00",
+                defaultDate: "01:00",
                 noCalendar: true,
+                onChange: function (selectedDates, dateStr) {
+                    const shiftFromInstance = document.querySelector("#shiftfromdate")._flatpickr;
+                    if (shiftFromInstance) {
+                        let toDate = shiftToInstance.parseDate(dateStr, "h:i K");
+                        let fromDate = shiftFromInstance.selectedDates[0];
+
+                        if (!fromDate || toDate <= fromDate) {
+                            let adjustedDate = new Date(toDate);
+                            adjustedDate.setHours(toDate.getHours() - 1);
+                            shiftFromInstance.setDate(adjustedDate);
+                        }
+                    }
+                }
             });
         });
     </script>

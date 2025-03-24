@@ -106,10 +106,12 @@ using (var scope = app.Services.CreateScope())
 
 app.Use(async (context, next) =>
 {
-    if (context.User.Identity?.IsAuthenticated ?? false) 
+    var path = context.Request.Path.Value?.ToLower();
+
+    if (context.User.Identity?.IsAuthenticated ?? false)
     {
         var user = context.User;
-        var path = context.Request.Path.Value?.ToLower();
+
 
         if (!string.IsNullOrEmpty(path))
         {
@@ -140,6 +142,28 @@ app.Use(async (context, next) =>
             }
         }
     }
+    else
+    {
+        if (!string.IsNullOrEmpty(path))
+        {
+            if (!(path.StartsWith("/login") || path.StartsWith("/register") || path.StartsWith("/")))
+            {
+
+                if (context.Request.Headers["HX-Request"] == "true")
+                {
+                    // HTMX request: Send HX-Redirect header
+                    context.Response.Headers.Append("HX-Redirect", "/login");
+                    return;
+                }
+                else
+                {
+                    // Normal request: Redirect to login page
+                    context.Response.Redirect("/login");
+                    return;
+                }
+            }
+        }
+    }
 
     await next();
 });
@@ -166,6 +190,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.MapHub<AlertHub>("/alerts");
 
 app.UseAuthorization();
 

@@ -37,7 +37,7 @@
     </div>
 </div>
 
-<button type="button" hx-get="/organizer/open-create-resource-modal/@Model.EventId" hx-swap="none"
+<button type="button" hx-get="/organizer/open-create-resource-modal/@Model.EventId" hx-swap="outerHTML" hx-target="#createResourceModal"
     x-on:click="createResourceModal = !createResourceModal"
     class="flex items-center justify-center px-3 py-2 gap-2 text-sm font-medium rounded-md bg-coffee-600 hover:bg-coffee-700 active:bg-coffee-900 text-coffee-50">
     <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"

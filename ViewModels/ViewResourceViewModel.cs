@@ -1,5 +1,3 @@
-using Schedify.Attributes;
-using Schedify.Models;
 
 namespace Schedify.ViewModels;
 
@@ -8,31 +6,47 @@ public class ViewResourceViewModel
     public bool IsUsed { get; set; }
     public Guid? Id { get; set; }
     public string? ImageFileName { get; set; }
+
+    // General Resource
     public string ProviderName { get; set; } = null!;
     public string ProviderPhoneNumber { get; set; } = null!;
     public string ProviderEmail { get; set; } = null!;
     public string Name { get; set; } = null!;
     public string Description { get; set; } = null!;
     public ResourceType ResourceType { get; set; }
-    public string Cost { get; set; } = null!;
+    public decimal Cost { get; set; }
     public string CostType { get; set; } = null!;
-    public int Quantity { get; set; }
+
+    // Venue
     public int Capacity { get; set; }
     public decimal Size { get; set; }
     public string? AddressLine1 { get; set; }
     public string? AddressLine2 { get; set; }
     public string? CityMunicipality { get; set; }
     public string? Province { get; set; }
+
+    // Equipment
     public string? Brand { get; set; }
     public Dictionary<string, string> Specifications { get; set; } = [];
-    public string? Material { get; set; }
+    public int Quantity { get; set; } // Equipment & Furniture
+    public DateTime? Warranty { get; set; } // Equipment & Furniture
+
+    // Furniture
+    public FurnitureMaterial Material { get; set; }
+    public string? OtherMaterial { get; set; }
     public string? Dimensions { get; set; }
-    public string? MenuItems { get; set; }
+
+    // Catering
+    public int GuestCapacity { get; set; }
+    public List<string>? MenuItems { get; set; }
+
+    // Personnel
     public string? Position { get; set; }
-    public string? Shift { get; set; }
-    public DateTime ShiftFromDate { get; set; }
-    public DateTime ShiftToDate { get; set; }
+    public TimeSpan ShiftStart { get; set; }
+    public TimeSpan ShiftEnd { get; set; }
     public string? Experience { get; set; }
+
+
     public DateTime? CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 }
