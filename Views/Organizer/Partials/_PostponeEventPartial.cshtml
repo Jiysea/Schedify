@@ -1,4 +1,4 @@
-@model UpdateEventViewModel
+@model CUEventViewModel
 
 <header class="flex items-center justify-between text-lg font-medium py-3 px-4">
     <h1 class="text-coffee-900">Postpone Event</h1>
@@ -90,7 +90,7 @@
                     <div class="flex flex-col gap-1 w-full">
                         <label for="postpone-startat" class="text-xs text-coffee-500 whitespace-nowrap">
                             Start At</label>
-                        <input type="text" class="input-coffee p-2" id="postpone-startat" asp-for="StartAt"
+                        <input type="text" class="input-coffee p-2" id="postpone-startat" asp-for="StartAtString"
                             placeholder="Select a start time">
                         <div id="edit-validation-StartAt"></div>
                     </div>
@@ -98,7 +98,7 @@
                     <div class="flex flex-col gap-1 w-full">
                         <label for="postpone-endat" class="text-xs text-coffee-500 whitespace-nowrap">
                             End At</label>
-                        <input type="text" class="input-coffee p-2" id="postpone-endat" asp-for="EndAt"
+                        <input type="text" class="input-coffee p-2" id="postpone-endat" asp-for="EndAtString"
                             placeholder="Select an end time">
                         <div id="edit-validation-EndAt"></div>
                     </div>
@@ -131,8 +131,8 @@
         let startPicker = flatpickr("#postpone-startat", {
             enableTime: true,
             dateFormat: "Y-m-d H:i",
-            defaultDate: `@Model.StartAt.ToString("yyyy-MM-dd HH:mm")`,
-            minDate: `@Model.StartAt.ToString("yyyy-MM-dd HH:mm")`, // Tomorrow
+            defaultDate: `@Model.StartAtString`,
+            minDate: `@Model.StartAtString`, // Tomorrow
             onChange: function (selectedDates) {
                 if (selectedDates.length > 0) {
                     endPicker.set("minDate", selectedDates[0]); // Set end date min to start date
@@ -143,8 +143,8 @@
         let endPicker = flatpickr("#postpone-endat", {
             enableTime: true,
             dateFormat: "Y-m-d H:i",
-            defaultDate: `@Model.EndAt.ToString("yyyy-MM-dd HH:mm")`,
-            minDate: `@Model.StartAt.ToString("yyyy-MM-dd HH:mm")`, // Tomorrow
+            defaultDate: `@Model.EndAtString`,
+            minDate: `@Model.StartAtString`, // Tomorrow
         });
     });
 </script>

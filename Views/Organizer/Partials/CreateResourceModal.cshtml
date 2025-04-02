@@ -1,11 +1,11 @@
-@model CreateResourceViewModel
+@model CUResourceViewModel
 
 <div id="createResourceModal" x-cloak x-show="createResourceModal" x-transition.opacity
     class="fixed inset-0 flex justify-center items-start bg-black/50 backdrop-blur-sm overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-charcoal-700 z-50 p-4">
 
     @* Box *@
     <div x-data x-trap="createResourceModal" class="bg-coffee-50 rounded-lg shadow-lg"
-        @@close-modal.camel="createResourceModal = false;" @@keydown.escape = "createResourceModal = false" >
+        @@close-modal.camel="createResourceModal = false;" @@keydown.escape="createResourceModal = false">
 
         @* Top Header *@
         <header class="flex items-center justify-between text-lg font-medium py-3 px-4">
@@ -25,12 +25,12 @@
 
         <main class="">
             <form action="post" hx-post="/organizer/create-resource" hx-swap="none" enctype="multipart/form-data">
-                
+
                 <input type="hidden" asp-for="EventId">
 
                 @* Body *@
                 <div x-data="{ showQuantity: false }" class="flex flex-col gap-10 px-6 py-10">
-                    
+
                     @* Type of Resource *@
                     <div class="relative grid grid-cols-2 gap-3 p-5 border rounded-xl border-coffee-300">
                         <h2
@@ -50,7 +50,7 @@
                             <select class="input-coffee p-2" id="type" asp-for="ResourceType"
                                 hx-get="/organizer/select-resource-type" hx-target="#resource-type" hx-swap="innerHTML"
                                 hx-trigger="change" hx-vals='js:{"selectedOption": event.target.value}'
-                                asp-items="@(new SelectList(Model.ResourceTypes))">
+                                asp-items="ViewBag.ResourceTypes">
                             </select>
                         </div>
 
@@ -59,7 +59,6 @@
                             <label for="name" class="text-xs text-coffee-700">Provider Name</label>
                             <input type="text" autofocus class="input-coffee p-2" id="providername"
                                 asp-for="ProviderName" placeholder="Type name here" />
-
                             <div id="validation-ProviderName">
                             </div>
                         </div>
@@ -136,8 +135,8 @@
                         @* Cost *@
                         <div class="flex flex-col gap-1 relative">
                             <label for="costasstring" class="text-xs text-coffee-700">Cost</label>
-                            <input type="text" x-mask:dynamic="$money($input)" class="input-coffee p-2" id="costasstring"
-                                asp-for="CostAsString" placeholder="Type cost here" />
+                            <input type="text" x-mask:dynamic="$money($input)" class="input-coffee p-2"
+                                id="costasstring" asp-for="CostAsString" placeholder="Type cost here" />
                             <div id="validation-CostAsString">
                             </div>
                         </div>
@@ -145,9 +144,10 @@
                         @* Cost Type *@
                         <div class="flex flex-col gap-1 relative" :class="{ 'col-span-2': (!showQuantity) }">
                             <label for="costtype" class="text-xs text-coffee-700">Type of Cost</label>
-                            <select class="input-coffee p-2" id="costtype" name="CostType" asp-for="CostType"
-                                hx-get="/organizer/cost-types" hx-trigger="load, change from:#type" hx-swap="innerHTML"
-                                hx-vals='js:{"selectedOption": document.getElementById("type").value}'
+                            <select class="input-coffee p-2" id="costtype" asp-for="CostType"
+                                hx-get="/organizer/cost-types"
+                                hx-trigger="load, change from:#type" hx-swap="innerHTML"
+                                hx-vals='js:{"selectedOption": document.getElementById("type")?.value || "Equipment", "savedCostType": ""}'
                                 hx-target="#costtype">
                             </select>
                             <div id="validation-CostType">
@@ -164,7 +164,7 @@
                             </div>
                         </div>
                     </div>
-
+                    
                     <div id="resource-type"
                         class="relative grid grid-cols-5 gap-3 p-5 border rounded-xl border-coffee-300">
                         @await Html.PartialAsync("_SelectResourceTypePartial", Model)

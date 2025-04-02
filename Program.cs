@@ -34,6 +34,19 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LoginPath = "/login";
 
     options.AccessDeniedPath = "/login"; // Change this to your desired page
+
+    options.Events.OnRedirectToLogin = context =>
+    {
+        if (context.Request.Headers["HX-Request"] == "true")
+        {
+            context.Response.StatusCode = StatusCodes.Status403Forbidden; // Or 401
+            context.Response.Headers["HX-Redirect"] = context.RedirectUri;
+            return Task.CompletedTask;
+        }
+
+        context.Response.Redirect(context.RedirectUri);
+        return Task.CompletedTask;
+    };
 });
 
 builder.Services.AddSession(options =>

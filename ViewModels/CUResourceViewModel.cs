@@ -6,8 +6,10 @@ using Schedify.Attributes;
 
 namespace Schedify.ViewModels;
 
-public class CreateResourceViewModel
+public class CUResourceViewModel
 {
+    public Guid Id { get; set; }
+    public string? ImageFileName { get; set; }
     public Guid EventId { get; set; }
 
     [AllowedExtensions([".jpg", ".jpeg", ".png"])]
@@ -86,7 +88,7 @@ public class CreateResourceViewModel
 
     public string? Dimensions { get; set; }
     public string? Warranty { get; set; }
-    public string WarrantyDuration { get; set; } = null!;
+    public string? WarrantyDuration { get; set; }
 
     [RequiredRange([ResourceType.Catering])]
     public int GuestCapacity { get; set; }
@@ -116,9 +118,12 @@ public class CreateResourceViewModel
         }
     }
     public string? Experience { get; set; }
-    public string ExperienceType { get; set; } = "1";
+    public string? ExperienceType { get; set; }
 
     public IEnumerable<ResourceType> ResourceTypes { get; set; } = Enum.GetValues<ResourceType>();
     public IEnumerable<FurnitureMaterial> FurnitureMaterials { get; set; } = Enum.GetValues<FurnitureMaterial>();
     public bool IsOtherMaterial = false;
+
+    public DateTime? CreatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
 }

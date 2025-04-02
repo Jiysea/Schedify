@@ -27,11 +27,11 @@ public class AdminController : Controller
         _environment = environment;
     }
 
-    [Route("admin/dashboard")]
-    public ActionResult Dashboard()
-    {
-        return View();
-    }
+    // [Route("admin/dashboard")]
+    // public ActionResult Dashboard()
+    // {
+    //     return View();
+    // }
 
     // [Route("admin/resources")]
     // public ActionResult Resources()

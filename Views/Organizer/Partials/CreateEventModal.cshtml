@@ -1,4 +1,4 @@
-@model CreateEventViewModel
+@model CUEventViewModel
 
 <div x-cloak x-show="createEventModal" x-transition.opacity
     class="fixed inset-0 flex justify-center items-start bg-black/50 backdrop-blur-sm overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-coffee-700 z-50 p-4">
@@ -90,9 +90,9 @@
                                             </svg>
                                         </span>
                                         <input type="text" class="input-coffee ps-12 pe-2 py-2 cursor-pointer" id="startat"
-                                            asp-for="StartAt" placeholder="Select a start time" />
+                                            asp-for="StartAtString" placeholder="Select a start time" />
                                     </div>
-                                    <div id="validation-StartAt">
+                                    <div id="validation-StartAtString">
                                     </div>
                                 </div>
                                 <div class="relative text-coffee-500">
@@ -115,9 +115,9 @@
                                             </svg>
                                         </span>
                                         <input type="text" class="input-coffee ps-12 pe-2 py-2 cursor-pointer" id="endat"
-                                            asp-for="EndAt" placeholder="Select an end time" />
+                                            asp-for="EndAtString" placeholder="Select an end time" />
                                     </div>
-                                    <div id="validation-EndAt">
+                                    <div id="validation-EndAtString">
                                     </div>
                                 </div>
                             </span>
@@ -155,19 +155,19 @@
             dateFormat: "Y-m-d H:i",
             appendTo: document.body,
             defaultDate: new Date().fp_incr(1),
-            minDate: new Date().fp_incr(1), // Tomorrow
+            @* minDate: new Date().fp_incr(1), // Tomorrow
             onChange: function (selectedDates) {
                 if (selectedDates.length > 0) {
                     endPicker.set("minDate", selectedDates[0]); // Set end date min to start date
                 }
-            }
+            } *@
         });
 
         let endPicker = flatpickr("#endat", {
             enableTime: true,
             dateFormat: "Y-m-d H:i",
             appendTo: document.body,
-            minDate: new Date().fp_incr(1), // Tomorrow
+            @* minDate: new Date().fp_incr(1), // Tomorrow *@
             defaultDate: new Date().fp_incr(1), // Tomorrow
         });
     });

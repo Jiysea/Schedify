@@ -4,8 +4,8 @@
     class="fixed inset-0 flex justify-center items-start bg-black/50 backdrop-blur-sm overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-coffee-700 z-50 p-4">
 
     @* Box *@
-    <div id="viewResourceModalContent" x-data x-trap="viewResourceModal" class="bg-coffee-50 rounded-lg shadow-lg md:max-w-[45rem] lg:max-w-[62.5rem]"
-        @@keydown.escape = "viewResourceModal = false;">
+    <div id="viewResourceModalContent" x-data x-trap="viewResourceModal" class="bg-coffee-50 rounded-lg shadow-lg"
+        @@keydown.escape = "viewResourceModal = false;" @@close-modal.camel="viewResourceModal = false;">
 
         @* The Partials will be swapped here *@
 

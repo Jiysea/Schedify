@@ -5,6 +5,7 @@ public class ViewResourceViewModel
 {
     public bool IsUsed { get; set; }
     public Guid? Id { get; set; }
+    public Guid? EventId { get; set; }
     public string? ImageFileName { get; set; }
 
     // General Resource

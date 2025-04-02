@@ -18,8 +18,8 @@ public class ResourceViewModel
 
     // Add the image
     public Dictionary<Guid, string?> ResourceImages { get; set; } = []; // Maps ResourceId → ImageFileName
-    public CreateResourceViewModel CreateResourceViewModel { get; set; } = new CreateResourceViewModel();
-    public ViewResourceViewModel ViewResourceViewModel { get; set; } = new ViewResourceViewModel();
+    public CUResourceViewModel CUResourceViewModel { get; set; } = new CUResourceViewModel();
+    public ViewResourceViewModel? ViewResourceViewModel { get; set; }
     public int CurrentPage { get; set; }
     public int PageSize { get; set; }
     public int TotalCount { get; set; }

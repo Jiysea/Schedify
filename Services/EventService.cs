@@ -19,12 +19,12 @@ public class EventService
         _environment = environment;
     }
 
-    public List<Event>? GetEventsByUser()
+    public async Task<List<Event>?> GetEventsByUser()
     {
-        return _context.Events
+        return await _context.Events
             .Where(e => e.UserId == Guid.Parse(_userService.GetUserId()!))
             .OrderByDescending(e => e.CreatedAt)
-            .ToList();
+            .ToListAsync();
     }
 
     public Event? GetEventById(Guid Id)
@@ -41,44 +41,44 @@ public class EventService
             .FirstOrDefaultAsync();
     }
 
-    // public async Task<ViewEventViewModel?> GetEventByIdAsync(Guid Id)
-    // {
-    //     var _event = await _context.Events
-    //         .Include(e => e.Conversation)
-    //         .FirstOrDefaultAsync(e => e.Id == Id);
-
-    //     if (_event == null) return null;
-
-    //     bool hasVenue = IsEventHasVenue(_event.Id);
-
-    //     return new ViewEventViewModel()
-    //     {
-    //         Id = _event.Id,
-    //         Name = _event.Name,
-    //         Description = _event.Description,
-    //         StartAt = _event.StartAt,
-    //         EndAt = _event.EndAt,
-    //         Status = _event.Status,
-    //         EntryFee = _event.EntryFee.ToString("N2"),
-    //         CreatedAt = DateTime.UtcNow,
-    //         UpdatedAt = DateTime.UtcNow,
-    //         EventHasVenue = hasVenue,
-    //     };
-    // }
-
-    public bool IsEventHasVenue(Guid Id)
+    public async Task<Dictionary<Guid, bool>> GetEventHasVenueByUser()
     {
-        var resources = _context.Resources.Where(er => er.EventId == Id).ToList();
+        return await _context.Events
+            .Include(e => e.Resources)
+            .Where(e => e.UserId == Guid.Parse(_userService.GetUserId()!))
+            .ToDictionaryAsync(
+                e => e.Id,
+                e => e.Resources.Any(r => r.ResourceType == ResourceType.Venue));
+    }
+
+    public async Task<bool> IsEventHasVenue(Guid EventId)
+    {
+        var resources = await _context.Resources.Where(er => er.EventId == EventId).ToListAsync();
 
         foreach (var resource in resources)
         {
-            if (resource.ResourceType == ResourceType.Venue)
-            {
-                return true;
-            }
+            if (resource.ResourceType == ResourceType.Venue) return true;
         }
 
         return false;
+    }
+
+    public async Task<Dictionary<Guid, bool>> GetEventIsOpenableByUser()
+    {
+        return await _context.Events
+            .Include(e => e.Resources)
+            .Where(e => e.UserId == Guid.Parse(_userService.GetUserId()!))
+            .ToDictionaryAsync(
+                e => e.Id,
+                e => e.StartAt >= DateTime.UtcNow);
+    }
+
+    public async Task<bool> IsEventOpenable(Guid EventId)
+    {
+        var evt = await _context.Events.FindAsync(EventId);
+        if (evt == null) return false;
+        if (evt.StartAt <= DateTime.UtcNow) return false;
+        return true;
     }
 
     public async Task<List<Event>> GetEventsForDropdown()
@@ -87,29 +87,6 @@ public class EventService
             .Where(e => e.UserId == Guid.Parse(_userService.GetUserId()!))
             .OrderByDescending(e => e.CreatedAt)
             .ToListAsync();
-
-        return events;
-    }
-
-    public List<PublishedEventDto> GetEventsPublished()
-    {
-        var events = _context.Events
-            .Include(e => e.EventBookings)
-            .Where(e => e.Status == EventStatus.Open)
-            .Select(e => new PublishedEventDto
-            {
-                Event = e,
-                Resource = e.Resources
-                    .Where(e => e.ResourceType == ResourceType.Venue)
-                    .FirstOrDefault(),
-                Image = e.Resources
-                    .Where(e => e.ResourceType == ResourceType.Venue)
-                    .Select(e => e.Image)
-                    .FirstOrDefault(),
-                AttendeeCount = e.EventBookings.Count
-            })
-            .OrderByDescending(e => e.Event.CreatedAt)
-            .ToList();
 
         return events;
     }
@@ -206,13 +183,8 @@ public class EventService
             .ToDictionary(g => g.EventId, g => g.Count);
     }
 
-    public async Task<(bool IsSuccess, Dictionary<string, string>? Error, Event? Event)> CreateEventAsync(CreateEventViewModel model)
+    public async Task<(bool IsSuccess, Dictionary<string, string>? Error, Event? Event)> CreateEventAsync(CUEventViewModel model)
     {
-        // var validationErrors = ValidateResourceModel(model);
-        // if (validationErrors.Any())
-        // {
-        //     return (false, validationErrors, null);
-        // }
 
         using var transaction = await _context.Database.BeginTransactionAsync();
         try
@@ -260,7 +232,7 @@ public class EventService
         }
     }
 
-    public async Task<(bool IsSuccess, Dictionary<string, string>? Error, Event? Event)> UpdateEventAsync(UpdateEventViewModel model)
+    public async Task<(bool IsSuccess, Dictionary<string, string>? Error, Event? Event)> UpdateEventAsync(CUEventViewModel model)
     {
         using var transaction = await _context.Database.BeginTransactionAsync();
         try
@@ -271,11 +243,6 @@ public class EventService
                 return (false, new Dictionary<string, string> { { "Authentication", "User must be authenticated." } }, null);
             }
 
-            if (model.Status != EventStatus.Draft)
-            {
-                return (false, new Dictionary<string, string> { { "InvalidStatus", "The event status should be on \"Draft\" before updating." } }, null);
-            }
-
             var _event = await _context.Events.FindAsync(model.Id);
 
             if (_event == null)
@@ -283,7 +250,7 @@ public class EventService
                 return (false, new Dictionary<string, string> { { "NotFound", "Event not found." } }, null);
             }
 
-            if (_event.Status != EventStatus.Draft)
+            if (model.Status != EventStatus.Draft || _event.Status != EventStatus.Draft)
             {
                 return (false, new Dictionary<string, string> { { "InvalidStatus", "The event status should be on \"Draft\" before updating." } }, null);
             }
@@ -309,28 +276,6 @@ public class EventService
         }
     }
 
-
-
-    public async Task<UpdateEventViewModel?> GetEditEventByIdAsync(Guid Id)
-    {
-        var _event = await _context.Events
-            .Include(e => e.Conversation)
-            .FirstOrDefaultAsync(e => e.Id == Id);
-
-        if (_event == null) return null;
-
-        return new UpdateEventViewModel()
-        {
-            Id = _event.Id,
-            Name = _event.Name,
-            Description = _event.Description,
-            StartAt = _event.StartAt,
-            EndAt = _event.EndAt,
-            Status = _event.Status,
-            EntryFeeString = _event.EntryFee.ToString("N2"),
-        };
-    }
-
     public async Task<bool> DeleteEventAsync(Guid Id)
     {
         var _event = await _context.Events
@@ -339,9 +284,64 @@ public class EventService
 
         if (_event == null) return false;
 
+        var resources = _context.Resources.Where(r => r.EventId == _event.Id)
+            .Include(r => r.Image)
+            .Include(r => r.ResourceVenue)
+            .Include(r => r.ResourceEquipment)
+            .Include(r => r.ResourceFurniture)
+            .Include(r => r.ResourceCatering)
+            .Include(r => r.ResourcePersonnel)
+            .ToList();
+
         if (_event.Status != EventStatus.Draft)
         {
             return false;
+        }
+
+        // Only Delete Resources when there is at least one
+        if (resources != null)
+        {
+            if (resources.Count > 0)
+            {
+
+                foreach (var resource in resources)
+                {
+                    // Delete the associated resource type model
+                    switch (resource.ResourceType)
+                    {
+                        case ResourceType.Venue:
+                            if (resource.ResourceVenue != null) _context.ResourceVenues.Remove(resource.ResourceVenue);
+                            break;
+
+                        case ResourceType.Equipment:
+                            if (resource.ResourceEquipment != null) _context.ResourceEquipments.Remove(resource.ResourceEquipment);
+                            break;
+
+                        case ResourceType.Furniture:
+                            if (resource.ResourceFurniture != null) _context.ResourceFurnitures.Remove(resource.ResourceFurniture);
+                            break;
+
+                        case ResourceType.Catering:
+                            if (resource.ResourceCatering != null) _context.ResourceCaterings.Remove(resource.ResourceCatering);
+                            break;
+
+                        case ResourceType.Personnel:
+                            if (resource.ResourcePersonnel != null) _context.ResourcePersonnels.Remove(resource.ResourcePersonnel);
+                            break;
+                    }
+
+                    // Delete associated images first
+                    if (resource.Image?.ImageFileName != null)
+                    {
+                        string imagePath = Path.Combine(_environment.WebRootPath, "resources", resource.Image.ImageFileName);
+                        if (File.Exists(imagePath)) File.Delete(imagePath);
+                        _context.Images.Remove(resource.Image);
+                    }
+
+                    _context.Resources.Remove(resource);
+                    await _context.SaveChangesAsync();
+                }
+            }
         }
 
         // Delete associated conversations first
@@ -352,53 +352,52 @@ public class EventService
         return true;
     }
 
-    public async Task<bool> OpenEventByIdAsync(Guid Id)
+    public async Task<(bool IsSuccess, Dictionary<string, string>? Error)> OpenEventByIdAsync(Guid Id)
     {
         var _event = await _context.Events
             .FindAsync(Id);
 
-        if (_event == null) return false;
+        if (_event == null) return (false, new Dictionary<string, string> { { "NullEvent", "Event does not exist." } });
 
-        if (_event.Status != EventStatus.Draft)
-        {
-            return false;
-        }
+        if (_event.Status != EventStatus.Draft) return (false, new Dictionary<string, string> { { "Status", "Event should be in draft phase." } });
+
+        if (_event.StartAt <= DateTime.UtcNow) return (false, new Dictionary<string, string> { { "DateOvershoot", "Event schedule has already passed." } });
 
         _event.Status = EventStatus.Open;
         await _context.SaveChangesAsync();
-        return true;
+        return (true, null);
     }
 
-    public async Task<bool> DraftEventByIdAsync(Guid Id)
+    public async Task<(bool IsSuccess, Dictionary<string, string>? Error)> DraftEventByIdAsync(Guid Id)
     {
         var _event = await _context.Events
             .FindAsync(Id);
 
-        if (_event == null) return false;
+        if (_event == null) return (false, new Dictionary<string, string> { { "NullEvent", "Event does not exist." } });
 
         _event.Status = EventStatus.Draft;
         await _context.SaveChangesAsync();
-        return true;
+        return (true, null);
     }
 
-    public async Task<bool> CancelEventByIdAsync(Guid Id)
+    public async Task<(bool IsSuccess, Dictionary<string, string>? Error)> CancelEventByIdAsync(Guid Id)
     {
         var _event = await _context.Events
             .FindAsync(Id);
 
-        if (_event == null) return false;
+        if (_event == null) return (false, new Dictionary<string, string> { { "NullEvent", "Event does not exist." } });
 
         if (_event.Status == EventStatus.Open || _event.Status == EventStatus.Ongoing || _event.Status == EventStatus.Postponed)
         {
             _event.Status = EventStatus.Cancelled;
             await _context.SaveChangesAsync();
-            return true;
+            return (true, null);
         }
 
-        return false;
+        return (false, new Dictionary<string, string> { { "Unsuccessful", "Could not cancel the event." } });
     }
 
-    public async Task<(bool IsSuccess, Dictionary<string, string>? Error, Event? Event)> PostponeEventByIdAsync(UpdateEventViewModel model)
+    public async Task<(bool IsSuccess, Dictionary<string, string>? Error, Event? Event)> PostponeEventByIdAsync(CUEventViewModel model)
     {
         using var transaction = await _context.Database.BeginTransactionAsync();
         try
@@ -413,7 +412,7 @@ public class EventService
 
             if (_event == null)
             {
-                return (false, new Dictionary<string, string> { { "NotFound", "Event not found." } }, null);
+                return (false, new Dictionary<string, string> { { "NotFound", "Event does not exist." } }, null);
             }
 
             if (_event.StartAt == model.StartAt)
@@ -442,45 +441,5 @@ public class EventService
             return (false, new Dictionary<string, string> { { "Exception", $"An error occurred: {ex.Message}" } }, null);
         }
     }
-
-    // public async Task<(bool IsSuccess, Dictionary<string, string>? Error, EventResource? EventResource)> AddToEventResourceAsync(EventResourceViewModel model)
-    // {
-    //     using var transaction = await _context.Database.BeginTransactionAsync();
-    //     try
-    //     {
-    //         var user = await _userService.GetUserAsync();
-    //         if (user == null)
-    //         {
-    //             return (false, new Dictionary<string, string> { { "Authentication", "User must be authenticated." } }, null);
-    //         }
-
-    //         var resource = await _context.Resources.FindAsync(model.ResourceId);
-
-    //         if (resource == null) return (false, new Dictionary<string, string> { { "NullError", "Resource not found." } }, null);
-
-    //         resource.UpdatedAt = DateTime.UtcNow;
-    //         await _context.SaveChangesAsync();
-
-    //         var eventResource = new EventResource
-    //         {
-    //             ResourceId = resource.Id,
-    //             EventId = model.EventId,
-    //             TotalCost = model.TotalCost,
-    //             Quantity = model.QuantityFromForm,
-    //             AddedAt = DateTime.UtcNow,
-    //         };
-
-    //         _context.EventResources.Add(eventResource);
-    //         await _context.SaveChangesAsync();
-
-    //         await transaction.CommitAsync();
-    //         return (true, null, eventResource);
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         await transaction.RollbackAsync();
-    //         return (false, new Dictionary<string, string> { { "Exception", $"An error occurred: {ex.Message}" } }, null);
-    //     }
-    // }
 
 }

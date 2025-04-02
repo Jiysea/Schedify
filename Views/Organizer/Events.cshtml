@@ -39,7 +39,7 @@
                             d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Z">
                         </path>
                     </svg>
-                    <input type="text" hx-get="/organizer/events" hx-trigger="change" hx-target="#events-list"
+                    <input type="text" hx-get="/organizer/event-filter-date" hx-trigger="change" hx-target="#events-list"
                         name="startDate"
                         class="duration-200 ease-in-out appearance-none w-36 text-sm font-medium outline-none px-3 py-1 rounded-md border-2 focus:ring-0 bg-white border-zinc-300 focus:border-coffee-700 text-zinc-500 focus:text-coffee-500 selection:text-coffee-50 selection:bg-coffee-700 placeholder-zinc-500"
                         id="startDate" placeholder="Start date" />
@@ -53,7 +53,7 @@
                             d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Z">
                         </path>
                     </svg>
-                    <input type="text" hx-get="/organizer/events" hx-trigger="change" hx-target="#events-list"
+                    <input type="text" hx-get="/organizer/event-filter-date" hx-trigger="change" hx-target="#events-list"
                         name="endDate"
                         class="duration-200 ease-in-out appearance-none w-36 text-sm font-medium outline-none px-2 py-1 rounded-md border-2 focus:ring-0 bg-white border-zinc-300 focus:border-coffee-700 text-zinc-500 focus:text-coffee-500 selection:text-coffee-50 selection:bg-coffee-700 placeholder-zinc-500"
                         id="endDate" placeholder="End date" />
@@ -85,7 +85,7 @@
 
         <div id="all-modals">
             @* Create Events *@ 
-            @await Html.PartialAsync("~/Views/Organizer/Partials/CreateEventModal.cshtml", Model.CreateEventViewModel)
+            @await Html.PartialAsync("~/Views/Organizer/Partials/CreateEventModal.cshtml", Model.CUEventViewModel)
 
             @* View, Update & Delete Events *@
             @await Html.PartialAsync("~/Views/Organizer/Partials/ViewEventModal.cshtml", Model.ViewEventViewModel)
@@ -147,19 +147,19 @@
                     dateFormat: "Y-m-d H:i",
                     appendTo: document.body,
                     defaultDate: new Date().fp_incr(1),
-                    minDate: new Date().fp_incr(1), // Tomorrow
+                    @* minDate: new Date().fp_incr(1), // Tomorrow
                     onChange: function (selectedDates) {
                         if (selectedDates.length > 0) {
                             endPicker.set("minDate", selectedDates[0]); // Set end date min to start date
                         }
-                    }
+                    } *@
                 });
 
                 let endPicker = flatpickr("#endat", {
                     enableTime: true,
                     dateFormat: "Y-m-d H:i",
                     appendTo: document.body,
-                    minDate: new Date().fp_incr(1), // Tomorrow
+                    @* minDate: new Date().fp_incr(1), // Tomorrow *@
                     defaultDate: new Date().fp_incr(1), // Tomorrow
                 });
             }

@@ -1,29 +1,32 @@
 @model ResourceType
+@{
+    string savedCostType = ViewBag.SavedCostType;
+}
 
 @if (Model == ResourceType.Venue)
 {
-    <option selected>Per Hour</option>
-    <option>Per Day</option>
-    <option>Fixed Rate</option>
+    <option value="Per Hour" selected="@(savedCostType == "Per Hour")">Per Hour</option>
+    <option value="Per Day" selected="@(savedCostType == "Per Day")">Per Day</option>
+    <option value="Fixed Rate" selected="@(savedCostType == "Fixed Rate")">Fixed Rate</option>
 }
 else if (Model == ResourceType.Equipment)
 {
-    <option selected>Per Unit</option>
-    <option>In Bulk</option>
+    <option value="Per Unit" selected="@(savedCostType == "Per Unit")">Per Unit</option>
+    <option value="In Bulk" selected="@(savedCostType == "In Bulk")">In Bulk</option>
 }
 else if (Model == ResourceType.Furniture)
 {
-    <option selected>Per Unit</option>
-    <option>In Bulk</option>
+    <option value="Per Unit" selected="@(savedCostType == "Per Unit")">Per Unit</option>
+    <option value="In Bulk" selected="@(savedCostType == "In Bulk")">In Bulk</option>
 }
 else if (Model == ResourceType.Catering)
 {
-    <option selected>Per Serving</option>
-    <option>In Bulk</option>
+    <option value="Per Serving" selected="@(savedCostType == "Per Serving")">Per Serving</option>
+    <option value="In Bulk" selected="@(savedCostType == "In Bulk")">In Bulk</option>
 }
 else if (Model == ResourceType.Personnel)
 {
-    <option selected>Per Hour</option>
-    <option>Per Day</option>
-    <option>Fixed Rate</option>
+    <option value="Per Hour" selected="@(savedCostType == "Per Hour")">Per Hour</option>
+    <option value="Per Day" selected="@(savedCostType == "Per Day")">Per Day</option>
+    <option value="Fixed Rate" selected="@(savedCostType == "Fixed Rate")">Fixed Rate</option>
 }

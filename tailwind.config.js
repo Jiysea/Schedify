@@ -4,10 +4,9 @@ module.exports = {
       "./Views/**/*.cshtml",
       "./Views/Home/**/*.cshtml",
       "./Views/Auth/**/*.cshtml",
-      "./Views/Admin/**/*.cshtml",
-      "./Views/Organizer/**/*.cshtml",
-      "./Views/Attendee/**/*.cshtml",
-      "./**/*.cshtml",
+      "./Views/Admin/Partials/*.cshtml",
+      "./Views/Organizer/Partials/*.cshtml",
+      "./Views/Attendee/Partials/*.cshtml",
   ],
   theme: {
       extend: {

@@ -5,13 +5,10 @@
     bool isHtmxRequest = Context.Request.Headers.ContainsKey("HX-Request");
 }
 
-@if (isHtmxRequest)
-{
-    <div id="events-dropdown" class="flex items-center justify-end gap-3" hx-swap-oob="true">
-        @await Html.PartialAsync("~/Views/Organizer/Partials/_EventsDropdown.cshtml", Model)
-    </div>
-}
-
 <div id="resources-list" hx-swap-oob="innerHTML">
     @await Html.PartialAsync("~/Views/Organizer/Partials/_ResourceListPartial.cshtml", Model)
+</div>
+
+<div id="viewResourceModalContent" hx-swap-oob="innerHTML">
+    @await Html.PartialAsync("~/Views/Organizer/Partials/_ViewResourcePartial.cshtml", Model.ViewResourceViewModel)
 </div>

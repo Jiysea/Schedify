@@ -34,7 +34,7 @@
 
                         @* Status *@
                         <span
-                            class="duration-200 ease-in-out bg-zinc-100 text-zinc-500 group-hover:bg-coffee-200 group-hover:text-coffee-600 rounded-md font-semibold px-3 py-1">
+                            class="select-none duration-200 ease-in-out bg-zinc-100 text-zinc-500 group-hover:bg-coffee-200 group-hover:text-coffee-600 rounded-md font-semibold px-3 py-1">
                             @evt.Status
                         </span>
 
@@ -43,19 +43,38 @@
                             Date Created: @evt.CreatedAt.ToString("MMM dd, yyyy")
                         </span> *@
 
-                        @if (!Model.HasResources.GetValueOrDefault(evt.Id, false))
+                        @if (!Model.HasVenues.GetValueOrDefault(evt.Id, false))
                         {
                             @* Has Resources? *@
                             <span
-                                class="duration-200 ease-in-out flex items-center bg-amber-100 text-amber-500 group-hover:bg-amber-200 group-hover:text-amber-600 rounded-md font-semibold ps-1 pe-3 py-1">
+                                class="select-none duration-200 ease-in-out flex items-center gap-1.5 bg-amber-100 text-amber-500 group-hover:bg-amber-200 group-hover:text-amber-600 rounded-md font-semibold ps-1 pe-3 py-1">
+                                <svg class="size-4" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                                    width="400" height="400" viewBox="0, 0, 400,400">
+                                    <g>
+                                        <path
+                                            d="M187.500 17.618 C 175.941 20.093,162.382 29.046,155.186 38.954 C 150.204 45.813,4.451 306.482,2.463 312.087 C -6.214 336.556,6.030 366.041,29.688 377.644 C 42.682 384.017,29.718 383.567,200.000 383.567 C 370.282 383.567,357.318 384.017,370.313 377.644 C 393.984 366.034,406.214 336.558,397.526 312.057 C 395.521 306.403,249.805 45.800,244.821 38.954 C 232.174 21.585,209.093 12.994,187.500 17.618 M209.315 53.300 C 211.215 54.212,213.997 56.215,215.497 57.752 C 219.680 62.040,364.753 321.046,365.812 326.116 C 367.536 334.377,362.682 343.190,354.081 347.413 L 349.609 349.609 200.000 349.609 L 50.391 349.609 45.919 347.413 C 37.335 343.198,32.464 334.375,34.181 326.151 C 35.222 321.164,180.349 62.025,184.474 57.787 C 191.010 51.072,200.933 49.280,209.315 53.300 M193.773 117.235 C 190.265 118.709,186.729 121.919,184.954 125.241 L 183.203 128.516 182.987 181.962 C 182.798 228.531,182.926 235.877,183.981 239.052 C 189.021 254.228,212.092 253.480,216.362 238.003 C 217.002 235.682,217.190 219.729,217.026 181.641 L 216.797 128.516 214.844 125.035 C 210.954 118.103,200.721 114.314,193.773 117.235 M195.128 283.545 C 176.442 289.569,180.445 316.872,200.000 316.771 C 221.603 316.659,222.933 284.818,201.404 283.172 C 199.128 282.998,196.304 283.166,195.128 283.545 "
+                                            stroke="none" fill="currentColor" fill-rule="evenodd"></path>
+                                    </g>
+                                </svg>
+                                <span>
+                                    No Venue Yet
+                                </span>
+                            </span>
+                        }
+
+                        @if (!Model.IsOpenable.GetValueOrDefault(evt.Id, false))
+                        {
+                            @* Is Openable based on StartAt *@
+                            <span
+                                class="select-none duration-200 ease-in-out flex items-center gap-1.5 bg-red-100 text-red-500 group-hover:bg-red-200 group-hover:text-red-600 rounded-md font-semibold ps-1 pe-3 py-1">
                                 <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
                                     viewBox="0 0 256 256">
                                     <path
-                                        d="M148,200a20,20,0,1,1-20-20A20,20,0,0,1,148,200Zm-20-40a12,12,0,0,0,12-12V48a12,12,0,0,0-24,0V148A12,12,0,0,0,128,160Z">
+                                        d="M208.49,191.51a12,12,0,0,1-17,17L128,145,64.49,208.49a12,12,0,0,1-17-17L111,128,47.51,64.49a12,12,0,0,1,17-17L128,111l63.51-63.52a12,12,0,0,1,17,17L145,128Z">
                                     </path>
                                 </svg>
                                 <span>
-                                    No Resources Allocated
+                                    Not Openable
                                 </span>
                             </span>
                         }

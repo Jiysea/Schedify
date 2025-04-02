@@ -16,4 +16,5 @@ public class ViewEventViewModel
 
     // To Check whether the event has a venue or not (for Draft only)
     public bool EventHasVenue { get; set; }
+    public bool IsEventOpenable { get; set; }
 }

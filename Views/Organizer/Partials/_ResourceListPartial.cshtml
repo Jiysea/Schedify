@@ -1,16 +1,6 @@
 @using System.Text.Json
 @using System.Globalization
 @model ResourceViewModel
-@{
-    bool isHtmxRequest = Context.Request.Headers.ContainsKey("HX-Request");
-}
-
-@if (isHtmxRequest)
-{
-    <div hx-swap-oob="innerHTML" id="events-dropdown">
-        @await Html.PartialAsync("~/Views/Organizer/Partials/_EventsDropdown.cshtml", Model)
-    </div>
-}
 
 @if (Model.Resources.Any())
 {
@@ -23,7 +13,7 @@
                     @* Resource Image *@
                     <span class="flex items-center justify-center flex-shrink size-24">
                         <img class="object-cover size-24 rounded-md"
-                            src="/resources/@(Model.ResourceImages.GetValueOrDefault(resource.Id, ""))" alt="Venue Image">
+                            src="/resources/@(Model.ResourceImages.GetValueOrDefault(resource.Id, ""))" loading="lazy" alt="Resource Image">
                     </span>
 
                     @* All Texts (Body) *@
@@ -61,10 +51,10 @@
                                             ₱@resource.Cost.ToString("N2")
                                         </span>
 
-                                        <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.cost"
+                                        @* <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.cost"
                                             class="rounded-md text-sm px-4 py-2 bg-white text-coffee-700 border border-coffee-500">
                                             Cost
-                                        </span>
+                                        </span> *@
                                     </div>
 
                                     <div x-data="{ hover: false }" class="text-zinc-700 group-hover:text-coffee-700">
@@ -79,10 +69,10 @@
                                             @resource.CostType
                                         </span>
 
-                                        <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
+                                        @* <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
                                             class="rounded-md text-sm px-4 py-2 bg-white text-coffee-700 border border-coffee-500">
                                             Cost Type or Rate
-                                        </span>
+                                        </span> *@
                                     </div>
 
                                     <div x-data="{ hover: false }" class="text-zinc-700 group-hover:text-coffee-700">
@@ -97,10 +87,10 @@
                                             @resource.ResourceVenue.Capacity
                                         </span>
 
-                                        <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
+                                        @* <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
                                             class="rounded-md text-sm px-4 py-2 bg-white text-coffee-700 border border-coffee-500">
                                             Capacity
-                                        </span>
+                                        </span> *@
                                     </div>
 
                                     <div x-data="{ hover: false }" class="text-zinc-700 group-hover:text-coffee-700">
@@ -115,10 +105,10 @@
                                             @resource.ResourceVenue.Size.ToString("N2") ft&sup2;
                                         </span>
 
-                                        <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
+                                        @* <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
                                             class="rounded-md text-sm px-4 py-2 bg-white text-coffee-700 border border-coffee-500">
                                             Size of the Venue in square feet
-                                        </span>
+                                        </span> *@
                                     </div>
                                 </span>
                             </div>
@@ -168,10 +158,10 @@
                                             ₱@resource.Cost.ToString("N2")
                                         </span>
 
-                                        <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.cost"
+                                        @* <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.cost"
                                             class="rounded-md text-sm px-4 py-2 bg-white text-coffee-700 border border-coffee-500">
                                             Cost
-                                        </span>
+                                        </span> *@
                                     </div>
 
                                     <div x-data="{ hover: false }" class="text-zinc-700 group-hover:text-coffee-700">
@@ -186,10 +176,10 @@
                                             @resource.CostType
                                         </span>
 
-                                        <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
+                                        @* <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
                                             class="rounded-md text-sm px-4 py-2 bg-white text-coffee-700 border border-coffee-500">
                                             Cost Type or Rate
-                                        </span>
+                                        </span> *@
                                     </div>
 
 
@@ -213,10 +203,10 @@
                                         @resource.ResourceEquipment.Quantity
                                     </span>
 
-                                    <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
+                                    @* <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
                                         class="rounded-md text-sm px-4 py-2 bg-white text-coffee-700 border border-coffee-500">
                                         Quantity
-                                    </span>
+                                    </span> *@
                                 </div>
 
                                 <div x-data="{ hover: false }" class="text-zinc-700 group-hover:text-coffee-700">
@@ -231,10 +221,10 @@
                                         @resource.ResourceEquipment.Brand
                                     </span>
 
-                                    <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
+                                    @* <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
                                         class="rounded-md text-sm px-4 py-2 bg-white text-coffee-700 border border-coffee-500">
                                         Brand of the Equipment
-                                    </span>
+                                    </span> *@
                                 </div>
 
                                 <div x-data="{ hover: false }" class="text-zinc-700 group-hover:text-coffee-700">
@@ -249,13 +239,20 @@
                                                     stroke="none" fill="currentColor" fill-rule="evenodd"></path>
                                             </g>
                                         </svg>
-                                        @resource.ResourceEquipment.Warranty.ToString("Y")
+                                        @if (resource.ResourceEquipment.Warranty <= DateTime.UtcNow)
+                                        {
+                                            <p>None</p>
+                                        }
+                                        else
+                                        {
+                                            @resource.ResourceEquipment.Warranty.ToString("Y")
+                                        }
                                     </span>
 
-                                    <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
+                                    @* <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
                                         class="rounded-md text-sm px-4 py-2 bg-white text-coffee-700 border border-coffee-500">
                                         End date of Warranty
-                                    </span>
+                                    </span> *@
                                 </div>
 
                                 <div x-data="{ hover: false }" class="text-zinc-700 group-hover:text-coffee-700">
@@ -278,10 +275,10 @@
                                         </span>
                                     </span>
     
-                                    <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
+                                    @* <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
                                         class="rounded-md text-sm px-4 py-2 bg-white text-coffee-700 border border-coffee-500">
                                         Specifications of the Equipment
-                                    </span>
+                                    </span> *@
                                 </div>
                             </div>
                         }
@@ -309,10 +306,10 @@
                                             ₱@resource.Cost.ToString("N2")
                                         </span>
 
-                                        <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.cost"
+                                        @* <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.cost"
                                             class="rounded-md text-sm px-4 py-2 bg-white text-coffee-700 border border-coffee-500">
                                             Cost
-                                        </span>
+                                        </span> *@
                                     </div>
 
                                     <div x-data="{ hover: false }" class="text-zinc-700 group-hover:text-coffee-700">
@@ -327,10 +324,10 @@
                                             @resource.CostType
                                         </span>
 
-                                        <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
+                                        @* <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
                                             class="rounded-md text-sm px-4 py-2 bg-white text-coffee-700 border border-coffee-500">
                                             Cost Type or Rate
-                                        </span>
+                                        </span> *@
                                     </div>
                                 </span>
                             </div>
@@ -353,10 +350,10 @@
                                         @resource.ResourceFurniture.Quantity
                                     </span>
 
-                                    <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
+                                    @* <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
                                         class="rounded-md text-sm px-4 py-2 bg-white text-coffee-700 border border-coffee-500">
                                         Quantity
-                                    </span>
+                                    </span> *@
                                 </div>
 
                                 <div x-data="{ hover: false }" class="text-zinc-700 group-hover:text-coffee-700">
@@ -378,10 +375,10 @@
                                         }
                                     </span>
 
-                                    <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
+                                    @* <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
                                         class="rounded-md text-sm px-4 py-2 bg-white text-coffee-700 border border-coffee-500">
                                         Material used for the Furniture
-                                    </span>
+                                    </span> *@
                                 </div>
 
                                 <div x-data="{ hover: false }" class="text-zinc-700 group-hover:text-coffee-700">
@@ -395,10 +392,10 @@
                                         </svg>
                                         @resource.ResourceFurniture.Dimensions
                                     </span>
-                                    <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
+                                    @* <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
                                         class="rounded-md text-sm px-4 py-2 bg-white text-coffee-700 border border-coffee-500">
                                         Dimensions
-                                    </span>
+                                    </span> *@
                                 </div>
 
                                 <div x-data="{ hover: false }" class="text-zinc-700 group-hover:text-coffee-700">
@@ -413,19 +410,22 @@
                                                     stroke="none" fill="currentColor" fill-rule="evenodd"></path>
                                             </g>
                                         </svg>
-                                        @resource.ResourceFurniture.Warranty.ToString("Y")
+                                        @if (resource.ResourceFurniture.Warranty <= DateTime.UtcNow)
+                                            {<p>None</p>}
+                                        else
+                                            @resource.ResourceFurniture.Warranty.ToString("Y")
                                     </span>
 
-                                    <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
+                                    @* <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
                                         class="rounded-md text-sm px-4 py-2 bg-white text-coffee-700 border border-coffee-500">
                                         End date of Warranty
-                                    </span>
+                                    </span> *@
                                 </div>
                             </div>
                         }
                         else if (resource.ResourceType == ResourceType.Catering)
                         {
-                            var menuItems = JsonSerializer.Deserialize<List<string>>(resource.ResourceCatering!.MenuItems!)!;
+                            var menuItems = resource.ResourceCatering!.MenuItems!.Split(",", StringSplitOptions.RemoveEmptyEntries).ToList();
 
                             @* 2nd Column *@
                             <div class="flex items-center justify-start gap-2 text-xs">
@@ -449,10 +449,10 @@
                                             ₱@resource.Cost.ToString("N2")
                                         </span>
 
-                                        <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.cost"
+                                        @* <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.cost"
                                             class="rounded-md text-sm px-4 py-2 bg-white text-coffee-700 border border-coffee-500">
                                             Cost
-                                        </span>
+                                        </span> *@
                                     </div>
 
                                     <div x-data="{ hover: false }" class="text-zinc-700 group-hover:text-coffee-700">
@@ -467,10 +467,10 @@
                                             @resource.CostType
                                         </span>
 
-                                        <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
+                                        @* <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
                                             class="rounded-md text-sm px-4 py-2 bg-white text-coffee-700 border border-coffee-500">
                                             Cost Type or Rate
-                                        </span>
+                                        </span> *@
                                     </div>
                                 </span>
                             </div>
@@ -490,10 +490,10 @@
                                         @resource.ResourceCatering.GuestCapacity
                                     </span>
 
-                                    <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
+                                    @* <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
                                         class="rounded-md text-sm px-4 py-2 bg-white text-coffee-700 border border-coffee-500">
                                         Capacity of guests that the menu can cater
-                                    </span>
+                                    </span> *@
                                 </div>
 
                                 <div x-data="{ hover: false }" class="text-zinc-700 group-hover:text-coffee-700">
@@ -514,10 +514,10 @@
                                             }
                                         </span>
                                     </span>
-                                    <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
+                                    @* <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
                                         class="rounded-md text-sm px-4 py-2 bg-white text-coffee-700 border border-coffee-500">
                                         Menu Items
-                                    </span>
+                                    </span> *@
                                 </div>
                             </div>
                         }
@@ -545,10 +545,10 @@
                                             ₱@resource.Cost.ToString("N2")
                                         </span>
 
-                                        <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.cost"
+                                        @* <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.cost"
                                             class="rounded-md text-sm px-4 py-2 bg-white text-coffee-700 border border-coffee-500">
                                             Cost
-                                        </span>
+                                        </span> *@
                                     </div>
 
                                     <div x-data="{ hover: false }" class="text-zinc-700 group-hover:text-coffee-700">
@@ -563,10 +563,10 @@
                                             @resource.CostType
                                         </span>
 
-                                        <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
+                                        @* <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
                                             class="rounded-md text-sm px-4 py-2 bg-white text-coffee-700 border border-coffee-500">
                                             Cost Type or Rate
-                                        </span>
+                                        </span> *@
                                     </div>
                                 </span>
                             </div>
@@ -586,10 +586,10 @@
                                         @resource.ResourcePersonnel.Position
                                     </span>
 
-                                    <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
+                                    @* <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
                                         class="rounded-md text-sm px-4 py-2 bg-white text-coffee-700 border border-coffee-500">
                                         Position of the Personnel/s
-                                    </span>
+                                    </span> *@
                                 </div>
 
                                 <div x-data="{ hover: false }" class="text-zinc-700 group-hover:text-coffee-700">
@@ -606,10 +606,10 @@
                                         @DateTime.Today.Add(resource.ResourcePersonnel.ShiftEnd).ToString("hh:mmtt", CultureInfo.InvariantCulture)
                                         
                                     </span>
-                                    <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
+                                    @* <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
                                         class="rounded-md text-sm px-4 py-2 bg-white text-coffee-700 border border-coffee-500">
                                         Shift Schedule
-                                    </span>
+                                    </span> *@
                                 </div>
 
                                 <div x-data="{ hover: false }" class="text-zinc-700 group-hover:text-coffee-700">
@@ -623,10 +623,10 @@
                                         </svg>
                                         @resource.ResourcePersonnel.Experience
                                     </span>
-                                    <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
+                                    @* <span x-cloak x-show="hover" x-transition.opacity x-anchor.top.offset.5="$refs.costtype"
                                         class="rounded-md text-sm px-4 py-2 bg-white text-coffee-700 border border-coffee-500">
                                         Personnel Experience
-                                    </span>
+                                    </span> *@
                                 </div>
                             </div>
                         }

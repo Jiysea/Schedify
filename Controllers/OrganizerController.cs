@@ -1,7 +1,9 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Schedify.Data;
 using Schedify.Hubs;
 using Schedify.Models;
@@ -42,14 +44,14 @@ public class OrganizerController : Controller
     }
 
     [HttpGet("organizer/events")]
-    public IActionResult Events(DateTime? startDate, DateTime? endDate)
+    public async Task<IActionResult> Events()
     {
-        var viewModel = GetEventsViewModel(startDate, endDate);
+        var viewModel = await GetEventsViewModel(null, null);
 
-        if (Request.Headers["HX-Request"].Any())
-        {
-            return PartialView("~/Views/Organizer/Partials/_EventsListPartial.cshtml", viewModel);
-        }
+        // if (Request.Headers.ContainsKey("HX-Request"))
+        // {
+        //     return PartialView("~/Views/Organizer/Partials/_EventsListPartial.cshtml", viewModel);
+        // }
 
         return View(viewModel);
     }
@@ -61,9 +63,10 @@ public class OrganizerController : Controller
 
         if (evt == null) return NotFound();
 
-        bool hasVenue = _eventService.IsEventHasVenue(evt.Id);
+        bool hasVenue = await _eventService.IsEventHasVenue(evt.Id);
+        bool isOpenable = await _eventService.IsEventOpenable(evt.Id);
 
-        var model = new ViewEventViewModel()
+        var viewModel = new ViewEventViewModel()
         {
             Id = evt.Id,
             Name = evt.Name,
@@ -75,25 +78,27 @@ public class OrganizerController : Controller
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
             EventHasVenue = hasVenue,
+            IsEventOpenable = isOpenable,
         };
 
-        return PartialView("~/Views/Organizer/Partials/_ViewEventPartial.cshtml", model);
+        return PartialView("~/Views/Organizer/Partials/_ViewEventPartial.cshtml", viewModel);
     }
 
     [HttpPost("organizer/create-event")]
-    public async Task<IActionResult> CreateEvent(CreateEventViewModel model)
+    public async Task<IActionResult> CreateEvent(CUEventViewModel model)
     {
         var result = await _eventService.CreateEventAsync(model);
-
+        var viewModel = await GetEventsViewModel(null, null);
         if (!result.IsSuccess)
         {
             // Split error messages and add them to ModelState
             foreach (var error in result.Error!)
             {
-                ModelState.AddModelError(error.Key, error.Value);
                 if (error.Key == "Authentication")
                 {
-                    Response.Headers.Append("HX-Redirect", Url.Action("Login", "Auth"));
+                    var errorJson = $"{{\"closeModal\": true, \"clearValidations\": true, \"showToast\": {{ \"title\": \"{error.Value}\", \"icon\": \"error\", \"timer\": 3000 }} }}";
+                    Response.Headers.Append("HX-Trigger", errorJson);
+                    return PartialView("~/Views/Organizer/Partials/_UpdateEventsListPartial.cshtml", viewModel);
                 }
             }
 
@@ -101,39 +106,47 @@ public class OrganizerController : Controller
         }
 
         ModelState.Clear();
-        var viewModel = GetEventsViewModel(null, null);
 
-        // Define the SweetAlert event in the HX-Trigger header
-        var sweetAlertJson = "{\"closeModal\": true, \"clearValidations\": true, \"showSweetAlert\": { \"title\": \"Successfully created an event!\", \"icon\": \"success\", \"timer\": 3000 }}";
-
-        Response.Headers.Append("HX-Trigger", sweetAlertJson);
+        // Define the Toastr event in the HX-Trigger header
+        var toastrJson = "{\"closeModal\": true, \"clearValidations\": true, \"showToast\": { \"title\": \"Successfully created an event!\", \"icon\": \"success\", \"timer\": 3000 }}";
+        Response.Headers.Append("HX-Trigger", toastrJson);
         return PartialView("~/Views/Organizer/Partials/_UpdateEventsListPartial.cshtml", viewModel);
     }
 
     [HttpGet("organizer/show-update-event/{id}")]
     public async Task<IActionResult> ShowUpdateEvent(Guid id)
     {
-        var _event = await _eventService.GetEditEventByIdAsync(id);
+        var evt = await _eventService.GetEventByIdAsync(id);
 
-        if (_event == null)
-        {
-            return NotFound();
-        }
+        if (evt == null) return NotFound();
+        
 
-        if (_event.Status != EventStatus.Draft)
+        if (evt.Status != EventStatus.Draft)
         {
             // Redirect to events list when event status is not Draft
             Response.Headers.Append("HX-Redirect", Url.Action("Events", "Organizer"));
             return Content(string.Empty);
         }
 
-        return PartialView("~/Views/Organizer/Partials/_UpdateEventPartial.cshtml", _event);
+        var viewModel = new CUEventViewModel()
+        {
+            Id = evt.Id,
+            Name = evt.Name,
+            Description = evt.Description,
+            StartAtString = evt.StartAt.ToString("yyyy-MM-dd HH:mm"),
+            EndAtString = evt.EndAt.ToString("yyyy-MM-dd HH:mm"),
+            Status = evt.Status,
+            EntryFeeString = evt.EntryFee.ToString("N2"),
+        };
+
+        return PartialView("~/Views/Organizer/Partials/_UpdateEventPartial.cshtml", viewModel);
     }
 
     [HttpPost("organizer/update-event")]
-    public async Task<IActionResult> UpdateEvent(UpdateEventViewModel model)
+    public async Task<IActionResult> UpdateEvent(CUEventViewModel model)
     {
         var result = await _eventService.UpdateEventAsync(model);
+        var viewModel = await GetEventsViewModel(null, null);
 
         if (!result.IsSuccess)
         {
@@ -141,22 +154,11 @@ public class OrganizerController : Controller
             foreach (var error in result.Error!)
             {
                 ModelState.AddModelError(error.Key, error.Value);
-                if (error.Key == "Authentication")
+                if (error.Key == "Authentication" || error.Key == "NoChanges" || error.Key == "InvalidStatus" || error.Key == "NotFound")
                 {
-                    Response.Headers.Append("HX-Redirect", Url.Action("Login", "Auth"));
-                    return Content(string.Empty);
-                }
-
-                if (error.Key == "NoChanges")
-                {
-                    Response.Headers.Append("HX-Redirect", Url.Action("Events", "Organizer"));
-                    return Content(string.Empty);
-                }
-
-                if (error.Key == "InvalidStatus")
-                {
-                    Response.Headers.Append("HX-Redirect", Url.Action("Events", "Organizer"));
-                    return Content(string.Empty);
+                    var errorJson = $"{{\"closeModal\": true, \"clearValidations\": true, \"showToast\": {{ \"title\": \"{error.Value}\", \"icon\": \"error\", \"timer\": 3000 }} }}";
+                    Response.Headers.Append("HX-Trigger", errorJson);
+                    return PartialView("~/Views/Organizer/Partials/_UpdateEventsListPartial.cshtml", viewModel);
                 }
             }
 
@@ -164,84 +166,153 @@ public class OrganizerController : Controller
         }
 
         ModelState.Clear();
-        var viewModel = GetEventsViewModel(null, null);
 
-        // Define the SweetAlert event in the HX-Trigger header
-        var sweetAlertJson = "{\"closeModal\": true, \"clearValidations\": true, \"showSweetAlert\": { \"title\": \"Successfully updated an event!\", \"icon\": \"success\", \"timer\": 3000 }}";
+        // Define the Toastr event in the HX-Trigger header
+        var toastrJson = "{\"closeModal\": true, \"clearValidations\": true, \"showToast\": { \"title\": \"Successfully updated an event!\", \"icon\": \"success\", \"timer\": 3000 }}";
 
-        Response.Headers.Append("HX-Trigger", sweetAlertJson);
+        Response.Headers.Append("HX-Trigger", toastrJson);
         return PartialView("~/Views/Organizer/Partials/_UpdateEventsListPartial.cshtml", viewModel);
     }
 
-    [HttpDelete("organizer/delete-event/{id}")]
-    public async Task<IActionResult> DeleteResource(Guid id)
+    [HttpPost("organizer/delete-event/{EventId}")]
+    public async Task<IActionResult> DeleteEvent(Guid EventId)
     {
-        var success = await _eventService.DeleteEventAsync(id);
-        if (!success)
-        {
-            return NotFound(); // Return 404 if resource doesn't exist
-        }
-
-        Response.Headers.Append("HX-Redirect", Url.Action("Events", "Organizer")); // Redirect to resource list after deletion
-        return Content(string.Empty);
-    }
-
-    [HttpPatch("organizer/open-event/{id}")]
-    public async Task<IActionResult> OpenEvent(Guid id)
-    {
-        var success = await _eventService.OpenEventByIdAsync(id);
+        var success = await _eventService.DeleteEventAsync(EventId);
+        var viewModel = await GetEventsViewModel(null, null);
 
         if (!success)
         {
-            return NotFound();
+            var errorJson = $"{{\"closeModal\": true, \"clearValidations\": true, \"showToast\": {{ \"title\": \"Event does not exist.\", \"icon\": \"error\", \"timer\": 3000 }} }}";
+            Response.Headers.Append("HX-Trigger", errorJson);
+            return PartialView("~/Views/Organizer/Partials/_UpdateEventsListPartial.cshtml", viewModel);
         }
 
-        Response.Headers.Append("HX-Redirect", Url.Action("Events", "Organizer")); // Redirect to resource list after deletion
-        return Content(string.Empty);
+        // If the EventId to delete matches the same EventId stored in session, remove that session prop
+        if (HttpContext.Session.GetString("SelectedEventId") == EventId.ToString())
+            HttpContext.Session.Remove("SelectedEventId");
+
+        // Define the Toastr event in the HX-Trigger header
+        var toastrJson = "{\"closeModal\": true, \"clearValidations\": true, \"showToast\": { \"title\": \"Successfully deleted a resource!\", \"icon\": \"success\", \"timer\": 3000 }}";
+        Response.Headers.Append("HX-Trigger", toastrJson);
+        return PartialView("~/Views/Organizer/Partials/_EventsListPartial.cshtml", viewModel);
     }
 
-    [HttpPatch("organizer/draft-event/{id}")]
-    public async Task<IActionResult> DraftEvent(Guid id)
+    [HttpPatch("organizer/open-event/{EventId}")]
+    public async Task<IActionResult> OpenEvent(Guid EventId)
     {
-        var success = await _eventService.DraftEventByIdAsync(id);
+        var result = await _eventService.OpenEventByIdAsync(EventId);
+        var viewModel = await GetEventsViewModel(null, null);
 
-        if (!success)
+        if (!result.IsSuccess)
         {
-            return NotFound();
+            // Split error messages and add them to ModelState
+            foreach (var error in result.Error!)
+            {
+                // Define the Toastr event in the HX-Trigger header
+                var errorJson = $"{{\"closeModal\": true, \"clearValidations\": true, \"showToast\": {{ \"title\": \"{error.Value}\", \"icon\": \"error\", \"timer\": 3000 }} }}";
+                Response.Headers.Append("HX-Trigger", errorJson);
+            }
+
+            return PartialView("~/Views/Organizer/Partials/_UpdateEventsListPartial.cshtml", viewModel);
         }
 
-        Response.Headers.Append("HX-Redirect", Url.Action("Events", "Organizer")); // Redirect to resource list after deletion
-        return Content(string.Empty);
+        ModelState.Clear();
+
+        // Define the Toastr event in the HX-Trigger header
+        var toastrJson = "{\"closeModal\": true, \"clearValidations\": true, \"showToast\": { \"title\": \"Successfully opened the event!\", \"icon\": \"success\", \"timer\": 3000 }}";
+        Response.Headers.Append("HX-Trigger", toastrJson);
+        return PartialView("~/Views/Organizer/Partials/_UpdateEventsListPartial.cshtml", viewModel);
     }
 
-    [HttpPatch("organizer/cancel-event/{id}")]
-    public async Task<IActionResult> CancelEvent(Guid id)
+    [HttpGet("organizer/event-filter-date")]
+    public async Task<IActionResult> FilterDate(DateTime? startDate, DateTime? endDate)
     {
-        var success = await _eventService.CancelEventByIdAsync(id);
-
-        if (!success)
-        {
-            return NotFound();
-        }
-
-        Response.Headers.Append("HX-Redirect", Url.Action("Events", "Organizer")); // Redirect to resource list after deletion
-        return Content(string.Empty);
+        var viewModel = await GetEventsViewModel(startDate, endDate);
+        return PartialView("~/Views/Organizer/Partials/_UpdateEventsListPartial.cshtml", viewModel);
     }
 
-    [HttpGet("organizer/show-postpone-event/{id}")]
-    public async Task<IActionResult> ShowPostponeEvent(Guid id)
+    [HttpPatch("organizer/draft-event/{EventId}")]
+    public async Task<IActionResult> DraftEvent(Guid EventId)
+    {
+        var result = await _eventService.DraftEventByIdAsync(EventId);
+        var viewModel = await GetEventsViewModel(null, null);
+
+        if (!result.IsSuccess)
+        {
+            // Split error messages and add them to ModelState
+            foreach (var error in result.Error!)
+            {
+                // Define the Toastr event in the HX-Trigger header
+                var errorJson = $"{{\"closeModal\": true, \"clearValidations\": true, \"showToast\": {{ \"title\": \"{error.Value}\", \"icon\": \"error\", \"timer\": 3000 }} }}";
+                Response.Headers.Append("HX-Trigger", errorJson);
+            }
+
+            return PartialView("~/Views/Organizer/Partials/_UpdateEventsListPartial.cshtml", viewModel);
+        }
+
+        ModelState.Clear();
+
+        // Define the Toastr event in the HX-Trigger header
+        var toastrJson = "{\"closeModal\": true, \"clearValidations\": true, \"showToast\": { \"title\": \"Successfully drafted an event!\", \"icon\": \"success\", \"timer\": 3000 }}";
+        Response.Headers.Append("HX-Trigger", toastrJson);
+        return PartialView("~/Views/Organizer/Partials/_UpdateEventsListPartial.cshtml", viewModel);
+    }
+
+    [HttpPatch("organizer/cancel-event/{EventId}")]
+    public async Task<IActionResult> CancelEvent(Guid EventId)
+    {
+        var result = await _eventService.CancelEventByIdAsync(EventId);
+        var viewModel = await GetEventsViewModel(null, null);
+
+        if (!result.IsSuccess)
+        {
+            // Split error messages and add them to ModelState
+            foreach (var error in result.Error!)
+            {
+                // Define the Toastr event in the HX-Trigger header
+                var errorJson = $"{{\"closeModal\": true, \"clearValidations\": true, \"showToast\": {{ \"title\": \"{error.Value}\", \"icon\": \"error\", \"timer\": 3000 }} }}";
+                Response.Headers.Append("HX-Trigger", errorJson);
+            }
+
+            return PartialView("~/Views/Organizer/Partials/_UpdateEventsListPartial.cshtml", viewModel);
+        }
+
+        ModelState.Clear();
+
+        // Define the Toastr event in the HX-Trigger header
+        var toastrJson = "{\"closeModal\": true, \"clearValidations\": true, \"showToast\": { \"title\": \"Successfully cancelled an event!\", \"icon\": \"success\", \"timer\": 3000 }}";
+        Response.Headers.Append("HX-Trigger", toastrJson);
+        return PartialView("~/Views/Organizer/Partials/_UpdateEventsListPartial.cshtml", viewModel);
+    }
+
+    [HttpGet("organizer/show-postpone-event/{EventId}")]
+    public async Task<IActionResult> ShowPostponeEvent(Guid EventId)
     {
         // Changing the status to "Postponed" is techincally an "Edit/Update"
-        var _event = await _eventService.GetEditEventByIdAsync(id);
+        var evt = await _eventService.GetEventByIdAsync(EventId);
 
-        if (_event == null)
+        if (evt == null)
         {
-            return NotFound();
+            var viewModel = await GetEventsViewModel(null, null);
+            var errorJson = $"{{\"closeModal\": true, \"clearValidations\": true, \"showToast\": {{ \"title\": \"Event does not exist.\", \"icon\": \"error\", \"timer\": 3000 }} }}";
+            Response.Headers.Append("HX-Trigger", errorJson);
+            return PartialView("~/Views/Organizer/Partials/_UpdateEventsListPartial.cshtml", viewModel);
         }
 
-        if (_event.Status == EventStatus.Open || _event.Status == EventStatus.Ongoing)
+        if (evt.Status == EventStatus.Open || evt.Status == EventStatus.Ongoing)
         {
-            return PartialView("~/Views/Organizer/Partials/_PostponeEventPartial.cshtml", _event);
+            var viewModel = new CUEventViewModel()
+            {
+                Id = evt.Id,
+                Name = evt.Name,
+                Description = evt.Description,
+                StartAtString = evt.StartAt.ToString("yyyy-MM-dd HH:mm"),
+                EndAtString = evt.EndAt.ToString("yyyy-MM-dd HH:mm"),
+                Status = evt.Status,
+                EntryFeeString = evt.EntryFee.ToString("N2"),
+            };
+
+            return PartialView("~/Views/Organizer/Partials/_PostponeEventPartial.cshtml", viewModel);
         }
 
         // Redirect to events list when event status is not Open or Ongoing
@@ -250,28 +321,25 @@ public class OrganizerController : Controller
     }
 
     [HttpPost("organizer/postpone-event")]
-    public async Task<IActionResult> PostponeEvent(UpdateEventViewModel model)
+    public async Task<IActionResult> PostponeEvent(CUEventViewModel model)
     {
         var result = await _eventService.PostponeEventByIdAsync(model);
+        var viewModel = await GetEventsViewModel(null, null);
 
         if (!result.IsSuccess)
         {
+
             // Split error messages and add them to ModelState
             foreach (var error in result.Error!)
             {
-                if (error.Key == "Authentication")
+                if (error.Key == "Authentication" || error.Key == "NotFound" || error.Key == "InvalidStatus")
                 {
-                    Response.Headers.Append("HX-Redirect", Url.Action("Login", "Auth"));
-                    return Content(string.Empty);
+                    // Define the Toastr event in the HX-Trigger header
+                    var errorJson = $"{{\"closeModal\": true, \"clearValidations\": true, \"showToast\": {{ \"title\": \"{error.Value}\", \"icon\": \"error\", \"timer\": 3000 }} }}";
+                    Response.Headers.Append("HX-Trigger", errorJson);
+                    return PartialView("~/Views/Organizer/Partials/_UpdateEventsListPartial.cshtml", viewModel);
                 }
-
-                if (error.Key == "InvalidStatus")
-                {
-                    Response.Headers.Append("HX-Redirect", Url.Action("Events", "Organizer"));
-                    return Content(string.Empty);
-                }
-
-                if (error.Key == "NoChanges")
+                else if (error.Key == "NoChanges")
                 {
                     ModelState.AddModelError("CustomError", error.Value);
                     break;
@@ -283,8 +351,12 @@ public class OrganizerController : Controller
             return PartialView("_ValidationEditMessages", ModelState);
         }
 
-        Response.Headers.Append("HX-Redirect", Url.Action("Events", "Organizer"));
-        return Content(string.Empty);
+        ModelState.Clear();
+
+        // Define the Toastr event in the HX-Trigger header
+        var toastrJson = "{\"closeModal\": true, \"clearValidations\": true, \"showToast\": { \"title\": \"Successfully postponed an event!\", \"icon\": \"success\", \"timer\": 3000 }}";
+        Response.Headers.Append("HX-Trigger", toastrJson);
+        return PartialView("~/Views/Organizer/Partials/_UpdateEventsListPartial.cshtml", viewModel);
     }
 
     // --------------------------------------------------------------------------------------
@@ -299,31 +371,42 @@ public class OrganizerController : Controller
     }
 
     [HttpGet("organizer/resources")]
-    public IActionResult Resources()
+    public async Task<IActionResult> Resources()
     {
         var eventIdString = HttpContext.Session.GetString("SelectedEventId");
 
-        List<Event>? events = _eventService.GetEventsByUser();
+        List<Event>? events = await _eventService.GetEventsByUser();
 
         Event? evt = null;
 
         // Get the Event Id to pass to the hidden input
         if (eventIdString != null)
         {
-            evt = _eventService.GetEventById(Guid.Parse(eventIdString));
+            evt = await _eventService.GetEventByIdAsync(Guid.Parse(eventIdString));
         }
         else if (events!.Any() != false)
         {
-            evt = _eventService.GetEventById(events!.First().Id);
+            evt = await _eventService.GetEventByIdAsync(events!.First().Id);
         }
 
         // if there's no event, redirect to Events page
         if (evt == null)
         {
-            Response.Headers.Append("HX-Redirect", Url.Action("Events", "Organizer"));
+            // Define the Toastr event in the HX-Trigger header
+            var errorJson = $"{{\"closeModal\": true, \"clearValidations\": true, \"showToast\": {{ \"title\": \"Please create an event first.\", \"icon\": \"error\", \"timer\": 3000 }} }}";
+            Response.Headers.Append("HX-Trigger", errorJson);
+
+            // Set HX-Push-Url to the current URL so the history doesn’t change.
+            Response.Headers.Append("HX-Push-Url", "events");
+            Response.Headers.Append("HX-Reswap", "none");
+
+            if (Request.Headers.ContainsKey("HX-Request"))
+                return Content(string.Empty);
+
             return RedirectToAction("Events", "Organizer");
         }
 
+        SetEventSession(evt.Id);
         var resources = _resourceService.GetResourcesByEventId(evt.Id);
 
         var model = new ResourceViewModel
@@ -361,7 +444,7 @@ public class OrganizerController : Controller
             ResourceImages = _resourceService.GetResourceImageFromList(resources!),
         };
 
-        return PartialView("~/Views/Organizer/Partials/_ResourceListPartial.cshtml", model);
+        return PartialView("~/Views/Organizer/Partials/_UpdateResourcesListPartial.cshtml", model);
     }
 
     // ----------------------------------------------
@@ -372,10 +455,21 @@ public class OrganizerController : Controller
     [HttpGet("organizer/open-create-resource-modal/{EventId}")]
     public IActionResult OpenResourceModal(Guid EventId)
     {
-        var model = new CreateResourceViewModel
+        var model = new CUResourceViewModel
         {
             EventId = EventId
         };
+
+        var evt = _context.Events.Include(e => e.Resources).FirstOrDefault(e => e.Id == EventId);
+        bool eventHasVenue = evt?.Resources.Any(r => r.ResourceType == ResourceType.Venue) ?? false;
+        var resourceTypes = Enum.GetValues(typeof(ResourceType)).Cast<ResourceType>().Where(r => r != ResourceType.Venue || !eventHasVenue)
+            .ToList();
+
+        ViewBag.ResourceTypes = new SelectList(resourceTypes, eventHasVenue ? ResourceType.Venue : ResourceType.Equipment);
+        if (eventHasVenue)
+        {
+            model.ResourceType = ResourceType.Equipment;
+        }
 
         return PartialView("~/Views/Organizer/Partials/CreateResourceModal.cshtml", model);
     }
@@ -384,14 +478,14 @@ public class OrganizerController : Controller
     [HttpGet("organizer/select-resource-type")]
     public IActionResult ResourceExtra(ResourceType selectedOption)
     {
-        CreateResourceViewModel viewModel = selectedOption switch
+        CUResourceViewModel viewModel = selectedOption switch
         {
-            ResourceType.Venue => new CreateResourceViewModel { ResourceType = ResourceType.Venue },
-            ResourceType.Equipment => new CreateResourceViewModel { ResourceType = ResourceType.Equipment },
-            ResourceType.Furniture => new CreateResourceViewModel { ResourceType = ResourceType.Furniture },
-            ResourceType.Catering => new CreateResourceViewModel { ResourceType = ResourceType.Catering },
-            ResourceType.Personnel => new CreateResourceViewModel { ResourceType = ResourceType.Personnel },
-            _ => new CreateResourceViewModel { ResourceType = ResourceType.Venue } // Default
+            ResourceType.Venue => new CUResourceViewModel { ResourceType = ResourceType.Venue },
+            ResourceType.Equipment => new CUResourceViewModel { ResourceType = ResourceType.Equipment },
+            ResourceType.Furniture => new CUResourceViewModel { ResourceType = ResourceType.Furniture },
+            ResourceType.Catering => new CUResourceViewModel { ResourceType = ResourceType.Catering },
+            ResourceType.Personnel => new CUResourceViewModel { ResourceType = ResourceType.Personnel },
+            _ => new CUResourceViewModel { ResourceType = ResourceType.Venue } // Default
         };
         return PartialView("_SelectResourceTypePartial", viewModel);
     }
@@ -400,15 +494,15 @@ public class OrganizerController : Controller
     [HttpGet("organizer/select-furniture-material")]
     public IActionResult SelectFurnitureMaterial(FurnitureMaterial selectedOption)
     {
-        CreateResourceViewModel viewModel = selectedOption switch
+        CUResourceViewModel viewModel = selectedOption switch
         {
-            FurnitureMaterial.Wood => new CreateResourceViewModel { Material = FurnitureMaterial.Wood },
-            FurnitureMaterial.Metal => new CreateResourceViewModel { Material = FurnitureMaterial.Metal },
-            FurnitureMaterial.Plastic => new CreateResourceViewModel { Material = FurnitureMaterial.Plastic },
-            FurnitureMaterial.Glass => new CreateResourceViewModel { Material = FurnitureMaterial.Glass },
-            FurnitureMaterial.Fabric => new CreateResourceViewModel { Material = FurnitureMaterial.Fabric },
-            FurnitureMaterial.Other => new CreateResourceViewModel { Material = FurnitureMaterial.Other },
-            _ => new CreateResourceViewModel { Material = FurnitureMaterial.Wood } // Default
+            FurnitureMaterial.Wood => new CUResourceViewModel { Material = FurnitureMaterial.Wood },
+            FurnitureMaterial.Metal => new CUResourceViewModel { Material = FurnitureMaterial.Metal },
+            FurnitureMaterial.Plastic => new CUResourceViewModel { Material = FurnitureMaterial.Plastic },
+            FurnitureMaterial.Glass => new CUResourceViewModel { Material = FurnitureMaterial.Glass },
+            FurnitureMaterial.Fabric => new CUResourceViewModel { Material = FurnitureMaterial.Fabric },
+            FurnitureMaterial.Other => new CUResourceViewModel { Material = FurnitureMaterial.Other },
+            _ => new CUResourceViewModel { Material = FurnitureMaterial.Wood } // Default
         };
 
         if (selectedOption == FurnitureMaterial.Other)
@@ -421,10 +515,11 @@ public class OrganizerController : Controller
     }
 
     [HttpGet("organizer/cost-types")]
-    public IActionResult GetCostTypes(string selectedOption)
+    public IActionResult GetCostTypes(string selectedOption, string savedCostType)
     {
         if (Enum.TryParse<ResourceType>(selectedOption, out var resourceType))
         {
+            ViewBag.SavedCostType = savedCostType;
             return PartialView("_CostTypeOptionsPartial", resourceType);
         }
 
@@ -432,7 +527,7 @@ public class OrganizerController : Controller
     }
 
     [HttpPost("organizer/create-resource")]
-    public async Task<IActionResult> CreateResource(Guid EventId, CreateResourceViewModel model)
+    public async Task<IActionResult> CreateResource(Guid EventId, CUResourceViewModel model)
     {
         var result = await _resourceService.CreateResourceAsync(model, EventId);
 
@@ -449,7 +544,7 @@ public class OrganizerController : Controller
 
         // Once everything is clear with no errors, it's time to hx-swap
         ModelState.Clear();
-        List<Event>? events = _eventService.GetEventsByUser();
+        List<Event>? events = await _eventService.GetEventsByUser();
 
         Event? evt = _eventService.GetEventById(EventId);
 
@@ -471,9 +566,9 @@ public class OrganizerController : Controller
             ResourceImages = _resourceService.GetResourceImageFromList(resources!),
         };
 
-        // Define the SweetAlert event in the HX-Trigger header
-        var sweetAlertJson = "{\"closeModal\": true, \"clearValidations\": true, \"showSweetAlert\": { \"title\": \"Successfully added a resource!\", \"icon\": \"success\", \"timer\": 3000 }}";
-        Response.Headers.Append("HX-Trigger", sweetAlertJson);
+        // Define the Toastr event in the HX-Trigger header
+        var toastrJson = "{\"closeModal\": true, \"clearValidations\": true, \"showToast\": { \"title\": \"Successfully added a resource!\", \"icon\": \"success\", \"timer\": 3000 }}";
+        Response.Headers.Append("HX-Trigger", toastrJson);
         return PartialView("~/Views/Organizer/Partials/_UpdateResourcesListPartial.cshtml", viewModel);
     }
 
@@ -494,9 +589,140 @@ public class OrganizerController : Controller
         var resourceWithType = await _resourceService.GetResourceByTypeAsync(ResourceId, resource.ResourceType);
         if (resourceWithType == null) return NotFound();
 
-        var viewModel = GetViewResourceViewModel(resourceWithType);
+        var viewModel = await _resourceService.GetViewResourceViewModel(resourceWithType.Id);
 
         return PartialView("~/Views/Organizer/Partials/_ViewResourcePartial.cshtml", viewModel);
+    }
+
+    [HttpPost("organizer/delete-resource/{ResourceId}")]
+    public async Task<IActionResult> DeleteResource(Guid ResourceId)
+    {
+        Console.WriteLine("Hello?");
+        var resource = await _resourceService.GetResourceByIdAsync(ResourceId);
+        if (resource == null) return NotFound();
+
+        Console.WriteLine("Is Anyone There?");
+        Event? evt = await _eventService.GetEventByIdAsync(resource.EventId);
+        List<Event>? events = await _eventService.GetEventsByUser();
+
+        Console.WriteLine("Oh-oh,");
+        var success = await _resourceService.DeleteResourceAsync(ResourceId);
+        if (!success) return NotFound(); // Return 404 if resource doesn't exist
+
+        Console.WriteLine("Hi!?");
+        // if there's no event, redirect to Events page
+        if (evt == null)
+        {
+            Response.Headers.Append("HX-Redirect", Url.Action("Events", "Organizer"));
+            return RedirectToAction("Events", "Organizer");
+        }
+
+        SetEventSession(evt.Id);
+        var resources = _resourceService.GetResourcesByEventId(evt.Id);
+
+        var viewModel = new ResourceViewModel
+        {
+            EventId = evt.Id,
+            Events = events!,
+            SelectedName = evt.Name,
+            Resources = resources!,
+            ResourceImages = _resourceService.GetResourceImageFromList(resources!),
+        };
+
+        // Define the Toastr event in the HX-Trigger header
+        var toastrJson = "{\"closeModal\": true, \"clearValidations\": true, \"showToast\": { \"title\": \"Successfully deleted a resource!\", \"icon\": \"success\", \"timer\": 3000 }}";
+        Response.Headers.Append("HX-Trigger", toastrJson);
+        return PartialView("~/Views/Organizer/Partials/_UpdateResourcesListPartial.cshtml", viewModel);
+    }
+
+    [HttpGet("organizer/show-update-resource/{ResourceId}")]
+    public async Task<IActionResult> ShowUpdateResource(Guid ResourceId)
+    {
+        var viewModel = await _resourceService.GetCUResourceViewModel(ResourceId);
+
+        if(viewModel == null)
+        {
+            Console.WriteLine("viewModel");
+            return NotFound();
+        }
+
+        var evt = _context.Events
+            .Include(e => e.Resources)
+            .FirstOrDefault(e => e.Id == viewModel.EventId);
+
+        bool hasVenue = evt?.Resources.Any(r => r.ResourceType == ResourceType.Venue) ?? false;
+
+        // Exclude Venue only if the event has a Venue and the viewed resource is NOT a Venue
+        var resourceTypes = Enum.GetValues(typeof(ResourceType))
+            .Cast<ResourceType>()
+            .Where(r => !(hasVenue && r == ResourceType.Venue && viewModel.ResourceType != ResourceType.Venue))
+            .ToList();
+
+        ViewBag.ResourceTypes = new SelectList(resourceTypes);
+        return PartialView("~/Views/Organizer/Partials/_UpdateResourcePartial.cshtml", viewModel);
+    }
+
+    [HttpPost("organizer/update-resource")]
+    public async Task<IActionResult> UpdateResource(CUResourceViewModel model)
+    {
+        var result = await _resourceService.UpdateResourceAsync(model);
+
+        if (!result.IsSuccess)
+        {
+            // Split error messages and add them to ModelState
+            foreach (var error in result.Error!)
+            {
+                ModelState.AddModelError(error.Key, error.Value);
+                var errorJson = $"{{\"showToast\": {{ \"title\": \"{error.Value}\", \"icon\": \"error\", \"timer\": 3000 }} }}";
+                Response.Headers.Append("HX-Trigger", errorJson);
+            }
+
+            return PartialView("_ValidationEditMessages", ModelState);
+        }
+
+        // Once everything is clear with no errors, it's time to hx-swap
+        ModelState.Clear();
+        List<Event>? events = await _eventService.GetEventsByUser();
+
+        Event? evt = _eventService.GetEventById(model.EventId);
+
+        // if there's no event, redirect to Events page
+        if (evt == null)
+        {
+            Response.Headers.Append("HX-Redirect", Url.Action("Events", "Organizer"));
+            return RedirectToAction("Events", "Organizer");
+        }
+
+        var resources = _resourceService.GetResourcesByEventId(model.EventId);
+        var resource = await _resourceService.GetResourceByIdAsync(model.Id);
+        if (resource == null)
+        {
+            var errorJson = $"{{\"showToast\": {{ \"title\": \"Resource does not exist.\", \"icon\": \"error\", \"timer\": 3000 }} }}";
+            Response.Headers.Append("HX-Trigger", errorJson);
+            return NotFound();
+        }
+        var viewResourceViewModel = await _resourceService.GetViewResourceViewModel(resource.Id);
+        if (viewResourceViewModel == null)
+        {
+            var errorJson = $"{{\"showToast\": {{ \"title\": \"Resource does not exist.\", \"icon\": \"error\", \"timer\": 3000 }} }}";
+            Response.Headers.Append("HX-Trigger", errorJson);
+            return NotFound();
+        }
+
+        var viewModel = new ResourceViewModel
+        {
+            EventId = model.EventId,
+            Events = events!,
+            SelectedName = evt.Name,
+            Resources = resources!,
+            ResourceImages = _resourceService.GetResourceImageFromList(resources!),
+            ViewResourceViewModel = viewResourceViewModel,
+        };
+
+        // Define the Toastr event in the HX-Trigger header
+        var toastrJson = "{\"clearValidations\": true, \"showToast\": { \"title\": \"Successfully updated a resource!\", \"icon\": \"success\", \"timer\": 3000 }}";
+        Response.Headers.Append("HX-Trigger", toastrJson);
+        return PartialView("~/Views/Organizer/Partials/_AfterResourceUpdate.cshtml", viewModel);
     }
 
     // ----------------------------------------------
@@ -543,7 +769,7 @@ public class OrganizerController : Controller
     // Private Methods
     // --------------------------------------------------------------------------------------
 
-    private EventsViewModel GetEventsViewModel(DateTime? startDate, DateTime? endDate)
+    private async Task<EventsViewModel> GetEventsViewModel(DateTime? startDate, DateTime? endDate)
     {
         // Set default values if not provided
         startDate ??= new DateTime(DateTime.UtcNow.Year, 1, 1, 0, 0, 0, DateTimeKind.Utc); // Jan 1st, 00:00 UTC
@@ -558,11 +784,8 @@ public class OrganizerController : Controller
         var MergedAttendeeCounts = pAttendeeCount.Concat(cAttendeeCount)
             .ToDictionary(kvp => kvp.Key, kvp => kvp.Value); // kvp == key-value pair
 
-        var hasResources = _context.Events
-            .ToDictionary(
-                e => e.Id,
-                e => e.Resources.Any()
-            );
+        var hasVenues = await _eventService.GetEventHasVenueByUser();
+        var isOpenable = await _eventService.GetEventIsOpenableByUser();
 
         var viewModel = new EventsViewModel
         {
@@ -570,69 +793,75 @@ public class OrganizerController : Controller
             PublishedEvents = PublishedEvents,
             ConcludedEvents = ConcludedEvents,
             EventAttendeeCounts = MergedAttendeeCounts,
-            HasResources = hasResources
+            HasVenues = hasVenues,
+            IsOpenable = isOpenable,
         };
 
         return viewModel;
     }
 
-    private ViewResourceViewModel? GetViewResourceViewModel(Resource? resource)
-    {
-        if (resource == null) return null;
-        
-        var viewModel = new ViewResourceViewModel
-        {
-            Id = resource.Id,
-            ImageFileName = resource.Image!.ImageFileName,
-            ProviderName = resource.ProviderName,
-            ProviderEmail = resource.ProviderEmail,
-            ProviderPhoneNumber = resource.ProviderPhoneNumber,
-            Name = resource.Name,
-            Description = resource.Description,
-            ResourceType = resource.ResourceType,
-            Cost = resource.Cost,
-            CostType = resource.CostType,
-            CreatedAt = resource.CreatedAt,
-            UpdatedAt = resource.UpdatedAt,
-        };
+    // private ViewResourceViewModel? GetViewResourceViewModel(Resource? resource)
+    // {
+    //     if (resource == null) return null;
+    //     Console.WriteLine(resource.Image!.ImageFileName);
+    //     Console.WriteLine(resource.Image!.ImageFileName);
+    //     Console.WriteLine(resource.Image!.ImageFileName);
+    //     Console.WriteLine(resource.Image!.ImageFileName);
+    //     Console.WriteLine(resource.Image!.ImageFileName);
+    //     var viewModel = new ViewResourceViewModel
+    //     {
+    //         Id = resource.Id,
+    //         EventId = resource.EventId,
+    //         ImageFileName = resource.Image!.ImageFileName,
+    //         ProviderName = resource.ProviderName,
+    //         ProviderEmail = resource.ProviderEmail,
+    //         ProviderPhoneNumber = resource.ProviderPhoneNumber,
+    //         Name = resource.Name,
+    //         Description = resource.Description,
+    //         ResourceType = resource.ResourceType,
+    //         Cost = resource.Cost,
+    //         CostType = resource.CostType,
+    //         CreatedAt = resource.CreatedAt,
+    //         UpdatedAt = resource.UpdatedAt,
+    //     };
 
-        if (resource.ResourceType == ResourceType.Venue)
-        {
-            viewModel.Capacity = resource.ResourceVenue.Capacity;
-            viewModel.Size = resource.ResourceVenue.Size;
-            viewModel.AddressLine1 = resource.ResourceVenue.AddressLine1;
-            viewModel.AddressLine2 = resource.ResourceVenue.AddressLine2;
-            viewModel.CityMunicipality = resource.ResourceVenue.CityMunicipality;
-            viewModel.Province = resource.ResourceVenue.Province;
-        }
-        else if (resource.ResourceType == ResourceType.Equipment)
-        {
-            viewModel.Quantity = resource.ResourceEquipment.Quantity;
-            viewModel.Brand = resource.ResourceEquipment.Brand;
-            viewModel.Warranty = resource.ResourceEquipment.Warranty;
-            viewModel.Specifications = JsonSerializer.Deserialize<Dictionary<string, string>>(resource.ResourceEquipment.Specifications!)!;
-        }
-        else if (resource.ResourceType == ResourceType.Furniture)
-        {
-            viewModel.Quantity = resource.ResourceFurniture.Quantity;
-            viewModel.Material = resource.ResourceFurniture.Material;
-            viewModel.OtherMaterial = resource.ResourceFurniture.OtherMaterial;
-            viewModel.Dimensions = resource.ResourceFurniture.Dimensions;
-            viewModel.Warranty = resource.ResourceFurniture.Warranty;
-        }
-        else if (resource.ResourceType == ResourceType.Catering)
-        {
-            viewModel.GuestCapacity = resource.ResourceCatering.GuestCapacity;
-            viewModel.MenuItems = JsonSerializer.Deserialize<List<string>>(resource.ResourceCatering.MenuItems);
-        }
-        else if (resource.ResourceType == ResourceType.Personnel)
-        {
-            viewModel.Position = resource.ResourcePersonnel.Position;
-            viewModel.ShiftStart = resource.ResourcePersonnel.ShiftStart;
-            viewModel.ShiftEnd = resource.ResourcePersonnel.ShiftEnd;
-            viewModel.Experience = resource.ResourcePersonnel.Experience;
-        }
+    //     if (resource.ResourceType == ResourceType.Venue)
+    //     {
+    //         viewModel.Capacity = resource.ResourceVenue.Capacity;
+    //         viewModel.Size = resource.ResourceVenue.Size;
+    //         viewModel.AddressLine1 = resource.ResourceVenue.AddressLine1;
+    //         viewModel.AddressLine2 = resource.ResourceVenue.AddressLine2;
+    //         viewModel.CityMunicipality = resource.ResourceVenue.CityMunicipality;
+    //         viewModel.Province = resource.ResourceVenue.Province;
+    //     }
+    //     else if (resource.ResourceType == ResourceType.Equipment)
+    //     {
+    //         viewModel.Quantity = resource.ResourceEquipment.Quantity;
+    //         viewModel.Brand = resource.ResourceEquipment.Brand;
+    //         viewModel.Warranty = resource.ResourceEquipment.Warranty;
+    //         viewModel.Specifications = JsonSerializer.Deserialize<Dictionary<string, string>>(resource.ResourceEquipment.Specifications!)!;
+    //     }
+    //     else if (resource.ResourceType == ResourceType.Furniture)
+    //     {
+    //         viewModel.Quantity = resource.ResourceFurniture.Quantity;
+    //         viewModel.Material = resource.ResourceFurniture.Material;
+    //         viewModel.OtherMaterial = resource.ResourceFurniture.OtherMaterial;
+    //         viewModel.Dimensions = resource.ResourceFurniture.Dimensions;
+    //         viewModel.Warranty = resource.ResourceFurniture.Warranty;
+    //     }
+    //     else if (resource.ResourceType == ResourceType.Catering)
+    //     {
+    //         viewModel.GuestCapacity = resource.ResourceCatering.GuestCapacity;
+    //         viewModel.MenuItems = resource.ResourceCatering.MenuItems.Split(",").ToList();
+    //     }
+    //     else if (resource.ResourceType == ResourceType.Personnel)
+    //     {
+    //         viewModel.Position = resource.ResourcePersonnel.Position;
+    //         viewModel.ShiftStart = resource.ResourcePersonnel.ShiftStart;
+    //         viewModel.ShiftEnd = resource.ResourcePersonnel.ShiftEnd;
+    //         viewModel.Experience = resource.ResourcePersonnel.Experience;
+    //     }
 
-        return viewModel;
-    }
+    //     return viewModel;
+    // }
 }

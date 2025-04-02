@@ -1,4 +1,4 @@
-@model AttendeeEventsViewModel
+@model EventsViewModel
 
 
 @* All Events *@
@@ -12,17 +12,17 @@
                 @* Resource Image *@
                 <span class="flex items-center justify-center">
                     <img class="object-cover h-24 w-full rounded-md"
-                        src="/resources/@(evt.Image!.ImageFileName)" alt="Venue spot">
+                        src="/resources/" alt="Venue spot">
                 </span>
 
                 @* Body *@
                 <div class="flex flex-col flex-grow gap-2">
                     <span class="text-base font-medium text-coffee-900">
-                        @evt.Event.Name
+                        @evt.Name
                     </span>
 
                     <div class="flex items-center justify-start gap-2 text-xs">
-                        @if (evt.Event.Status == EventStatus.Open)
+                        @if (evt.Status == EventStatus.Open)
                         {
                             <span class="flex items-center justify-center gap-2 text-zinc-500 font-medium">
                                 <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
@@ -31,19 +31,19 @@
                                         d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z">
                                     </path>
                                 </svg>
-                                @if ((evt.Event.StartAt - DateTime.Today).Days == 0)
+                                @if ((evt.StartAt - DateTime.Today).Days == 0)
                                 {
-                                    TimeSpan ts = evt.Event.StartAt - DateTime.Today;
+                                    TimeSpan ts = evt.StartAt - DateTime.Today;
                                     <p>Starts In @ts</p>
                                 }
                                 else
                                 {
-                                    <p>@((evt.Event.StartAt - DateTime.Today).Days) Days Left</p>
+                                    <p>@((evt.StartAt - DateTime.Today).Days) Days Left</p>
                                 }
                             </span>
                         }
 
-                        @if (evt.Event.Status == EventStatus.Open)
+                        @if (evt.Status == EventStatus.Open)
                         {
                             <span class="bg-amber-100 text-amber-500 rounded-md font-semibold px-3 py-1">
                                 OPEN
@@ -57,14 +57,14 @@
                                     d="M117.25,157.92a60,60,0,1,0-66.5,0A95.83,95.83,0,0,0,3.53,195.63a8,8,0,1,0,13.4,8.74,80,80,0,0,1,134.14,0,8,8,0,0,0,13.4-8.74A95.83,95.83,0,0,0,117.25,157.92ZM40,108a44,44,0,1,1,44,44A44.05,44.05,0,0,1,40,108Zm210.14,98.7a8,8,0,0,1-11.07-2.33A79.83,79.83,0,0,0,172,168a8,8,0,0,1,0-16,44,44,0,1,0-16.34-84.87,8,8,0,1,1-5.94-14.85,60,60,0,0,1,55.53,105.64,95.83,95.83,0,0,1,47.22,37.71A8,8,0,0,1,250.14,206.7Z">
                                 </path>
                             </svg>
-                            @evt.AttendeeCount
+                            @* @evt.AttendeeCount *@
                         </span>
                     </div>
                 </div>
 
                 @* View Button *@
                 <div class="flex flex-shrink">
-                    <button type="menu" x-on:click="viewEventModal = !viewEventModal" hx-get="/attendee/view-event/@evt.Event.Id"
+                    <button type="menu" x-on:click="viewEventModal = !viewEventModal" hx-get="/attendee/view-event/@evt.Id"
                         hx-target="#viewEventModalContent" hx-swap="innerHTML"
                         class="duration-200 ease-in-out rounded-lg focus:outline-none text-center p-2 hover:bg-coffee-700 active:bg-coffee-900 text-zinc-500 hover:text-coffee-50 active:text-coffee-50">
                         <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"

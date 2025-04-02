@@ -2,7 +2,6 @@
 
 @if (Model.ResourceType == ResourceType.Venue)
 {
-
     <span class="absolute flex items-center gap-2 start-4 -top-3 text-sm font-medium text-pumpkin-600 bg-coffee-50 px-2">
         <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
             viewBox="0 0 256 256">
@@ -15,39 +14,39 @@
 
     @* Address Line 1 *@
     <div class="flex flex-col col-span-full gap-1 relative">
-        <label for="addressline1" class="text-xs text-coffee-700">Address Line 1</label>
-        <input type="text" class="input-coffee p-2" id="addressline1" asp-for="AddressLine1"
+        <label for="edit-addressline1" class="text-xs text-coffee-700">Address Line 1</label>
+        <input type="text" class="input-coffee p-2" id="edit-addressline1" asp-for="AddressLine1"
             placeholder="Type address here" />
-        <div id="validation-AddressLine1">
+        <div id="edit-validation-AddressLine1">
         </div>
     </div>
 
     @* Address Line 2 *@
     <div class="flex flex-col col-span-full gap-1 relative">
-        <label for="addressline2" class="text-xs text-coffee-700">Address Line 2</label>
-        <input type="text" class="input-coffee p-2" id="addressline2" asp-for="AddressLine2"
+        <label for="edit-addressline2" class="text-xs text-coffee-700">Address Line 2</label>
+        <input type="text" class="input-coffee p-2" id="edit-addressline2" asp-for="AddressLine2"
             placeholder="Type address here" />
-        <div id="validation-AddressLine2">
+        <div id="edit-validation-AddressLine2">
         </div>
     </div>
 
     @* City/Municipality *@
     <div class="flex flex-col col-span-2 gap-1 relative">
-        <label for="citymunicipality" class="text-xs text-coffee-700">City/Municipality</label>
-        <input disabled readonly type="text" class="input-coffee p-2" id="citymunicipality" value="Davao City" />
+        <label for="edit-citymunicipality" class="text-xs text-coffee-700">City/Municipality</label>
+        <input disabled readonly type="text" class="input-coffee p-2" id="edit-citymunicipality" value="Davao City" />
     </div>
 
     @* Province *@
     <div class="flex flex-col col-span-3 gap-1 relative">
-        <label for="province" class="text-xs text-coffee-700">Province</label>
-        <input disabled readonly type="text" class="input-coffee p-2" id="province" value="Davao del Sur" />
+        <label for="edit-province" class="text-xs text-coffee-700">Province</label>
+        <input disabled readonly type="text" class="input-coffee p-2" id="edit-province" value="Davao del Sur" />
     </div>
 
     @* Capacity *@
     <div class="flex flex-col gap-1 relative">
-        <label for="capacity" class="text-xs text-coffee-700">Capacity</label>
+        <label for="edit-capacity" class="text-xs text-coffee-700">Capacity</label>
         <span class="relative">
-            <input type="number" inputmode="numeric" class="input-coffee p-2" id="capacity" asp-for="Capacity"
+            <input type="number" inputmode="numeric" class="input-coffee p-2" id="edit-capacity" asp-for="Capacity"
                 placeholder="Enter capacity here" min="1" />
             <span
                 class="pointer-events-none absolute top-0 end-0 rounded-r-md border border-transparent bg-coffee-600 text-coffee-50 text-sm px-2 py-2">
@@ -59,22 +58,22 @@
                 </svg>
             </span>
         </span>
-        <div id="validation-Capacity">
+        <div id="edit-validation-Capacity">
         </div>
     </div>
 
     @* Size *@
     <div class="flex flex-col gap-1 w-full relative">
-        <label for="size" class="text-xs text-coffee-700">Size</label>
+        <label for="edit-size" class="text-xs text-coffee-700">Size</label>
         <span class="relative">
-            <input type="text" x-mask:dynamic="$money($input)" class="input-coffee p-2" id="size" asp-for="Size"
+            <input type="text" x-mask:dynamic="$money($input)" class="input-coffee p-2" id="edit-size" asp-for="Size"
                 placeholder="Type size here" />
             <span
                 class="pointer-events-none absolute top-0 end-0 rounded-r-md border border-transparent bg-coffee-600 text-coffee-50 text-sm px-4 py-2">
                 ft&sup2;
             </span>
         </span>
-        <div id="validation-Size"></div>
+        <div id="edit-validation-Size"></div>
     </div>
 }
 
@@ -92,22 +91,22 @@ else if (Model.ResourceType == ResourceType.Equipment)
 
     @* Brand *@
     <div class="flex flex-col col-span-2 gap-1 relative">
-        <label for="brand" class="text-xs text-coffee-700">Brand</label>
-        <input type="text" class="input-coffee p-2" id="brand" asp-for="Brand" placeholder="Type brand here" />
-        <div id="validation-Brand">
+        <label for="edit-brand" class="text-xs text-coffee-700">Brand</label>
+        <input type="text" class="input-coffee p-2" id="edit-brand" asp-for="Brand" placeholder="Type brand here" />
+        <div id="edit-validation-Brand">
         </div>
     </div>
 
     @* Warranty *@
     <div class="flex flex-col col-span-2 gap-1 relative">
-        <label for="warranty" class="text-xs text-coffee-700">Warranty</label>
+        <label for="edit-warranty" class="text-xs text-coffee-700">Warranty</label>
         <span x-data="{ mask: '99' }" class="flex items-center justify-between relative gap-3">
-            <input x-mask:dynamic="mask" class="input-coffee z-10 p-2" id="warranty" asp-for="Warranty"
+            <input x-mask:dynamic="mask" class="input-coffee z-10 p-2" id="edit-warranty" asp-for="Warranty"
                 placeholder="Type number of year or month" />
             <span class="absolute size-full rounded-md start-0 top-0 p-2 bg-coffee-500 z-0"></span>
             <select
                 class="z-10 cursor-pointer px-2 py-1.5 text-sm rounded-md focus:outline-none border bg-coffee-200 border-coffee-500 text-coffee-950"
-                id="warrantyduration" asp-for="WarrantyDuration"
+                id="edit-warrantyduration" asp-for="WarrantyDuration"
                 x-on:change="
                     mask = ($event.target.value == '1') ? '99' : '999';
                 ">
@@ -115,33 +114,33 @@ else if (Model.ResourceType == ResourceType.Equipment)
                 <option value="2">By Month</option>
             </select>
         </span>
-        <div id="validation-Warranty">
+        <div id="edit-validation-Warranty">
         </div>
     </div>
 
     @* Quantity *@
     <div class="flex flex-col gap-1 relative">
-        <label for="quantity" class="text-xs text-coffee-700">Quantity</label>
-        <input type="number" inputmode="numeric" class="input-coffee p-2" name="quantity" value="1" id="quantity"
+        <label for="edit-quantity" class="text-xs text-coffee-700">Quantity</label>
+        <input type="number" inputmode="numeric" class="input-coffee p-2" id="edit-quantity"
             asp-for="Quantity" placeholder="Type quantity here" />
-        <div id="validation-Quantity">
+        <div id="edit-validation-Quantity">
         </div>
     </div>
 
     @* Specifications *@
     <div class="flex flex-col col-span-full gap-2 w-full relative"
-        x-data="{ specs: @Json.Serialize(Model.Specifications), newKey: '', newValue: ''}">
+        x-data='{ specs: @Json.Serialize(Model.Specifications), newKey: "", newValue: ""}'>
 
         <div class="flex items-center gap-2 w-full">
             <div class="flex flex-col gap-1 relative w-full">
-                <label for="specificationtype" class="text-xs text-coffee-700">Specification Type</label>
-                <input type="text" class="w-full input-coffee p-2" id="specificationtype" x-model="newKey"
+                <label for="edit-specificationtype" class="text-xs text-coffee-700">Specification Type</label>
+                <input type="text" class="w-full input-coffee p-2" id="edit-specificationtype" x-model="newKey"
                     placeholder="ex. Color, Battery Life, Resolution, etc." class="input" />
             </div>
 
             <div class="flex flex-col gap-1 relative w-full">
-                <label for="specificationvalue" class="text-xs text-coffee-700">Specification Value</label>
-                <input type="text" class="w-full input-coffee p-2" id="specificationvalue" x-model="newValue"
+                <label for="edit-specificationvalue" class="text-xs text-coffee-700">Specification Value</label>
+                <input type="text" class="w-full input-coffee p-2" id="edit-specificationvalue" x-model="newValue"
                     placeholder="ex. Red, 1800mAh, 1920x1080px, etc." class="input" />
             </div>
         </div>
@@ -184,7 +183,7 @@ else if (Model.ResourceType == ResourceType.Equipment)
                 </template>
             </div>
 
-            <div id="validation-Specifications">
+            <div id="edit-validation-Specifications">
             </div>
         </div>
 
@@ -207,12 +206,12 @@ else if (Model.ResourceType == ResourceType.Furniture)
     </span>
 
     <div class="flex flex-col @(Model.IsOtherMaterial ? "col-span-3" : "col-span-full") gap-1 relative">
-        <label for="material" class="text-xs text-coffee-700">Material</label>
-        <select class="input-coffee p-2" id="material" asp-for="Material" hx-get="/organizer/select-furniture-material"
+        <label for="edit-material" class="text-xs text-coffee-700">Material</label>
+        <select class="input-coffee p-2" id="edit-material" asp-for="Material" hx-get="/organizer/select-furniture-material"
             hx-target="#resource-type" hx-swap="innerHTML" hx-trigger="change"
             hx-vals='js:{"selectedOption": event.target.value}' asp-items="@(new SelectList(Model.FurnitureMaterials))">
         </select>
-        <div id="validation-Material">
+        <div id="edit-validation-Material">
         </div>
     </div>
 
@@ -220,42 +219,42 @@ else if (Model.ResourceType == ResourceType.Furniture)
     {
         @* Other Material *@
         <div class="flex flex-col col-span-2 gap-1 relative">
-            <label for="othermaterial" class="text-xs text-coffee-700">Other Material</label>
-            <input type="text" class="input-coffee p-2" id="othermaterial" asp-for="OtherMaterial"
+            <label for="edit-othermaterial" class="text-xs text-coffee-700">Other Material</label>
+            <input type="text" class="input-coffee p-2" id="edit-othermaterial" asp-for="OtherMaterial"
                 placeholder="Type its specific material" />
-            <div id="validation-OtherMaterial">
+            <div id="edit-validation-OtherMaterial">
             </div>
         </div>
     }
 
     @* Quantity *@
     <div class="flex flex-col col-span-2 gap-1 relative">
-        <label for="quantity" class="text-xs text-coffee-700">Quantity</label>
-        <input type="number" inputmode="numeric" class="input-coffee p-2" name="quantity" value="1" id="quantity"
+        <label for="edit-quantity" class="text-xs text-coffee-700">Quantity</label>
+        <input type="number" inputmode="numeric" class="input-coffee p-2" id="edit-quantity"
             asp-for="Quantity" placeholder="Type quantity here" />
-        <div id="validation-Quantity">
+        <div id="edit-validation-Quantity">
         </div>
     </div>
 
     @* Dimensions *@
     <div class="flex flex-col col-span-3 gap-1 relative">
-        <label for="dimensions" class="text-xs text-coffee-700">Dimensions</label>
-        <input type="text" class="input-coffee p-2" id="dimensions" asp-for="Dimensions"
+        <label for="edit-dimensions" class="text-xs text-coffee-700">Dimensions</label>
+        <input type="text" class="input-coffee p-2" id="edit-dimensions" asp-for="Dimensions"
             placeholder="ex. 6ft x 3ft x 30in, 1920x1080px, etc." />
-        <div id="validation-Dimensions">
+        <div id="edit-validation-Dimensions">
         </div>
     </div>
 
     @* Warranty *@
     <div class="flex flex-col col-span-3 gap-1 relative">
-        <label for="warranty" class="text-xs text-coffee-700">Warranty</label>
+        <label for="edit-warranty" class="text-xs text-coffee-700">Warranty</label>
         <span x-data="{ mask: '99' }" class="flex items-center justify-between relative gap-3">
-            <input x-mask:dynamic="mask" class="input-coffee z-10 p-2" id="warranty" asp-for="Warranty"
+            <input x-mask:dynamic="mask" class="input-coffee z-10 p-2" id="edit-warranty" asp-for="Warranty"
                 placeholder="Type number of year or month" />
             <span class="absolute size-full rounded-md start-0 top-0 p-2 bg-coffee-500 z-0"></span>
             <select
                 class="z-10 cursor-pointer px-2 py-1.5 text-sm rounded-md focus:outline-none border bg-coffee-200 border-coffee-500 text-coffee-950"
-                id="warrantyduration" asp-for="WarrantyDuration"
+                id="edit-warrantyduration" asp-for="WarrantyDuration"
                 x-on:change="
                     mask = ($event.target.value == '1') ? '99' : '999';
                 ">
@@ -263,7 +262,7 @@ else if (Model.ResourceType == ResourceType.Furniture)
                 <option value="2">By Month</option>
             </select>
         </span>
-        <div id="validation-Warranty">
+        <div id="edit-validation-Warranty">
         </div>
     </div>
 }
@@ -279,25 +278,25 @@ else if (Model.ResourceType == ResourceType.Catering)
         </svg>
         Catering Information
     </span>
-
+    
     <div class="col-span-full grid grid-cols-5 gap-3"
-        x-data="{ menuItems: @Json.Serialize(Model.MenuItems ?? new List<string>()), newItem: '' }">
+        x-data='{ menuItems: @Json.Serialize(Model.MenuItems), newItem: "" }'>
         @* Guest Capacity *@
         <div class="flex flex-col col-span-2 gap-1 relative">
-            <label for="guestcapacity" class="text-xs text-coffee-700">Guest Capacity</label>
-            <input type="number" inputmode="numeric" class="input-coffee p-2" name="guestcapacity" value="1"
-                id="guestcapacity" asp-for="GuestCapacity" placeholder="Type guest capacity here" />
-            <div id="validation-GuestCapacity">
+            <label for="edit-guestcapacity" class="text-xs text-coffee-700">Guest Capacity</label>
+            <input type="number" inputmode="numeric" class="input-coffee p-2"
+                id="edit-guestcapacity" asp-for="GuestCapacity" placeholder="Type guest capacity here" />
+            <div id="edit-validation-GuestCapacity">
             </div>
         </div>
 
         @* Menu Items *@
         <div class="flex flex-col col-span-3 gap-1 relative">
 
-            <label for="menuitems" class="text-xs text-coffee-700">Menu Items</label>
+            <label for="edit-menuitems" class="text-xs text-coffee-700">Menu Items</label>
 
             <div class="flex items-center gap-2">
-                <input type="text" class="input-coffee p-2 w-full" id="menuitems" x-model="newItem"
+                <input type="text" class="input-coffee p-2 w-full" id="edit-menuitems" x-model="newItem"
                     placeholder="Type menu items here" />
                 <button type="button"
                     class="px-3 py-2 text-sm font-semibold bg-coffee-600 hover:bg-coffee-700 active:bg-coffee-900 text-white rounded-md"
@@ -357,58 +356,57 @@ else if (Model.ResourceType == ResourceType.Personnel)
 
     @* Position *@
     <div class="flex flex-col col-span-2 gap-1 relative">
-        <label for="position" class="text-xs text-coffee-700">Position</label>
-        <input type="text" class="input-coffee p-2" id="position" asp-for="Position" placeholder="Type position here" />
-        <div id="validation-Position">
+        <label for="edit-position" class="text-xs text-coffee-700">Position</label>
+        <input type="text" class="input-coffee p-2" id="edit-position" asp-for="Position"
+            placeholder="Type position here" />
+        <div id="edit-validation-Position">
         </div>
     </div>
 
     @* Shift *@
     <div class="flex flex-col col-span-3 gap-1 relative w-full">
-        <p for="shift" class="text-xs text-coffee-700">Shift</p>
+        <p for="edit-shift" class="text-xs text-coffee-700">Shift</p>
         <span class="flex items-center gap-2 w-full">
             <span class="flex items-start gap-2 w-full">
-                <label for="shiftfromdate" class="text-coffee-700 text-xs">From</label>
-                <input type="text" class="input-coffee p-2" id="shiftfromdate" asp-for="ShiftStartString"
+                <label for="edit-shiftfromdate" class="text-coffee-700 text-xs">From</label>
+                <input type="text" class="input-coffee p-2" id="edit-shiftfromdate" asp-for="ShiftStartString"
                     placeholder="Select a start time" />
             </span>
             <span class="flex items-start gap-2 w-full">
-                <label for="shifttodate" class="text-coffee-700 text-xs">To</label>
-                <input type="text" class="input-coffee p-2" id="shifttodate" asp-for="ShiftEndString"
+                <label for="edit-shifttodate" class="text-coffee-700 text-xs">To</label>
+                <input type="text" class="input-coffee p-2" id="edit-shifttodate" asp-for="ShiftEndString"
                     placeholder="Select an end time" />
             </span>
         </span>
-        <div id="validation-Shift">
+        <div id="edit-validation-Shift">
         </div>
     </div>
 
     @* Experience *@
     <div class="flex flex-col col-span-full gap-1 relative">
-        <label for="experience" class="text-xs text-coffee-700">Experience</label>
+        <label for="edit-experience" class="text-xs text-coffee-700">Experience</label>
         <span x-data="{ mask: '99' }" class="relative flex items-center gap-3">
-            <input x-mask:dynamic="mask" class="input-coffee p-2" id="experience" asp-for="Experience"
+            <input x-mask:dynamic="mask" class="input-coffee p-2" id="edit-experience" asp-for="Experience"
                 placeholder="Type number of year or month" />
-            <select class="input-coffee p-2" id="experiencetype" asp-for="ExperienceType"
-                x-on:change="
-                    mask = ($event.target.value == '1') ? '99' : '999';
-                ">
+            <select class="input-coffee p-2" id="edit-experiencetype" asp-for="ExperienceType" x-on:change="
+                        mask = ($event.target.value == '1') ? '99' : '999';
+                    ">
                 <option value="1" selected>By Year</option>
                 <option value="2">By Month</option>
             </select>
         </span>
-        <div id="validation-Experience">
+        <div id="edit-validation-Experience">
         </div>
     </div>
 
     <script>
         document.addEventListener("htmx:afterSettle", () => {
-            const shiftFromInstance = flatpickr("#shiftfromdate", {
+            const shiftFromInstance = flatpickr("#edit-shiftfromdate", {
                 enableTime: true,
                 dateFormat: "h:i K",
-                defaultDate: "00:00",
                 noCalendar: true,
                 onChange: function (selectedDates, dateStr) {
-                    const shiftToInstance = document.querySelector("#shifttodate")._flatpickr;
+                    const shiftToInstance = document.querySelector("#edit-shifttodate")._flatpickr;
                     if (shiftToInstance) {
                         let fromDate = shiftFromInstance.parseDate(dateStr, "h:i K");
                         let toDate = shiftToInstance.selectedDates[0];
@@ -422,13 +420,12 @@ else if (Model.ResourceType == ResourceType.Personnel)
                 }
             });
 
-            const shiftToInstance = flatpickr("#shifttodate", {
+            const shiftToInstance = flatpickr("#edit-shifttodate", {
                 enableTime: true,
                 dateFormat: "h:i K",
-                defaultDate: "01:00",
                 noCalendar: true,
                 onChange: function (selectedDates, dateStr) {
-                    const shiftFromInstance = document.querySelector("#shiftfromdate")._flatpickr;
+                    const shiftFromInstance = document.querySelector("#edit-shiftfromdate")._flatpickr;
                     if (shiftFromInstance) {
                         let toDate = shiftToInstance.parseDate(dateStr, "h:i K");
                         let fromDate = shiftFromInstance.selectedDates[0];

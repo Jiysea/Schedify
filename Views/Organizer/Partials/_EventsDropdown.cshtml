@@ -21,8 +21,7 @@
         {
             @foreach (var evt in Model.Events)
             {
-                <div x-on:click="open = false" hx-get="/organizer/select-event-dropdown/@evt.Id" hx-swap="innerHTML"
-                    hx-target="#resources-list"
+                <div x-on:click="open = false" hx-get="/organizer/select-event-dropdown/@evt.Id" hx-swap="none"
                     class="w-96 duration-200 ease-in-out px-4 py-2 hover:bg-zinc-100 cursor-pointer">
                     <span class="truncate text-xs">@evt.Name</span>
                 </div>

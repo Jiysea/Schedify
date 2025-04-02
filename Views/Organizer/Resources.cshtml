@@ -47,15 +47,9 @@
 
                 @* The Events selection dropdown and Add Resource Button *@
                 <div id="events-dropdown" class="flex items-center justify-end gap-3">
-
                     @await Html.PartialAsync("~/Views/Organizer/Partials/_EventsDropdown.cshtml", Model)
-
                 </div>
             </div>
-
-            @* <nav id="resources-nav">
-                <partial name="~/Views/Organizer/Partials/_ResourceNav.cshtml" model="@("Venues")" />
-            </nav> *@
         </div>
     </header>
 
@@ -67,7 +61,7 @@
         </div>
 
         @* Create Resource Modal *@
-        @await Html.PartialAsync("~/Views/Organizer/Partials/CreateResourceModal.cshtml", Model.CreateResourceViewModel)
+        @await Html.PartialAsync("~/Views/Organizer/Partials/CreateResourceModal.cshtml", Model.CUResourceViewModel)
 
         @* View Resource Modal *@
         @await Html.PartialAsync("~/Views/Organizer/Partials/ViewResourceModal.cshtml", Model.ViewResourceViewModel)

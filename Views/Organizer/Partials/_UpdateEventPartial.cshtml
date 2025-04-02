@@ -1,4 +1,4 @@
-@model UpdateEventViewModel
+@model CUEventViewModel
 
 <header class="flex items-center justify-between text-lg font-medium py-3 px-4">
     <h1 class="text-coffee-900">Edit Event</h1>
@@ -72,19 +72,19 @@
                             <span class="flex items-start gap-2 w-full">
                                 <label for="edit-startat" class="text-xs text-coffee-500 whitespace-nowrap">
                                     Start At</label>
-                                <input type="text" class="input-coffee p-2" id="edit-startat" asp-for="StartAt"
+                                <input type="text" class="input-coffee p-2" id="edit-startat" asp-for="StartAtString"
                                     placeholder="Select a start time">
                             </span>
-                            <div id="edit-validation-StartAt"></div>
+                            <div id="edit-validation-StartAtString"></div>
                         </div>
                         <div class="flex flex-col gap-1">
                             <span class="flex items-start gap-2 w-full">
                                 <label for="edit-endat" class="text-xs text-coffee-500 whitespace-nowrap">
                                     End At</label>
-                                <input type="text" class="input-coffee p-2" id="edit-endat" asp-for="EndAt"
+                                <input type="text" class="input-coffee p-2" id="edit-endat" asp-for="EndAtString"
                                     placeholder="Select an end time">
                             </span>
-                            <div id="edit-validation-EndAt"></div>
+                            <div id="edit-validation-EndAtString"></div>
                         </div>
                     </span>
                 </div>
@@ -94,7 +94,7 @@
             <div class="flex items-center justify-center gap-2 w-full">
                 <button type="submit"
                     class="duration-200 ease-in-out text-sm py-2 rounded-md w-full font-semibold text-coffee-50 bg-coffee-700 hover:bg-coffee-800 active:bg-coffee-900">
-                    SAVE
+                    Save
 
                     <svg class="htmx-indicator size-5 animate-spin" xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -109,19 +109,26 @@
                 <button type="button" hx-get="/organizer/view-event/@Model.Id" hx-target="#viewEventModalContent"
                     hx-swap="innerHTML"
                     class="duration-200 ease-in-out text-sm py-2 px-3 rounded-md font-semibold focus:outline-none text-center text-coffee-50 bg-coffee-700 hover:bg-coffee-800 active:bg-coffee-900">
-                    CANCEL
+                    Cancel
                 </button>
             </div>
         </div>
     </form>
 </main>
-
+    @{
+        Console.WriteLine(Model.StartAt);
+        Console.WriteLine(Model.StartAt);
+        Console.WriteLine(Model.StartAt);
+        Console.WriteLine(Model.EndAt);
+        Console.WriteLine(Model.EndAt);
+        Console.WriteLine(Model.EndAt);
+    }
 <script>
     document.addEventListener("htmx:afterSwap", () => {
         let startPicker = flatpickr("#edit-startat", {
             enableTime: true,
             dateFormat: "Y-m-d H:i",
-            defaultDate: new Date().fp_incr(1),
+            appendTo: document.body,
             minDate: new Date().fp_incr(1), // Tomorrow
             onChange: function (selectedDates) {
                 if (selectedDates.length > 0) {
@@ -133,8 +140,8 @@
         let endPicker = flatpickr("#edit-endat", {
             enableTime: true,
             dateFormat: "Y-m-d H:i",
+            appendTo: document.body,
             minDate: new Date().fp_incr(1), // Tomorrow
-            defaultDate: new Date().fp_incr(1), // Tomorrow
         });
     });
 </script>

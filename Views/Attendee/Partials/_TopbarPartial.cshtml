@@ -1,4 +1,8 @@
-<div class="grid grid-cols-2 w-full text-center h-[7.5vh] px-4 bg-white text-zinc-500 border-b-2 border-zinc-100">
+@{
+    var currentUrl = Context.Request.Path;
+}
+
+<div class="grid grid-cols-3 w-full text-center h-[7.5vh] px-4 bg-white text-zinc-500 border-b-2 border-zinc-100">
 
     @* Col 1 *@
     <span class="flex items-center justify-start gap-2">
@@ -7,13 +11,27 @@
         <img src="~/images/logo_landscape.png" class="h-8" alt="Schedify Logo">
     </span>
 
-    @* Col 2 *@
+    <div class="flex items-center justify-center gap-5">
+        <a href="/attendee/bookings" class="duration-200 ease-in-out text-sm font-medium px-3 py-1 rounded-md @(currentUrl == "/attendee/bookings" ? "bg-coffee-600 hover:bg-coffee-700 active:bg-coffee-900 text-coffee-50" : "text-zinc-500 hover:bg-zinc-50")">Bookings</a>
+        <a href="/attendee/events" class="duration-200 ease-in-out text-sm font-medium px-3 py-1 rounded-md @(currentUrl == "/attendee/events" ? "bg-coffee-600 hover:bg-coffee-700 active:bg-coffee-900 text-coffee-50" : "text-zinc-500 hover:bg-zinc-50")">Events</a>
+    </div>
+
+    @* Col 3 *@
     <div x-data="{open: false}" class="flex items-center justify-end gap-2">
 
         <span class="relative flex items-center">
             <button x-on:click="open = !open;" type="menu" class="rounded-full text-center">
-                <img class="size-7 object-cover rounded-full pointer-events-none" src="~/images/avatar.jpg"
-                    alt="User's Avatar">
+                @* <img class="size-7 object-cover rounded-full pointer-events-none" src="~/images/avatar.jpg"
+                    alt="User's Avatar"> *@
+
+                    <svg class="size-5 pointer-events-none rounded-full text-coffee-700" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                    width="400" height="400" viewBox="0, 0, 400,400">
+                    <g>
+                        <path
+                            d="M176.172 0.866 C 93.868 10.736,25.169 71.441,5.478 151.697 C -3.051 186.459,-1.676 227.565,9.147 261.328 C 20.494 296.728,48.476 337.791,73.179 355.294 L 75.655 357.048 76.178 351.766 C 80.395 309.166,106.791 270.961,145.195 251.873 L 153.280 247.854 150.273 245.639 C 83.673 196.571,114.046 92.549,196.154 88.509 C 281.749 84.297,319.310 194.390,249.756 245.617 L 246.777 247.810 254.834 251.851 C 293.358 271.172,319.608 309.189,323.822 351.766 L 324.345 357.048 326.821 355.335 C 332.287 351.554,353.875 328.959,360.283 320.313 C 450.002 199.243,381.887 29.005,233.012 2.229 C 222.507 0.340,187.549 -0.499,176.172 0.866 M187.891 112.092 C 147.646 119.548,124.716 163.943,141.811 201.308 C 164.580 251.077,235.420 251.077,258.189 201.308 C 279.667 154.363,238.910 102.639,187.891 112.092 M187.500 262.241 C 134.297 270.665,98.469 311.641,98.442 364.095 L 98.438 373.112 106.836 377.516 C 164.632 407.823,234.656 407.835,293.164 377.547 L 301.563 373.199 301.558 364.139 C 301.527 302.684,245.905 252.993,187.500 262.241 "
+                            stroke="none" fill="currentColor" fill-rule="evenodd"></path>
+                    </g>
+                </svg>
             </button>
 
             <div x-cloak x-show="open" x-on:click.outside="open = false"

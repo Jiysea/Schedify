@@ -10,13 +10,16 @@
     <title>@ViewData["Title"]</title>
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/css/output.css" />
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.17.2/dist/sweetalert2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/lib/sweetalert2/sweetalert2.min.css" />
+    <link rel="stylesheet" href="~/lib/toastr/toastr.min.css" />
+    <script src="~/lib/jquery/jquery-3.7.1.min.js"></script>
 </head>
 
-<body class="font-poppins antialiased">
+<body class="font-poppins subpixel-antialiased">
     @RenderBody()
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.17.2/dist/sweetalert2.all.min.js"></script>
     <script src="~/lib/htmx/htmx.min.js"></script>
+    <script src="~/lib/sweetalert2/sweetalert2.all.min.js"></script>
+    <script src="~/lib/toastr/toastr.min.js"></script>
     <script src="~/lib/signalr/dist/browser/signalr.js"></script>
     <script src="~/dist/bundle.js"></script>
     <script>
@@ -25,7 +28,7 @@
                 document.querySelectorAll("[id^='validation-']").forEach(el => el.innerHTML = "");
                 document.querySelectorAll("[id^='edit-validation-']").forEach(el => el.innerHTML = "");
             }
-        });
+        }, { passive: true });
 
         document.body.addEventListener("showSweetAlert", function (event) {
             if (event.detail) {
@@ -38,7 +41,41 @@
                     allowOutsideClick: true
                 });
             }
-        });
+        }, { passive: true });
+        document.body.addEventListener("showToast", function (event) {
+            if (event.detail) {
+                toastr.options = {
+                    "closeButton": false,
+                    "debug": false,
+                    "newestOnTop": true,
+                    "progressBar": true,
+                    "positionClass": "toast-bottom-left",
+                    "preventDuplicates": false,
+                    "onclick": null,
+                    "showDuration": "500",
+                    "hideDuration": "500",
+                    "timeOut": event.detail.timer,
+                    "extendedTimeOut": "1000",
+                    "showEasing": "swing",
+                    "hideEasing": "linear",
+                    "showMethod": "fadeIn",
+                    "hideMethod": "fadeOut"
+                }
+
+                if (event.detail.icon == "success") {
+                    toastr.success(event.detail.title);
+                }
+                else if (event.detail.icon == "error") {
+                    toastr.error(event.detail.title);
+                }
+                else if (event.detail.icon == "warning") {
+                    toastr.warning(event.detail.title);
+                }
+                else if (event.detail.icon == "info") {
+                    toastr.info(event.detail.title);
+                }
+            }
+        }, { passive: true });
     </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

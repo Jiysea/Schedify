@@ -1,3 +1,4 @@
+@using System.Globalization
 @model ViewResourceViewModel
 
 @* Top Header *@
@@ -17,6 +18,7 @@
 
 <main class="grid grid-cols-2 gap-5 p-6 relative">
 
+    @* 1st Column *@
     <div class="flex flex-col gap-5">
         @* Resource Image *@
         <div class="flex items-center justify-center w-full h-96 py-6">
@@ -29,7 +31,7 @@
             <button type="button"
                 class="w-full flex items-center justify-center gap-2 p-2 text-sm duration-200 ease-in-out rounded-md text-coffee-50 bg-coffee-700 hover:bg-coffee-800 active:bg-coffee-700"
                 hx-get="/organizer/show-update-resource/@Model.Id" hx-swap="innerHTML"
-                hx-target="#viewEventModalContent">
+                hx-target="#viewResourceModalContent">
                 <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
                     viewBox="0 0 256 256">
                     <path
@@ -39,8 +41,8 @@
                 Edit
             </button>
 
-            <button type="button" hx-delete="/organizer/delete-resource/@Model.Id"
-                hx-confirm="Are you sure you want to delete this event?" hx-swap="none"
+            <button type="button" hx-post="/organizer/delete-resource/@Model.Id"
+                hx-confirm="Are you sure you want to delete this resource?" hx-swap="none"
                 class="w-full flex items-center justify-center gap-2 p-2 text-sm duration-200 ease-in-out rounded-md bg-red-700 hover:bg-red-800 active:bg-red-900 text-red-50">
                 <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
                     viewBox="0 0 256 256">
@@ -54,12 +56,13 @@
         </div>
     </div>
 
+    @* 2nd Column *@
     <div
-        class="flex flex-col gap-10 h-[76.5vh] overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-coffee-700 p-2">
+        class="flex flex-col gap-5 h-[76.5vh] overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-coffee-700 px-2">
         @* Type of Resource *@
-        <div class="relative grid grid-cols-2 gap-3 p-5 border rounded-xl border-coffee-300">
+        <div class="relative flex flex-col gap-2 text-sm">
             <span
-                class="absolute flex items-center gap-2 start-4 -top-3 font-medium text-sm text-pumpkin-600 bg-coffee-50 px-2">
+                class="select-none flex items-center gap-2 py-1 font-medium text-sm rounded-md text-pumpkin-600 bg-pumpkin-100 px-2">
                 <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
                     viewBox="0 0 256 256">
                     <path
@@ -70,42 +73,42 @@
             </span>
 
             @* Type of Resource *@
-            <div class="flex flex-col col-span-2 gap-1 relative">
-                <p for="type" class="text-xs text-coffee-900">Type of Resource</p>
-                <span class="p-2 text-coffee-700">
+            <div class="grid grid-cols-3 w-full gap-2 px-2">
+                <span class="col-span-1 text-coffee-600">Type of Resource</span>
+                <span class="col-span-2 text-coffee-900">
                     @Model.ResourceType
                 </span>
             </div>
 
             @* Provider Name *@
-            <div class="flex flex-col col-span-2 gap-1 relative">
-                <p for="name" class="text-xs text-coffee-900">Provider Name</p>
-                <span class="p-2 text-coffee-700">
+            <div class="grid grid-cols-3 w-full gap-2 px-2">
+                <span class="col-span-1 text-coffee-600">Provider Name</span>
+                <span class="col-span-2 text-coffee-900">
                     @Model.ProviderName
                 </span>
             </div>
 
             @* Provider Phone Number *@
-            <div class="flex flex-col gap-1 relative">
-                <p for="name" class="text-xs text-coffee-900">Provider Phone Number</p>
-                <span class="p-2 text-coffee-700">
+            <div class="grid grid-cols-3 w-full gap-2 px-2">
+                <span class="col-span-1 text-coffee-600">Provider Phone Number</span>
+                <span class="col-span-2 text-coffee-900">
                     @Model.ProviderPhoneNumber
                 </span>
             </div>
 
             @* Provider Email *@
-            <div class="flex flex-col gap-1 relative">
-                <p for="name" class="text-xs text-coffee-900">Provider Email</p>
-                <span class="p-2 text-coffee-700">
+            <div class="grid grid-cols-3 w-full gap-2 px-2">
+                <span class="col-span-1 text-coffee-600">Provider Email</span>
+                <span class="col-span-2 text-coffee-900">
                     @Model.ProviderEmail
                 </span>
             </div>
         </div>
 
         @* General Information *@
-        <div class="relative grid grid-cols-5 gap-3 p-5 border rounded-xl border-coffee-300">
+        <div class="relative flex flex-col gap-2 text-sm">
             <span
-                class="absolute flex items-center gap-2 start-4 -top-3 font-medium text-sm text-pumpkin-600 bg-coffee-50 px-2">
+                class="select-none flex items-center gap-2 py-1 font-medium text-sm rounded-md text-pumpkin-600 bg-pumpkin-100 px-2">
                 <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
                     viewBox="0 0 256 256">
                     <path
@@ -116,54 +119,44 @@
             </span>
 
             @* Resource Name *@
-            <div class="flex flex-col col-span-full gap-1 relative">
-                <p for="name" class="text-xs text-coffee-900">Resource Name</p>
-                <span class="p-2 text-coffee-700">
+            <div class="grid grid-cols-3 w-full gap-2 px-2">
+                <span class="col-span-1 text-coffee-600">Resource Name</span>
+                <span class="col-span-2 text-coffee-900">
                     @Model.Name
                 </span>
             </div>
 
             @* Cost *@
-            <div class="flex flex-col col-span-2 gap-1 relative">
-                <p for="cost" class="text-xs text-coffee-900">Cost</p>
-                <span class="p-2 text-coffee-700">
-                    @Model.Cost
+            <div class="grid grid-cols-3 w-full gap-2 px-2">
+                <span class="col-span-1 text-coffee-600">Cost</span>
+                <span class="col-span-2 text-coffee-900">
+                    ₱@Model.Cost.ToString("N2")
                 </span>
             </div>
 
             @* Cost Type *@
-            <div class="flex flex-col gap-1 relative" :class="{
-                'col-span-2': ('@Model.ResourceType' == 'Venue'),
-            }">
-                <p for="costtype" class="text-xs text-coffee-900">Type of Cost</p>
-                <span class="p-2 text-coffee-700">
+            <div class="grid grid-cols-3 w-full gap-2 px-2">
+                <span class="col-span-1 text-coffee-600">Rate of Cost</span>
+                <span class="col-span-2 text-coffee-900">
                     @Model.CostType
                 </span>
             </div>
 
-            @* Quantity *@
-            <div x-show="'@Model.ResourceType' == 'Venue'" class="flex flex-col gap-1 relative">
-                <p for="quantity" class="text-xs text-coffee-900">Quantity</p>
-                <span class="p-2 text-coffee-700">
-                    @Model.Quantity
-                </span>
-            </div>
-
-            @* Descriptions *@
-            <div class="col-span-full flex flex-col gap-1 relative w-full">
-                <p for="description" class="text-xs text-coffee-900">Description</p>
-                <span class="p-2 text-coffee-700">
+            @* Description *@
+            <div class="grid grid-cols-3 w-full gap-2 px-2">
+                <span class="col-span-1 text-coffee-600">Description</span>
+                <span class="col-span-2 text-coffee-900 break-words line-clamp-[10] max-h-[10rem] overflow-hidden">
                     @Model.Description
                 </span>
             </div>
         </div>
 
         @* Type Information *@
-        <div class="relative grid grid-cols-5 gap-3 p-5 border rounded-xl border-coffee-300">
+        <div class="relative flex flex-col gap-2 text-sm">
             @if (Model.ResourceType == ResourceType.Venue)
             {
                 <span
-                    class="absolute flex items-center gap-2 start-4 -top-3 font-medium text-sm text-pumpkin-600 bg-coffee-50 px-2">
+                    class="select-none flex items-center gap-2 py-1 font-medium text-sm rounded-md text-pumpkin-600 bg-pumpkin-100 px-2">
                     <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
                         viewBox="0 0 256 256">
                         <path
@@ -174,55 +167,55 @@
                 </span>
 
                 @* Address Line 1 *@
-                <div class="flex flex-col col-span-full gap-1 relative">
-                    <p for="addressline1" class="text-xs text-coffee-900">Address Line @(Model.AddressLine2 != null ? "1" :
-                        "")
-                </p>
-                <span class="p-2 text-coffee-700">
-                    @Model.AddressLine1
-                </span>
-            </div>
+                <div class="grid grid-cols-3 w-full gap-2 px-2">
+                    <span class="col-span-1 text-coffee-600">
+                        Address Line @(Model.AddressLine2 != null ? "1" : "")
+                    </span>
+                    <span class="col-span-2 text-coffee-900">
+                        @Model.AddressLine1
+                    </span>
+                </div>
 
-            @if (Model.AddressLine2 != null)
+                @if (Model.AddressLine2 != null)
                 {
                     @* Address Line 2 *@
-                    <div class="flex flex-col col-span-full gap-1 relative">
-                        <p for="addressline2" class="text-xs text-coffee-900">Address Line 2</p>
-                        <span class="p-2 text-coffee-700">
+                    <div class="grid grid-cols-3 w-full gap-2 px-2">
+                        <span class="col-span-1 text-coffee-600">Address Line 2</span>
+                        <span class="col-span-2 text-coffee-900">
                             @Model.AddressLine2
                         </span>
                     </div>
                 }
 
                 @* City/Municipality *@
-                <div class="flex flex-col col-span-2 gap-1 relative">
-                    <p for="citymunicipality" class="text-xs text-coffee-900">City/Municipality</p>
-                    <span class="p-2 text-coffee-700">
+                <div class="grid grid-cols-3 w-full gap-2 px-2">
+                    <span class="col-span-1 text-coffee-600">City/Municipality</span>
+                    <span class="col-span-2 text-coffee-900">
                         @Model.CityMunicipality
                     </span>
                 </div>
 
                 @* Province *@
-                <div class="flex flex-col col-span-3 gap-1 relative">
-                    <p for="province" class="text-xs text-coffee-900">Province</p>
-                    <span class="p-2 text-coffee-700">
+                <div class="grid grid-cols-3 w-full gap-2 px-2">
+                    <span class="col-span-1 text-coffee-600">Province</span>
+                    <span class="col-span-2 text-coffee-900">
                         @Model.Province
                     </span>
                 </div>
 
                 @* Capacity *@
-                <div class="flex flex-col col-span-2 gap-1 relative">
-                    <p for="capacity" class="text-xs text-coffee-900">Capacity</p>
-                    <span class="p-2 text-coffee-700">
+                <div class="grid grid-cols-3 w-full gap-2 px-2">
+                    <span class="col-span-1 text-coffee-600">Capacity</span>
+                    <span class="col-span-2 text-coffee-900">
                         @Model.Capacity
                     </span>
                 </div>
 
                 @* Size *@
-                <div class="flex flex-col gap-1 w-full relative">
-                    <p for="size" class="text-xs text-coffee-900">Size</p>
-                    <span class="flex items-center w-full p-2 text-coffee-700">
-                        @Model.Size ft&sup2;
+                <div class="grid grid-cols-3 w-full gap-2 px-2">
+                    <span class="col-span-1 text-coffee-600">Size</span>
+                    <span class="col-span-2 text-coffee-900">
+                        @Model.Size.ToString("N2") ft&sup2;
                     </span>
                 </div>
             }
@@ -230,7 +223,7 @@
             else if (Model.ResourceType == ResourceType.Equipment)
             {
                 <span
-                    class="absolute flex items-center gap-2 start-4 -top-3 font-medium text-sm text-pumpkin-600 bg-coffee-50 px-2">
+                    class="select-none flex items-center gap-2 py-1 font-medium text-sm rounded-md text-pumpkin-600 bg-pumpkin-100 px-2">
                     <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
                         viewBox="0 0 256 256">
                         <path
@@ -241,31 +234,60 @@
                 </span>
 
                 @* Brand *@
-                <div class="flex flex-col col-span-full gap-1 relative">
-                    <p for="brand" class="text-xs text-coffee-900">Brand</p>
-                    <span class="p-2 text-coffee-700">
+                <div class="grid grid-cols-3 w-full gap-2 px-2">
+                    <span class="col-span-1 text-coffee-600">Brand</span>
+                    <span class="col-span-2 text-coffee-900">
                         @Model.Brand
                     </span>
                 </div>
 
+                @* Quantity *@
+                <div class="grid grid-cols-3 w-full gap-2 px-2">
+                    <span class="col-span-1 text-coffee-600">Quantity</span>
+                    <span class="col-span-2 text-coffee-900">
+                        @Model.Quantity
+                    </span>
+                </div>
+
                 @* Specifications *@
-                <div class="flex flex-col col-span-full gap-2 w-full relative">
-                    <p for="specificationtype" class="text-xs text-coffee-900">Specification Type</p>
-                    <div class="p-6 border rounded-xl border-coffee-300 text-coffee-700">
+                <div class="grid grid-cols-3 w-full gap-2 px-2">
+                    <span class="col-span-1 text-coffee-600">Specifications</span>
+                    <div class="flex flex-col gap-2 col-span-2">
                         @foreach (var spec in Model.Specifications)
                         {
-                            <div class="flex items-center gap-1">
-                                <span class="text-coffee-900">@spec.Key:</span>
-                                <span class="text-coffee-700">@spec.Value</span>
+                            <div class="flex items-center gap-2">
+                                <span class="flex items-center text-coffee-600 text-xs">
+                                    <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                                        fill="currentColor" viewBox="0 0 256 256">
+                                        <path d="M156,128a28,28,0,1,1-28-28A28,28,0,0,1,156,128Z"></path>
+                                    </svg>
+                                    @spec.Key:
+                                </span>
+                                <span class="text-coffee-900">@spec.Value</span>
                             </div>
                         }
                     </div>
+                </div>
+
+                @* Warranty *@
+                <div class="grid grid-cols-3 w-full gap-2 px-2">
+                    <span class="col-span-1 text-coffee-600">End of Warranty</span>
+                    <span class="col-span-2 text-coffee-900">
+                        @if (Model.Warranty <= DateTime.UtcNow)
+                        {
+                            <p>None</p>
+                        }
+                        else
+                        {
+                            @Model.Warranty?.ToString("Y")
+                        }
+                    </span>
                 </div>
             }
             else if (Model.ResourceType == ResourceType.Furniture)
             {
                 <span
-                    class="absolute flex items-center gap-2 start-4 -top-3 font-medium text-sm text-pumpkin-600 bg-coffee-50 px-2">
+                    class="select-none flex items-center gap-2 py-1 font-medium text-sm rounded-md text-pumpkin-600 bg-pumpkin-100 px-2">
                     <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
                         viewBox="0 0 256 256">
                         <path
@@ -276,18 +298,48 @@
                 </span>
 
                 @* Material *@
-                <div class="flex flex-col col-span-3 gap-1 relative">
-                    <p for="material" class="text-xs text-coffee-900">Material</p>
-                    <span class="p-2 text-coffee-700">
-                        @Model.Material
+                <div class="grid grid-cols-3 w-full gap-2 px-2">
+                    <span class="col-span-1 text-coffee-600">Material</span>
+                    <span class="col-span-2 text-coffee-900">
+                        @if (Model.Material == FurnitureMaterial.Other)
+                        {
+                            @Model.OtherMaterial
+                        }
+                        else
+                        {
+                            @Model.Material
+                        }
                     </span>
                 </div>
 
                 @* Dimensions *@
-                <div class="flex flex-col col-span-2 gap-1 relative">
-                    <p for="dimensions" class="text-xs text-coffee-900">Dimensions</p>
-                    <span class="p-2 text-coffee-700">
+                <div class="grid grid-cols-3 w-full gap-2 px-2">
+                    <span class="col-span-1 text-coffee-600">Dimensions</span>
+                    <span class="col-span-2 text-coffee-900">
                         @Model.Dimensions
+                    </span>
+                </div>
+
+                @* Quantity *@
+                <div class="grid grid-cols-3 w-full gap-2 px-2">
+                    <span class="col-span-1 text-coffee-600">Quantity</span>
+                    <span class="col-span-2 text-coffee-900">
+                        @Model.Quantity
+                    </span>
+                </div>
+
+                @* Warranty *@
+                <div class="grid grid-cols-3 w-full gap-2 px-2">
+                    <span class="col-span-1 text-coffee-600">End of Warranty</span>
+                    <span class="col-span-2 text-coffee-900">
+                        @if (Model.Warranty <= DateTime.UtcNow)
+                        {
+                            <p>None</p>
+                        }
+                        else
+                        {
+                            @Model.Warranty?.ToString("Y")
+                        }
                     </span>
                 </div>
             }
@@ -295,7 +347,7 @@
             else if (Model.ResourceType == ResourceType.Catering)
             {
                 <span
-                    class="absolute flex items-center gap-2 start-4 -top-3 font-medium text-sm text-pumpkin-600 bg-coffee-50 px-2">
+                    class="select-none flex items-center gap-2 py-1 font-medium text-sm rounded-md text-pumpkin-600 bg-pumpkin-100 px-2">
                     <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
                         viewBox="0 0 256 256">
                         <path
@@ -305,15 +357,27 @@
                     Catering Information
                 </span>
 
+                @* Guest Capacity *@
+                <div class="grid grid-cols-3 w-full gap-2 px-2">
+                    <span class="col-span-1 text-coffee-600">Guest Capacity</span>
+                    <span class="col-span-2 text-coffee-900">
+                        @Model.GuestCapacity
+                    </span>
+                </div>
+
                 @* Menu Items *@
-                <div class="flex flex-col col-span-full gap-1 w-full relative">
-                    <p for="menuitems" class="text-xs text-coffee-900">Menu Items</p>
-                    <div class="p-6 border rounded-xl border-coffee-300 text-coffee-700">
+                <div class="grid grid-cols-3 w-full gap-2 px-2">
+                    <span class="col-span-1 text-coffee-600">Menu Items</span>
+                    <div class="flex flex-col gap-2 col-span-2">
                         @foreach (var menu in Model.MenuItems!)
                         {
-                            <div class="flex items-center gap-1">
-                                <span class="text-coffee-700">@menu</span>
-                            </div>
+                            <span class="flex items-center gap-1 text-coffee-900">
+                                <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                                    fill="currentColor" viewBox="0 0 256 256">
+                                    <path d="M156,128a28,28,0,1,1-28-28A28,28,0,0,1,156,128Z"></path>
+                                </svg>
+                                @menu
+                            </span>
                         }
                     </div>
                 </div>
@@ -322,7 +386,7 @@
             else if (Model.ResourceType == ResourceType.Personnel)
             {
                 <span
-                    class="absolute flex items-center gap-2 start-4 -top-3 font-medium text-sm text-pumpkin-600 bg-coffee-50 px-2">
+                    class="select-none flex items-center gap-2 py-1 font-medium text-sm rounded-md text-pumpkin-600 bg-pumpkin-100 px-2">
                     <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
                         viewBox="0 0 256 256">
                         <path
@@ -333,25 +397,27 @@
                 </span>
 
                 @* Position *@
-                <div class="flex flex-col col-span-2 gap-1 relative">
-                    <p for="position" class="text-xs text-coffee-900">Position</p>
-                    <span class="p-2 text-coffee-700">
+                <div class="grid grid-cols-3 w-full gap-2 px-2">
+                    <span class="col-span-1 text-coffee-600">Position</span>
+                    <span class="col-span-2 text-coffee-900">
                         @Model.Position
                     </span>
                 </div>
 
                 @* Preferred Shift *@
-                <div class="flex flex-col col-span-3 gap-1 relative w-full">
-                    <p for="shift" class="text-xs text-coffee-900">Preferred Shift</p>
-                    <span class="p-2 text-coffee-700">
-                        @Model.ShiftStart
+                <div class="grid grid-cols-3 w-full gap-2 px-2">
+                    <span class="col-span-1 text-coffee-600">Shift Schedule</span>
+                    <span class="col-span-2 text-coffee-900">
+                        @DateTime.Today.Add(Model.ShiftStart).ToString("hh:mmtt", CultureInfo.InvariantCulture)
+                        -
+                        @DateTime.Today.Add(Model.ShiftEnd).ToString("hh:mmtt", CultureInfo.InvariantCulture)
                     </span>
                 </div>
 
                 @* Experience *@
-                <div class="flex flex-col col-span-full gap-1 relative">
-                    <p for="experience" class="text-xs text-coffee-900">Experience</p>
-                    <span class="p-2 text-coffee-700">
+                <div class="grid grid-cols-3 w-full gap-2 px-2">
+                    <span class="col-span-1 text-coffee-600">Experience</span>
+                    <span class="col-span-2 text-coffee-900">
                         @Model.Experience
                     </span>
                 </div>

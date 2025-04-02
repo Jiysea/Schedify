@@ -21,16 +21,22 @@ public class AttendeeController : Controller
         _eventService = eventService;
         _resourceService = resourceService;
     }
-    
-    [Route("attendee/events")]
-    public ActionResult Events()
-    {
-        var events = _eventService.GetEventsPublished();
 
-        var model = new AttendeeEventsViewModel
+    [HttpGet("attendee/bookings")]
+    public IActionResult Bookings()
+    {
+        return View();
+    }
+    
+    [HttpGet("attendee/events")]
+    public IActionResult Events()
+    {
+        // var events = _eventService.GetEventsPublished();
+
+        var model = new EventsViewModel
         {
-            PublishedEvents = events,
-            EventsCount = events.Count,
+            // PublishedEvents = events,
+            // EventsCount = events.Count,
         };
         
         return View(model);
