@@ -14,6 +14,10 @@ public class Event
     [Required]
     [StringLength(100)]
     public required string Name { get; set; }
+    
+    [Required]
+    [StringLength(20)]
+    public required string ShortName { get; set; }
 
     [Required]
     [StringLength(500)]

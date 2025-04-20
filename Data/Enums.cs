@@ -22,6 +22,7 @@ public enum EventStatus
 public enum BookingStatus
 {
     Pending,
+    Paid,
     Confirmed,
     Cancelled,
     Refunded
@@ -73,12 +74,4 @@ public enum FurnitureMaterial
     Glass,
     Fabric,
     Other
-}
-
-public enum AllocationStatus
-{
-    Available,
-    Pending,
-    Allocated,
-    Unavailable
 }

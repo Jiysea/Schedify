@@ -1,4 +1,6 @@
+using System.Text;
 using System.Text.Json;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -42,6 +44,19 @@ public class OrganizerController : Controller
         AlertHub.SaveConnectionId(userId, connectionId); // Save user’s connection ID somewhere
         return Ok();
     }
+
+    [HttpGet("organizer/generate-event-shortname")]
+    public IActionResult GenerateEventShortName(CUEventViewModel viewModel)
+    {
+        viewModel.ShortName = GenerateShortName(viewModel.Name);
+        Console.WriteLine(viewModel.IsEdit);
+
+        return PartialView("~/Views/Organizer/Partials/_UpdateEventShortNamePartial.cshtml", viewModel);
+    }
+
+    // --------------------------------------------------------------------------------------
+    // # Events
+    // --------------------------------------------------------------------------------------
 
     [HttpGet("organizer/events")]
     public async Task<IActionResult> Events()
@@ -119,7 +134,7 @@ public class OrganizerController : Controller
         var evt = await _eventService.GetEventByIdAsync(id);
 
         if (evt == null) return NotFound();
-        
+
 
         if (evt.Status != EventStatus.Draft)
         {
@@ -132,13 +147,15 @@ public class OrganizerController : Controller
         {
             Id = evt.Id,
             Name = evt.Name,
+            ShortName = evt.ShortName,
             Description = evt.Description,
             StartAtString = evt.StartAt.ToString("yyyy-MM-dd HH:mm"),
             EndAtString = evt.EndAt.ToString("yyyy-MM-dd HH:mm"),
             Status = evt.Status,
             EntryFeeString = evt.EntryFee.ToString("N2"),
+            IsEdit = true,
         };
-
+        Console.WriteLine(viewModel.IsEdit);
         return PartialView("~/Views/Organizer/Partials/_UpdateEventPartial.cshtml", viewModel);
     }
 
@@ -305,6 +322,7 @@ public class OrganizerController : Controller
             {
                 Id = evt.Id,
                 Name = evt.Name,
+                ShortName = evt.ShortName,
                 Description = evt.Description,
                 StartAtString = evt.StartAt.ToString("yyyy-MM-dd HH:mm"),
                 EndAtString = evt.EndAt.ToString("yyyy-MM-dd HH:mm"),
@@ -360,7 +378,7 @@ public class OrganizerController : Controller
     }
 
     // --------------------------------------------------------------------------------------
-    // Resources
+    // # Resources
     // --------------------------------------------------------------------------------------
 
     [HttpPost("organizer/resources/set-event")]
@@ -374,15 +392,15 @@ public class OrganizerController : Controller
     public async Task<IActionResult> Resources()
     {
         var eventIdString = HttpContext.Session.GetString("SelectedEventId");
-
+        Console.WriteLine(eventIdString);
         List<Event>? events = await _eventService.GetEventsByUser();
 
         Event? evt = null;
 
         // Get the Event Id to pass to the hidden input
-        if (eventIdString != null)
+        if (Guid.TryParse(eventIdString, out var parsedId))
         {
-            evt = await _eventService.GetEventByIdAsync(Guid.Parse(eventIdString));
+            evt = await _eventService.GetEventByIdAsync(parsedId);
         }
         else if (events!.Any() != false)
         {
@@ -413,9 +431,10 @@ public class OrganizerController : Controller
         {
             EventId = evt.Id,
             Events = events!,
-            SelectedName = evt.Name,
+            SelectedName = evt.ShortName,
             Resources = resources!,
             ResourceImages = _resourceService.GetResourceImageFromList(resources!),
+            IsEventOnDraft = evt.Status == EventStatus.Draft ? true : false,
         };
 
         return View(model);
@@ -439,9 +458,10 @@ public class OrganizerController : Controller
         {
             EventId = EventId,
             Events = events,
-            SelectedName = evt != null ? evt.Name : events.First().Name,
+            SelectedName = evt != null ? evt.ShortName : events.First().ShortName,
             Resources = resources!,
             ResourceImages = _resourceService.GetResourceImageFromList(resources!),
+            IsEventOnDraft = evt!.Status == EventStatus.Draft,
         };
 
         return PartialView("~/Views/Organizer/Partials/_UpdateResourcesListPartial.cshtml", model);
@@ -561,9 +581,10 @@ public class OrganizerController : Controller
         {
             EventId = EventId,
             Events = events!,
-            SelectedName = evt.Name,
+            SelectedName = evt.ShortName,
             Resources = resources!,
             ResourceImages = _resourceService.GetResourceImageFromList(resources!),
+            IsEventOnDraft = evt.Status == EventStatus.Draft ? true : false,
         };
 
         // Define the Toastr event in the HX-Trigger header
@@ -624,9 +645,10 @@ public class OrganizerController : Controller
         {
             EventId = evt.Id,
             Events = events!,
-            SelectedName = evt.Name,
+            SelectedName = evt.ShortName,
             Resources = resources!,
             ResourceImages = _resourceService.GetResourceImageFromList(resources!),
+            IsEventOnDraft = evt.Status == EventStatus.Draft ? true : false,
         };
 
         // Define the Toastr event in the HX-Trigger header
@@ -640,7 +662,7 @@ public class OrganizerController : Controller
     {
         var viewModel = await _resourceService.GetCUResourceViewModel(ResourceId);
 
-        if(viewModel == null)
+        if (viewModel == null)
         {
             Console.WriteLine("viewModel");
             return NotFound();
@@ -713,9 +735,10 @@ public class OrganizerController : Controller
         {
             EventId = model.EventId,
             Events = events!,
-            SelectedName = evt.Name,
+            SelectedName = evt.ShortName,
             Resources = resources!,
             ResourceImages = _resourceService.GetResourceImageFromList(resources!),
+            IsEventOnDraft = evt.Status == EventStatus.Draft ? true : false,
             ViewResourceViewModel = viewResourceViewModel,
         };
 
@@ -753,13 +776,17 @@ public class OrganizerController : Controller
     // }
 
     // --------------------------------------------------------------------------------------
-    // Feedbacks
+    // # Feedbacks
     // --------------------------------------------------------------------------------------
 
 
     [Route("organizer/feedbacks")]
     [HttpGet]
     public IActionResult Feedbacks() => View();
+
+    // --------------------------------------------------------------------------------------
+    // # Stats
+    // --------------------------------------------------------------------------------------
 
     [Route("organizer/stats")]
     [HttpGet]
@@ -798,6 +825,62 @@ public class OrganizerController : Controller
         };
 
         return viewModel;
+    }
+
+    /// <summary>
+    /// Generates a ShortName up to 20 chars:
+    /// 1. If there's a colon, take everything before it (but no more than 20 chars).
+    /// 2. Otherwise, add whole words until you hit 20 chars.
+    /// 3. If the first word itself exceeds 20, just truncate at 20 chars.
+    /// </summary>
+    private string GenerateShortName(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            return string.Empty;
+
+        const int MaxLength = 20;
+
+        // 1) Colon rule
+        var colonIndex = name.IndexOf(':');
+        if (colonIndex >= 0)
+        {
+            // take everything before the colon, then clamp to 20 chars
+            var beforeColon = name.Substring(0, colonIndex);
+            return beforeColon.Length <= MaxLength
+                ? beforeColon
+                : beforeColon.Substring(0, MaxLength);
+        }
+
+        // 2) Word‑by‑word accumulation
+        var words = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        var sb = new StringBuilder();
+
+        foreach (var word in words)
+        {
+            // how many chars if we add this word (plus a space if needed)
+            var extra = (sb.Length > 0 ? 1 : 0) + word.Length;
+            if (sb.Length + extra > MaxLength)
+            {
+                // 3) if no words added yet (first word > MaxLength), truncate the original
+                if (sb.Length == 0)
+                    return name.Substring(0, Math.Min(MaxLength, name.Length));
+                break;
+            }
+
+            if (sb.Length > 0)
+                sb.Append(' ');
+            sb.Append(word);
+        }
+
+        // if nothing was appended, fall back to simple truncate
+        if (sb.Length == 0)
+            return name.Substring(0, Math.Min(MaxLength, name.Length));
+
+        // final clamp just in case
+        var result = sb.ToString();
+        return result.Length <= MaxLength
+            ? result
+            : result.Substring(0, MaxLength);
     }
 
     // private ViewResourceViewModel? GetViewResourceViewModel(Resource? resource)

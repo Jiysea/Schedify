@@ -12,7 +12,7 @@ using Schedify.Data;
 namespace Schedify.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250316113923_InitialMigration")]
+    [Migration("20250419001709_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -187,51 +187,6 @@ namespace Schedify.Migrations
                     b.ToTable("ActivityLogs");
                 });
 
-            modelBuilder.Entity("Schedify.Models.BillingAddress", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("AddressLine1")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<string>("AddressLine2")
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<string>("CityMunicipality")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.Property<string>("Province")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("BillingAddresses");
-                });
-
             modelBuilder.Entity("Schedify.Models.Conversation", b =>
                 {
                     b.Property<Guid>("Id")
@@ -317,6 +272,11 @@ namespace Schedify.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("ShortName")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<DateTime>("StartAt")
                         .HasColumnType("datetime2");
 
@@ -377,38 +337,6 @@ namespace Schedify.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("EventBookings");
-                });
-
-            modelBuilder.Entity("Schedify.Models.EventResource", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("AddedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.Property<Guid>("EventId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("ResourceId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal>("TotalCost")
-                        .HasColumnType("decimal(18, 2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EventId");
-
-                    b.HasIndex("ResourceId");
-
-                    b.ToTable("EventResources");
                 });
 
             modelBuilder.Entity("Schedify.Models.Feedback", b =>
@@ -518,6 +446,59 @@ namespace Schedify.Migrations
                     b.ToTable("Messages");
                 });
 
+            modelBuilder.Entity("Schedify.Models.Payment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18, 2)");
+
+                    b.Property<string>("CardBrand")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<Guid>("EventBookingId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("EventShortName")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("PANLastDigits")
+                        .HasMaxLength(4)
+                        .HasColumnType("nvarchar(4)");
+
+                    b.Property<string>("PaymentMethod")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("SessionId")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Status")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventBookingId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Payments");
+                });
+
             modelBuilder.Entity("Schedify.Models.Resource", b =>
                 {
                     b.Property<Guid>("Id")
@@ -540,6 +521,9 @@ namespace Schedify.Migrations
                         .IsRequired()
                         .HasMaxLength(300)
                         .HasColumnType("nvarchar(300)");
+
+                    b.Property<Guid>("EventId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -569,10 +553,9 @@ namespace Schedify.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("EventId");
 
                     b.ToTable("Resources");
                 });
@@ -619,8 +602,8 @@ namespace Schedify.Migrations
                     b.Property<string>("Specifications")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Warranty")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("Warranty")
+                        .HasColumnType("date");
 
                     b.HasKey("Id");
 
@@ -653,8 +636,8 @@ namespace Schedify.Migrations
                     b.Property<Guid>("ResourceId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Warranty")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("Warranty")
+                        .HasColumnType("date");
 
                     b.HasKey("Id");
 
@@ -895,17 +878,6 @@ namespace Schedify.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Schedify.Models.BillingAddress", b =>
-                {
-                    b.HasOne("Schedify.Models.User", "User")
-                        .WithMany("BillingAddresses")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Schedify.Models.Conversation", b =>
                 {
                     b.HasOne("Schedify.Models.Event", "Event")
@@ -966,25 +938,6 @@ namespace Schedify.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Schedify.Models.EventResource", b =>
-                {
-                    b.HasOne("Schedify.Models.Event", "Event")
-                        .WithMany("EventResources")
-                        .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Schedify.Models.Resource", "Resource")
-                        .WithMany("EventResources")
-                        .HasForeignKey("ResourceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Event");
-
-                    b.Navigation("Resource");
-                });
-
             modelBuilder.Entity("Schedify.Models.Feedback", b =>
                 {
                     b.HasOne("Schedify.Models.Event", "Event")
@@ -1037,6 +990,36 @@ namespace Schedify.Migrations
                     b.Navigation("Conversation");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Schedify.Models.Payment", b =>
+                {
+                    b.HasOne("Schedify.Models.EventBooking", "EventBooking")
+                        .WithMany("Payments")
+                        .HasForeignKey("EventBookingId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Schedify.Models.User", "User")
+                        .WithMany("Payments")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EventBooking");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Schedify.Models.Resource", b =>
+                {
+                    b.HasOne("Schedify.Models.Event", "Event")
+                        .WithMany("Resources")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
                 });
 
             modelBuilder.Entity("Schedify.Models.ResourceCatering", b =>
@@ -1108,15 +1091,18 @@ namespace Schedify.Migrations
 
                     b.Navigation("EventBookings");
 
-                    b.Navigation("EventResources");
-
                     b.Navigation("Feedbacks");
+
+                    b.Navigation("Resources");
+                });
+
+            modelBuilder.Entity("Schedify.Models.EventBooking", b =>
+                {
+                    b.Navigation("Payments");
                 });
 
             modelBuilder.Entity("Schedify.Models.Resource", b =>
                 {
-                    b.Navigation("EventResources");
-
                     b.Navigation("Image");
 
                     b.Navigation("ResourceCatering")
@@ -1139,8 +1125,6 @@ namespace Schedify.Migrations
                 {
                     b.Navigation("ActivityLogs");
 
-                    b.Navigation("BillingAddresses");
-
                     b.Navigation("ConversationUsers");
 
                     b.Navigation("Events");
@@ -1150,6 +1134,8 @@ namespace Schedify.Migrations
                     b.Navigation("Image");
 
                     b.Navigation("Messages");
+
+                    b.Navigation("Payments");
                 });
 #pragma warning restore 612, 618
         }

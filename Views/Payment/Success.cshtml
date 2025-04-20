@@ -1,0 +1,167 @@
+﻿@model ReceiptViewModel
+
+@{
+    ViewData["Title"] = "Payment Successful | Schedify";
+}
+
+<style>
+    @@page {
+        size: A4 portrait;
+        margin: 0;
+    }
+
+    @@media print {
+        * {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        body {
+            margin: 2cm;
+            color: #000;
+            background: #fff;
+        }
+
+        #no-print,
+        #back-button {
+            display: none !important;
+        }
+    }
+</style>
+
+<div x-data="generateQR" x-init="startQR('@ViewBag.QRContent')"
+    class="min-h-screen print:min-h-0 print:bg-white bg-[#F9FBFA]">
+    <div
+        class="absolute print:static print:translate-x-0 print:translate-y-0 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+
+        @* Center Box *@
+        <div
+            class="relative flex flex-col items-center gap-8 py-10 rounded-lg border border-charcoal-300 print:w-[28rem] md:min-w-[28rem] md:max-w-md bg-charcoal-50 text-charcoal-900 print:mx-auto">
+
+            <span id="back-button" class="absolute top-2 start-2 z-10">
+                <a href="/attendee/bookings"
+                    class="duration-200 ease-in-out flex items-center justify-center gap-2 px-2 py-1 text-sm font-semibold rounded-md bg-coffee-600 hover:bg-coffee-700 active:bg-coffee-800 text-coffee-50 active:text-coffee-100">
+                    <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256">
+                        <path
+                            d="M236,200a12,12,0,0,1-24,0,84.09,84.09,0,0,0-84-84H61l27.52,27.51a12,12,0,0,1-17,17l-48-48a12,12,0,0,1,0-17l48-48a12,12,0,0,1,17,17L61,92h67A108.12,108.12,0,0,1,236,200Z">
+                        </path>
+                    </svg>
+                    My Bookings
+                </a>
+            </span>
+
+            @* Schedify Logo Watermark *@
+            <span class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0">
+                <svg class="size-[45rem] text-charcoal-900 opacity-5" xmlns="http://www.w3.org/2000/svg"
+                    xmlns:xlink="http://www.w3.org/1999/xlink" width="400" height="400" viewBox="0, 0, 400,400">
+                    <g>
+                        <path
+                            d="M188.587 45.484 C 122.626 52.678,81.808 120.344,106.149 182.148 C 120.641 218.945,158.107 245.067,196.392 245.067 L 200.000 245.067 200.000 298.400 L 200.000 351.733 202.808 351.733 C 220.886 351.733,242.659 344.188,258.543 332.418 C 312.709 292.282,312.938 211.954,259.002 171.411 C 243.034 159.409,221.116 151.733,202.808 151.733 L 200.000 151.733 200.000 98.400 L 200.000 45.067 195.933 45.096 C 193.697 45.113,190.391 45.287,188.587 45.484 M258.250 48.943 C 224.511 53.870,205.531 91.121,221.230 121.600 C 239.796 157.646,292.157 157.463,310.373 121.288 C 328.702 84.889,298.563 43.057,258.250 48.943 M127.600 251.760 C 93.118 256.679,73.876 293.689,89.763 324.533 C 108.424 360.762,160.967 360.369,179.056 323.867 C 196.874 287.911,167.059 246.131,127.600 251.760 "
+                            stroke="none" fill="currentColor" fill-rule="evenodd"></path>
+                        <path id="path1"
+                            d="M188.587 45.484 C 122.626 52.678,81.808 120.344,106.149 182.148 C 120.641 218.945,158.107 245.067,196.392 245.067 L 200.000 245.067 200.000 298.400 L 200.000 351.733 202.808 351.733 C 220.886 351.733,242.659 344.188,258.543 332.418 C 312.709 292.282,312.938 211.954,259.002 171.411 C 243.034 159.409,221.116 151.733,202.808 151.733 L 200.000 151.733 200.000 98.400 L 200.000 45.067 195.933 45.096 C 193.697 45.113,190.391 45.287,188.587 45.484 M258.250 48.943 C 224.511 53.870,205.531 91.121,221.230 121.600 C 239.796 157.646,292.157 157.463,310.373 121.288 C 328.702 84.889,298.563 43.057,258.250 48.943 M127.600 251.760 C 93.118 256.679,73.876 293.689,89.763 324.533 C 108.424 360.762,160.967 360.369,179.056 323.867 C 196.874 287.911,167.059 246.131,127.600 251.760 "
+                            stroke="none" fill="currentColor" fill-rule="evenodd"></path>
+                        <path id="path2"
+                            d="M188.587 45.484 C 122.626 52.678,81.808 120.344,106.149 182.148 C 120.641 218.945,158.107 245.067,196.392 245.067 L 200.000 245.067 200.000 298.400 L 200.000 351.733 202.808 351.733 C 220.886 351.733,242.659 344.188,258.543 332.418 C 312.709 292.282,312.938 211.954,259.002 171.411 C 243.034 159.409,221.116 151.733,202.808 151.733 L 200.000 151.733 200.000 98.400 L 200.000 45.067 195.933 45.096 C 193.697 45.113,190.391 45.287,188.587 45.484 M258.250 48.943 C 224.511 53.870,205.531 91.121,221.230 121.600 C 239.796 157.646,292.157 157.463,310.373 121.288 C 328.702 84.889,298.563 43.057,258.250 48.943 M127.600 251.760 C 93.118 256.679,73.876 293.689,89.763 324.533 C 108.424 360.762,160.967 360.369,179.056 323.867 C 196.874 287.911,167.059 246.131,127.600 251.760 "
+                            stroke="none" fill="currentColor" fill-rule="evenodd"></path>
+                        <path id="path3"
+                            d="M188.587 45.484 C 122.626 52.678,81.808 120.344,106.149 182.148 C 120.641 218.945,158.107 245.067,196.392 245.067 L 200.000 245.067 200.000 298.400 L 200.000 351.733 202.808 351.733 C 220.886 351.733,242.659 344.188,258.543 332.418 C 312.709 292.282,312.938 211.954,259.002 171.411 C 243.034 159.409,221.116 151.733,202.808 151.733 L 200.000 151.733 200.000 98.400 L 200.000 45.067 195.933 45.096 C 193.697 45.113,190.391 45.287,188.587 45.484 M258.250 48.943 C 224.511 53.870,205.531 91.121,221.230 121.600 C 239.796 157.646,292.157 157.463,310.373 121.288 C 328.702 84.889,298.563 43.057,258.250 48.943 M127.600 251.760 C 93.118 256.679,73.876 293.689,89.763 324.533 C 108.424 360.762,160.967 360.369,179.056 323.867 C 196.874 287.911,167.059 246.131,127.600 251.760 "
+                            stroke="none" fill="currentColor" fill-rule="evenodd"></path>
+                        <path id="path4"
+                            d="M188.587 45.484 C 122.626 52.678,81.808 120.344,106.149 182.148 C 120.641 218.945,158.107 245.067,196.392 245.067 L 200.000 245.067 200.000 298.400 L 200.000 351.733 202.808 351.733 C 220.886 351.733,242.659 344.188,258.543 332.418 C 312.709 292.282,312.938 211.954,259.002 171.411 C 243.034 159.409,221.116 151.733,202.808 151.733 L 200.000 151.733 200.000 98.400 L 200.000 45.067 195.933 45.096 C 193.697 45.113,190.391 45.287,188.587 45.484 M258.250 48.943 C 224.511 53.870,205.531 91.121,221.230 121.600 C 239.796 157.646,292.157 157.463,310.373 121.288 C 328.702 84.889,298.563 43.057,258.250 48.943 M127.600 251.760 C 93.118 256.679,73.876 293.689,89.763 324.533 C 108.424 360.762,160.967 360.369,179.056 323.867 C 196.874 287.911,167.059 246.131,127.600 251.760 "
+                            stroke="none" fill="currentColor" fill-rule="evenodd"></path>
+                    </g>
+                </svg>
+            </span>
+
+            <button type="button" id="no-print" onclick="window.print()"
+                class="duration-200 ease-in-out absolute top-2 end-2 p-2 rounded-lg hover:bg-coffee-100 active:bg-coffee-200 text-charcoal-500 hover:text-coffee-700 active:text-coffee-800">
+                <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                    viewBox="0 0 256 256">
+                    <path
+                        d="M240,96v80a8,8,0,0,1-8,8H200v32a8,8,0,0,1-8,8H64a8,8,0,0,1-8-8V184H24a8,8,0,0,1-8-8V96c0-13.23,11.36-24,25.33-24H56V40a8,8,0,0,1,8-8H192a8,8,0,0,1,8,8V72h14.67C228.64,72,240,82.77,240,96ZM72,72H184V48H72Zm112,88H72v48H184Zm16-44a12,12,0,1,0-12,12A12,12,0,0,0,200,116Z">
+                    </path>
+                </svg>
+            </button>
+
+            @* 1st Part / Header or the Payment Message *@
+            <div class="flex flex-col items-center gap-2 px-5 z-10">
+                @* Check Mark SVG *@
+                <span class="p-1.5 bg-coffee-600 rounded-2xl">
+                    <svg class="size-10 text-coffee-50" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                        fill="currentColor" viewBox="0 0 256 256">
+                        <path
+                            d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm45.66,85.66-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35a8,8,0,0,1,11.32,11.32Z">
+                        </path>
+                    </svg>
+                </span>
+
+                <div class="flex flex-col items-center px-5">
+                    <span class="font-semibold text-xl">Payment Successful</span>
+                    <span class="text-charcoal-500">Thank you for your order!</span>
+                </div>
+            </div>
+
+            @* 2nd Part / The QR Code *@
+            <div class="flex flex-col items-center gap-2 z-10">
+                <span
+                    class="flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-md bg-charcoal-100 text-charcoal-600">
+                    <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                        viewBox="0 0 256 256">
+                        <path
+                            d="M208,28H188V24a12,12,0,0,0-24,0v4H92V24a12,12,0,0,0-24,0v4H48A20,20,0,0,0,28,48V208a20,20,0,0,0,20,20H208a20,20,0,0,0,20-20V48A20,20,0,0,0,208,28ZM68,52a12,12,0,0,0,24,0h72a12,12,0,0,0,24,0h16V76H52V52ZM52,204V100H204V204Zm92-76a16,16,0,1,1-16-16A16,16,0,0,1,144,128Zm48,0a16,16,0,1,1-16-16A16,16,0,0,1,192,128ZM96,176a16,16,0,1,1-16-16A16,16,0,0,1,96,176Zm48,0a16,16,0,1,1-16-16A16,16,0,0,1,144,176Zm48,0a16,16,0,1,1-16-16A16,16,0,0,1,192,176Z">
+                        </path>
+                    </svg>
+                    @Model.EventShortName
+                </span>
+                <div class="bg-charcoal-100 rounded-lg p-5" id="qrcode"></div>
+            </div>
+
+            <hr class="w-full border-charcoal-300">
+
+            @* 3rd Part / Transaction Details *@
+            <div class="flex flex-col w-full gap-2 px-5 text-sm z-10">
+
+                @* Payment / Transaction Date *@
+                <div class="flex items-center justify-between w-full">
+                    <span class="text-charcoal-700">Transaction Date</span>
+                    <span class="">@Model.CreatedAt.ToString("MMM dd, yyyy / hh:mm:ss tt")</span>
+                </div>
+
+                @* Payment Method *@
+                <div class="flex items-center justify-between w-full">
+                    <span class="text-charcoal-700">Payment Method</span>
+                    <span>
+                        <span class="capitalize">@Model.PaymentMethod</span>
+                        <span class="uppercase">(@Model.CardBrand ****@Model.Last4)</span>
+                    </span>
+                </div>
+
+                @* Total Payment Amount *@
+                <div class="flex items-center justify-between w-full">
+                    <span class="text-charcoal-700">Total Amount</span>
+                    <span class="">₱@Model.Amount.ToString("N2")</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('generateQR', () => ({
+            qrcode: null,
+
+            startQR(content) {
+                this.qrcode = new QRCode("qrcode", {
+                    text: content,
+                    width: 175,
+                    height: 175,
+                    colorDark: "#2B2826",
+                    colorLight: "#E2E0DF",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            }
+        }));
+    });
+</script>

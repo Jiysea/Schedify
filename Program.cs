@@ -1,10 +1,12 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Schedify.Configuration;
 using Schedify.Data;
 using Schedify.Hubs;
 using Schedify.Models;
 using Schedify.Services;
+using Stripe;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,8 +14,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddSignalR();
 
+// Stripe configuration
+builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
+StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Add Hosted Service for Updating Open Events to Ongoing
+// builder.Services.AddHostedService<EventStatusUpdater>();
 
 // Add Identity
 builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
@@ -61,7 +70,9 @@ builder.Services.AddDistributedMemoryCache();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ResourceService>();
-builder.Services.AddScoped<EventService>();
+builder.Services.AddScoped<StripeService>();
+builder.Services.AddScoped<BookingService>();
+builder.Services.AddScoped<Schedify.Services.EventService>();
 
 var app = builder.Build();
 

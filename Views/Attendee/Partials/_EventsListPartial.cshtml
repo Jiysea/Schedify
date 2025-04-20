@@ -2,84 +2,170 @@
 
 
 @* All Events *@
-@if (Model.PublishedEvents.Any())
+@if (Model.OpenedEvents.Any())
 {
-    <div class="flex flex-col gap-2 mb-6">
-
-        @foreach (var evt in Model.PublishedEvents)
+    <div class="grid gap-2 mb-6">
+        @foreach (var evt in Model.OpenedEvents)
         {
-            <div class="flex items-center gap-2 w-full p-2 rounded-lg border-2 border-zinc-300 bg-white">
+            var venueResource = evt.Resources.FirstOrDefault(r => r.ResourceType == ResourceType.Venue);
+
+            string? fullAddress = venueResource!.ResourceVenue.AddressLine1 + ", " + (venueResource.ResourceVenue.AddressLine2
+            != null
+            ? venueResource!.ResourceVenue.AddressLine2 + ", " : "") + venueResource!.ResourceVenue.CityMunicipality + ", " +
+            venueResource!.ResourceVenue.Province;
+
+            var venueImage = Model.EventImages.GetValueOrDefault(evt.Id, "");
+            var organizerImage = Model.OrganizerImages.GetValueOrDefault(evt.UserId, "");
+            var attendeeCount = Model.EventAttendeeCounts.GetValueOrDefault(evt.Id, 0);
+
+            @* 1 Card per Event: Clickable *@
+            <div x-on:click="viewEventModal = !viewEventModal" hx-get="/attendee/view-event/@evt.Id"
+                hx-target="#viewEventModalContent" hx-swap="innerHTML"
+                class="cursor-pointer flex items-center gap-4 w-full p-2 rounded-lg border-2 border-zinc-300 hover:border-coffee-300 bg-white hover:bg-coffee-50 duration-200 ease-in-out group">
                 @* Resource Image *@
-                <span class="flex items-center justify-center">
-                    <img class="object-cover h-24 w-full rounded-md"
-                        src="/resources/" alt="Venue spot">
+                <span class="flex items-center justify-center flex-shrink size-28">
+                    <img class="object-cover size-28 rounded-md"
+                        src="/resources/@venueImage" alt="Venue spot">
                 </span>
 
                 @* Body *@
-                <div class="flex flex-col flex-grow gap-2">
-                    <span class="text-base font-medium text-coffee-900">
-                        @evt.Name
-                    </span>
+                <div class="flex flex-col justify-between flex-grow gap-2">
 
-                    <div class="flex items-center justify-start gap-2 text-xs">
-                        @if (evt.Status == EventStatus.Open)
-                        {
-                            <span class="flex items-center justify-center gap-2 text-zinc-500 font-medium">
-                                <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
-                                    viewBox="0 0 256 256">
-                                    <path
-                                        d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z">
-                                    </path>
-                                </svg>
-                                @if ((evt.StartAt - DateTime.Today).Days == 0)
+                    @* Event Name *@
+                    <div class="text-base font-medium text-coffee-900">
+                        @evt.Name
+                    </div>
+
+                    @* Event Description *@
+                    @* <div class="flex items-center gap-2 text-sm md:max-w-md lg:max-w-3xl xl:max-w-5xl">
+                        <p class="w-full line-clamp-2 text-zinc-500 italic">@evt.Description</p>
+                    </div> *@
+                        
+                    @* Event Organizer Image and Name *@
+                    <div class="flex flex-col gap-1">
+                        <div class="text-xs text-zinc-500">
+                            Organized By 
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <span class="flex items-center justify-center flex-shrink size-5">
+                                @if(!string.IsNullOrEmpty(organizerImage))
                                 {
-                                    TimeSpan ts = evt.StartAt - DateTime.Today;
-                                    <p>Starts In @ts</p>
+                                    <img class="object-cover size-5 rounded-full"
+                                        src="/avatar/@organizerImage" alt="Organizer Image">
                                 }
                                 else
                                 {
-                                    <p>@((evt.StartAt - DateTime.Today).Days) Days Left</p>
+                                    <svg class="duration-200 ease-in-out size-5 rounded-full text-zinc-500 group-hover:text-coffee-500" xmlns="http://www.w3.org/2000/svg"
+                                        xmlns:xlink="http://www.w3.org/1999/xlink" width="400" height="400" viewBox="0, 0, 400,400">
+                                        <g>
+                                            <path
+                                                d="M176.172 0.866 C 93.868 10.736,25.169 71.441,5.478 151.697 C -3.051 186.459,-1.676 227.565,9.147 261.328 C 20.494 296.728,48.476 337.791,73.179 355.294 L 75.655 357.048 76.178 351.766 C 80.395 309.166,106.791 270.961,145.195 251.873 L 153.280 247.854 150.273 245.639 C 83.673 196.571,114.046 92.549,196.154 88.509 C 281.749 84.297,319.310 194.390,249.756 245.617 L 246.777 247.810 254.834 251.851 C 293.358 271.172,319.608 309.189,323.822 351.766 L 324.345 357.048 326.821 355.335 C 332.287 351.554,353.875 328.959,360.283 320.313 C 450.002 199.243,381.887 29.005,233.012 2.229 C 222.507 0.340,187.549 -0.499,176.172 0.866 M187.891 112.092 C 147.646 119.548,124.716 163.943,141.811 201.308 C 164.580 251.077,235.420 251.077,258.189 201.308 C 279.667 154.363,238.910 102.639,187.891 112.092 M187.500 262.241 C 134.297 270.665,98.469 311.641,98.442 364.095 L 98.438 373.112 106.836 377.516 C 164.632 407.823,234.656 407.835,293.164 377.547 L 301.563 373.199 301.558 364.139 C 301.527 302.684,245.905 252.993,187.500 262.241 "
+                                                stroke="none" fill="currentColor" fill-rule="evenodd"></path>
+                                        </g>
+                                    </svg>
                                 }
                             </span>
-                        }
 
-                        @if (evt.Status == EventStatus.Open)
-                        {
-                            <span class="bg-amber-100 text-amber-500 rounded-md font-semibold px-3 py-1">
-                                OPEN
+                            <span class="text-sm text-zinc-700 group-hover:text-coffee-700">
+                                @evt.User.FirstName @evt.User.LastName
                             </span>
-                        }
+                        </div>
+                    </div>
 
-                        <span class="flex items-center gap-2 border text-zinc-500 border-zinc-500 rounded-lg px-3 py-1.5">
+                    @* Sub details *@
+                    <div class="flex items-center justify-start gap-2 text-xs">
+
+                        @* Starting Time (Countdown | Not Real-time) *@
+                        <span
+                            class="duration-200 ease-in-out flex items-center justify-center px-2 py-1 rounded-md gap-1 bg-zinc-100 group-hover:bg-coffee-100 text-zinc-500 group-hover:text-coffee-500">
+                            <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                                viewBox="0 0 256 256">
+                                <path
+                                    d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Zm-68-76a12,12,0,1,1-12-12A12,12,0,0,1,140,132Zm44,0a12,12,0,1,1-12-12A12,12,0,0,1,184,132ZM96,172a12,12,0,1,1-12-12A12,12,0,0,1,96,172Zm44,0a12,12,0,1,1-12-12A12,12,0,0,1,140,172Zm44,0a12,12,0,1,1-12-12A12,12,0,0,1,184,172Z">
+                                </path>
+                            </svg>
+
+                            @if ((evt.StartAt - DateTime.Now).TotalHours < 48 && (evt.StartAt - DateTime.Now).TotalHours > 24)
+                            {
+                                <p>1 Day Left</p>
+                            }
+                            else if ((evt.StartAt - DateTime.Now).TotalHours < 24 && (evt.StartAt - DateTime.Now).TotalHours > 2)
+                            {
+                                TimeSpan ts = evt.StartAt - DateTime.Now;
+                                <p>Starts in @($"{(int)ts.TotalHours} hours")</p>
+                            }
+                            else if ((evt.StartAt - DateTime.Now).TotalHours < 2 && (evt.StartAt - DateTime.Now).TotalHours > 1)
+                            {
+                                <p>Starts in 1 hour</p>
+                            }
+                            else if ((evt.StartAt - DateTime.Now).TotalMinutes < 60 && (evt.StartAt - DateTime.Now).TotalMinutes > 2)
+                            {
+                                TimeSpan ts = evt.StartAt - DateTime.Now;
+                                <p>Starts in @($"{(int)ts.Minutes:D2} minutes")</p>
+                            }
+                            else if ((evt.StartAt - DateTime.Now).TotalMinutes < 2 && (evt.StartAt - DateTime.Now).TotalMinutes > 1)
+                            {
+                                <p>Starts in 1 minute</p>
+                            }
+                            else if ((evt.StartAt - DateTime.Now).TotalSeconds < 60 && (evt.StartAt - DateTime.Now).TotalSeconds > 2)
+                            {
+                                TimeSpan ts = evt.StartAt - DateTime.Now;
+                                <p>Starts in @($"{(int)ts.TotalSeconds:D2} seconds")</p>
+                            }
+                            else if ((evt.StartAt - DateTime.Now).TotalSeconds < 2)
+                            {
+                                <p>Starts in 1 second</p>
+                            }
+                            else
+                            {
+                                <p>Starts in @((evt.StartAt - DateTime.Now).Days) Days</p>
+                            }
+                        </span>
+
+
+                        @* Full Address *@
+                        <span class="duration-200 ease-in-out flex items-center gap-2 px-2 py-1 rounded-md bg-zinc-100 group-hover:bg-coffee-100 text-zinc-500 group-hover:text-coffee-500">
+                            <span class="size-4">
+                                <svg class="size-4 me-2" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                                    fill="currentColor" viewBox="0 0 256 256">
+                                    <path
+                                        d="M112,80a16,16,0,1,1,16,16A16,16,0,0,1,112,80ZM64,80a64,64,0,0,1,128,0c0,59.95-57.58,93.54-60,94.95a8,8,0,0,1-7.94,0C121.58,173.54,64,140,64,80Zm16,0c0,42.2,35.84,70.21,48,78.5,12.15-8.28,48-36.3,48-78.5a48,48,0,0,0-96,0Zm122.77,67.63a8,8,0,0,0-5.54,15C213.74,168.74,224,176.92,224,184c0,13.36-36.52,32-96,32s-96-18.64-96-32c0-7.08,10.26-15.26,26.77-21.36a8,8,0,0,0-5.54-15C29.22,156.49,16,169.41,16,184c0,31.18,57.71,48,112,48s112-16.82,112-48C240,169.41,226.78,156.49,202.77,147.63Z">
+                                    </path>
+                                </svg>
+                            </span>
+                            <span class="line-clamp-2 overflow-hidden text-ellipsis">
+                                @fullAddress
+                            </span>
+                        </span>
+
+                        @* Attendee Count *@
+                        <span class="flex items-center gap-2 border text-zinc-500 group-hover:text-coffee-500 border-zinc-500 group-hover:border-coffee-500 rounded-lg px-2 py-1">
                             <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
                                 viewBox="0 0 256 256">
                                 <path
                                     d="M117.25,157.92a60,60,0,1,0-66.5,0A95.83,95.83,0,0,0,3.53,195.63a8,8,0,1,0,13.4,8.74,80,80,0,0,1,134.14,0,8,8,0,0,0,13.4-8.74A95.83,95.83,0,0,0,117.25,157.92ZM40,108a44,44,0,1,1,44,44A44.05,44.05,0,0,1,40,108Zm210.14,98.7a8,8,0,0,1-11.07-2.33A79.83,79.83,0,0,0,172,168a8,8,0,0,1,0-16,44,44,0,1,0-16.34-84.87,8,8,0,1,1-5.94-14.85,60,60,0,0,1,55.53,105.64,95.83,95.83,0,0,1,47.22,37.71A8,8,0,0,1,250.14,206.7Z">
                                 </path>
                             </svg>
-                            @* @evt.AttendeeCount *@
+                            @attendeeCount
                         </span>
                     </div>
                 </div>
 
-                @* View Button *@
-                <div class="flex flex-shrink">
-                    <button type="menu" x-on:click="viewEventModal = !viewEventModal" hx-get="/attendee/view-event/@evt.Id"
-                        hx-target="#viewEventModalContent" hx-swap="innerHTML"
-                        class="duration-200 ease-in-out rounded-lg focus:outline-none text-center p-2 hover:bg-coffee-700 active:bg-coffee-900 text-zinc-500 hover:text-coffee-50 active:text-coffee-50">
-                        <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
-                            viewBox="0 0 256 256">
-                            <path
-                                d="M247.31,124.76c-.35-.79-8.82-19.58-27.65-38.41C194.57,61.26,162.88,48,128,48S61.43,61.26,36.34,86.35C17.51,105.18,9,124,8.69,124.76a8,8,0,0,0,0,6.5c.35.79,8.82,19.57,27.65,38.4C61.43,194.74,93.12,208,128,208s66.57-13.26,91.66-38.34c18.83-18.83,27.3-37.61,27.65-38.4A8,8,0,0,0,247.31,124.76ZM128,192c-30.78,0-57.67-11.19-79.93-33.25A133.47,133.47,0,0,1,25,128,133.33,133.33,0,0,1,48.07,97.25C70.33,75.19,97.22,64,128,64s57.67,11.19,79.93,33.25A133.46,133.46,0,0,1,231.05,128C223.84,141.46,192.43,192,128,192Zm0-112a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Z">
-                            </path>
-                        </svg>
-                    </button>
-                </div>
             </div>
         }
     </div>
 }
 else
 {
-    <p class="size-full flex items-center justify-center">No events found.</p>
+    @* Shows when there's no currently opened event *@
+    <div class="flex flex-col items-center justify-center size-full font-medium text-coffee-600">
+        <svg class="size-24" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+            viewBox="0 0 256 256">
+            <path
+                d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM157.66,170.34a8,8,0,0,1-11.32,11.32L128,163.31l-18.34,18.35a8,8,0,0,1-11.32-11.32L116.69,152,98.34,133.66a8,8,0,0,1,11.32-11.32L128,140.69l18.34-18.35a8,8,0,0,1,11.32,11.32L139.31,152ZM208,80H48V48H72v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24Z">
+            </path>
+        </svg>
+        <p class="text-base mt-4">No open events found.</p>
+        <p class="text-sm text-coffee-500">Wait for an organizer to open one</p>
+    </div>
 }

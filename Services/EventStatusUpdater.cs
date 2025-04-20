@@ -37,12 +37,13 @@ namespace Schedify.Services
                         // Find events that need status updates
                         var now = DateTime.UtcNow;
                         var events = await dbContext.Events
-                            .Where(e => (e.Status == EventStatus.Open && e.StartAt <= now) ||
-                                        (e.Status == EventStatus.Ongoing && e.EndAt <= now))
+                            .Where(e => (e.Status == EventStatus.Open) ||
+                                        (e.Status == EventStatus.Ongoing))
                             .ToListAsync(stoppingToken);
 
                         foreach (var evt in events)
                         {
+                        
                             if (evt.Status == EventStatus.Open && evt.StartAt <= now)
                             {
                                 evt.Status = EventStatus.Ongoing;

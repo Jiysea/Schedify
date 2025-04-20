@@ -1,0 +1,12 @@
+@model CUEventViewModel
+
+@if (!Model.IsEdit)
+{
+    <input type="text" autocomplete="off" maxlength="20" class="input-coffee p-2" id="shortname" asp-for="ShortName"
+        placeholder="Type short name here" />
+}
+else
+{
+    <input type="text" autocomplete="off" maxlength="20" class="input-coffee p-2" id="edit-shortname" asp-for="ShortName"
+        placeholder="Type short name here" />
+}

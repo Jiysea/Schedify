@@ -15,6 +15,7 @@ public class ResourceViewModel
     public List<Event> Events { get; set; } = new List<Event>();
     public Guid EventId { get; set; }
     public string? SelectedName { get; set; } = null!;
+    public bool IsEventOnDraft { get; set; } = false;
 
     // Add the image
     public Dictionary<Guid, string?> ResourceImages { get; set; } = []; // Maps ResourceId → ImageFileName

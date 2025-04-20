@@ -33,19 +33,46 @@
                 </h3>
 
                 @* Event Name *@
-                <div class="flex flex-col col-span-full gap-1 relative">
+                <div class="flex flex-col col-span-4 gap-1 relative">
                     <label for="edit-name" class="text-xs text-coffee-900">Event Name</label>
-                    <input type="text" autocomplete="off" maxlength="100" autofocus class="input-coffee p-2"
-                        id="edit-name" asp-for="Name" placeholder="Type event name here" />
+                    <input type="text" autocomplete="off" maxlength="100" class="input-coffee p-2"
+                        hx-indicator="#edit-shortname-loader" hx-get="/organizer/generate-event-shortname" hx-include="[name='IsEdit']"
+                        hx-trigger="blur" hx-target="#edit-shortname" hx-swap="outerHTML" id="edit-name" asp-for="Name"
+                        placeholder="Type event name here" />
 
                     <div id="edit-validation-Name">
+                    </div>
+                </div>
+
+                <input type="hidden" readonly asp-for="IsEdit">
+
+                @* Event Short Name *@
+                <div class="flex flex-col col-span-2 gap-1 relative">
+                    <label for="edit-shortname" class="text-xs text-coffee-900">Short Name</label>
+                    <span class="relative">
+                        @await Html.PartialAsync("~/Views/Organizer/Partials/_UpdateEventShortNamePartial.cshtml", Model)
+
+                        <svg id="edit-shortname-loader"
+                            class="absolute end-2 top-2 htmx-indicator size-5 animate-spin text-coffee-700"
+                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid"
+                            xmlns:xlink="http://www.w3.org/1999/xlink">
+                            <g>
+                                <circle stroke-dasharray="164.93361431346415 56.97787143782138" r="35" stroke-width="10"
+                                    stroke="currentColor" fill="none" cy="50" cx="50" transform="matrix(1,0,0,1,0,0)">
+                                </circle>
+                                <g></g>
+                            </g>
+                        </svg>
+                    </span>
+
+                    <div id="edit-validation-ShortName">
                     </div>
                 </div>
 
                 @* Description *@
                 <div class="flex flex-col col-span-full gap-1 relative">
                     <label for="edit-description" class="text-xs text-coffee-900">Description</label>
-                    <textarea type="text" autocomplete="off" autofocus class="input-coffee p-2 scrollbar-thin"
+                    <textarea type="text" autocomplete="off" class="input-coffee p-2 scrollbar-thin"
                         maxlength="500" rows="3" id="edit-description" style="resize: none;" asp-for="Description"
                         placeholder="Describe what kind of event this will be or how your attendees are going to enjoy this."></textarea>
 
@@ -56,7 +83,7 @@
                 @* Entry Fee *@
                 <div class="flex flex-col col-span-2 gap-1 relative">
                     <label for="edit-entryfee" class="text-xs text-coffee-900">Entry Fee</label>
-                    <input type="text" x-mask:dynamic="$money($input)" autocomplete="off" autofocus
+                    <input type="text" x-mask:dynamic="$money($input)" autocomplete="off"
                         class="input-coffee p-2" id="edit-entryfee" asp-for="EntryFeeString"
                         placeholder="Type fee here" />
 
@@ -115,14 +142,6 @@
         </div>
     </form>
 </main>
-    @{
-        Console.WriteLine(Model.StartAt);
-        Console.WriteLine(Model.StartAt);
-        Console.WriteLine(Model.StartAt);
-        Console.WriteLine(Model.EndAt);
-        Console.WriteLine(Model.EndAt);
-        Console.WriteLine(Model.EndAt);
-    }
 <script>
     document.addEventListener("htmx:afterSwap", () => {
         let startPicker = flatpickr("#edit-startat", {

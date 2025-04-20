@@ -16,12 +16,32 @@
 
 <main class="flex flex-col gap-10 p-6 relative">
     <div class="flex items-center justify-end gap-2 w-full">
-            <button type="button"
-                class="flex flex-1 items-center justify-center p-2 text-sm font-semibold duration-200 ease-in-out rounded-md border bg-coffee-700 hover:bg-coffee-800 active:bg-coffee-900 text-coffee-50"
-                hx-patch="/attendee/book-event/@Model.Id" hx-swap="none"
-                hx-confirm="Are you sure you want to book this event?">
+
+        <button type="button"
+            class="flex flex-1 items-center justify-center gap-2 p-2 text-sm font-semibold duration-200 ease-in-out rounded-md border @(Model.IsEventBooked ? "bg-zinc-300 text-zinc-500 cursor-not-allowed" : "bg-coffee-700 hover:bg-coffee-800 active:bg-coffee-900 text-coffee-50")"
+            @(!Model.IsEventBooked ? $"hx-get=/attendee/checkout/{@Model.Id} hx-swap=none hx-indicator=#book-loader" : "disabled")>
+            <span>
                 BOOK THIS EVENT
-            </button>
+            </span>
+
+            <svg class="icon-default size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                fill="currentColor" viewBox="0 0 256 256">
+                <path
+                    d="M208,24H72A32,32,0,0,0,40,56V224a8,8,0,0,0,8,8H192a8,8,0,0,0,0-16H56a16,16,0,0,1,16-16H208a8,8,0,0,0,8-8V32A8,8,0,0,0,208,24ZM120,40h48v72L148.79,97.6a8,8,0,0,0-9.6,0L120,112Zm80,144H72a31.82,31.82,0,0,0-16,4.29V56A16,16,0,0,1,72,40h32v88a8,8,0,0,0,12.8,6.4L144,114l27.21,20.4A8,8,0,0,0,176,136a8,8,0,0,0,8-8V40h16Z">
+                </path>
+            </svg>
+
+            <svg id="book-loader" class="htmx-indicator size-5 animate-spin" xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <g>
+                    <circle stroke-dasharray="164.93361431346415 56.97787143782138" r="35" stroke-width="10"
+                        stroke="currentColor" fill="none" cy="50" cx="50" transform="matrix(1,0,0,1,0,0)">
+                    </circle>
+                    <g></g>
+                </g>
+            </svg>
+        </button>
+
     </div>
 
     @* General Information *@
@@ -64,40 +84,40 @@
         @* Status *@
         <div class="flex flex-col col-span-full relative">
             <p class="text-xs text-coffee-900">Status</p>
-            <span class="p-2 font-semibold uppercase">
+            <span class="p-2 font-medium uppercase text-sm">
                 @if (@Model.Status == EventStatus.Draft)
                 {
-                    <span class="rounded-md py-1 px-3 text-zinc-700 bg-zinc-300">
+                    <span class="rounded-md py-1 px-2 text-zinc-500 bg-zinc-100">
                         @Model.Status
                     </span>
                 }
                 else if (@Model.Status == EventStatus.Open)
                 {
-                    <span class="rounded-md py-1 px-3 text-yellow-700 bg-yellow-300">
+                    <span class="rounded-md py-1 px-2 text-blue-500 bg-blue-100">
                         @Model.Status
                     </span>
                 }
                 else if (@Model.Status == EventStatus.Ongoing)
                 {
-                    <span class="rounded-md py-1 px-3 text-green-700 bg-green-300">
+                    <span class="rounded-md py-1 px-2 text-green-500 bg-green-100">
                         @Model.Status
                     </span>
                 }
                 else if (@Model.Status == EventStatus.Completed)
                 {
-                    <span class="rounded-md py-1 px-3 text-blue-700 bg-blue-300">
+                    <span class="rounded-md py-1 px-2 text-indigo-500 bg-indigo-100">
                         @Model.Status
                     </span>
                 }
                 else if (@Model.Status == EventStatus.Cancelled)
                 {
-                    <span class="rounded-md py-1 px-3 text-red-700 bg-red-300">
+                    <span class="rounded-md py-1 px-2 text-red-500 bg-red-100">
                         @Model.Status
                     </span>
                 }
                 else if (@Model.Status == EventStatus.Postponed)
                 {
-                    <span class="rounded-md py-1 px-3 text-fuchsia-700 bg-fuchsia-300">
+                    <span class="rounded-md py-1 px-2 text-orange-500 bg-orange-100">
                         @Model.Status
                     </span>
                 }

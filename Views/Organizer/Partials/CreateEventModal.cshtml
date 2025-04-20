@@ -4,7 +4,7 @@
     class="fixed inset-0 flex justify-center items-start bg-black/50 backdrop-blur-sm overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-coffee-700 z-50 p-4">
 
     @* White Box *@
-    <div x-data x-trap.noscroll="createEventModal" @@keydown.escape="createEventModal = false;" 
+    <div x-data x-trap.noscroll="createEventModal" @@keydown.escape="createEventModal = false;"
         @@close-modal.camel="createEventModal = false;" class="bg-coffee-50 rounded-lg shadow-lg">
 
         @* Top Header *@
@@ -24,7 +24,7 @@
         <hr class="w-full border-coffee-100">
 
         <main class="">
-            <form id="create-event-modal" action="post" hx-post="/organizer/create-event" hx-swap="none">
+            <form id="create-event-modal" action="post" hx-post="/organizer/create-event" hx-swap="none" hx-indicator="#create-event-loader">
 
                 @* Body *@
                 <div class="flex flex-col gap-10 px-6 py-10">
@@ -43,19 +43,42 @@
                         </h3>
 
                         @* Event Name *@
-                        <div class="flex flex-col col-span-full gap-1 relative">
+                        <div class="flex flex-col col-span-4 gap-1 relative">
                             <label for="name" class="text-xs text-coffee-900">Event Name</label>
-                            <input type="text" autocomplete="off" maxlength="100" autofocus class="input-coffee p-2"
+                            <input type="text" autocomplete="off" maxlength="100" class="input-coffee p-2" hx-indicator="#shortname-loader"
+                                hx-get="/organizer/generate-event-shortname" hx-trigger="blur" hx-target="#shortname" hx-swap="outerHTML"
                                 id="name" asp-for="Name" placeholder="Type event name here" />
 
                             <div id="validation-Name">
                             </div>
                         </div>
 
+                        @* Event Short Name *@
+                        <div class="flex flex-col col-span-2 gap-1 relative">
+                            <label for="shortname" class="text-xs text-coffee-900">Short Name</label>
+                            <span class="relative">
+                                @await Html.PartialAsync("~/Views/Organizer/Partials/_UpdateEventShortNamePartial.cshtml", Model)
+
+                                <svg id="shortname-loader" class="absolute end-2 top-2 htmx-indicator size-5 animate-spin text-coffee-700" xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 100 100" preserveAspectRatio="xMidYMid"
+                                    xmlns:xlink="http://www.w3.org/1999/xlink">
+                                    <g>
+                                        <circle stroke-dasharray="164.93361431346415 56.97787143782138" r="35" stroke-width="10"
+                                            stroke="currentColor" fill="none" cy="50" cx="50" transform="matrix(1,0,0,1,0,0)">
+                                        </circle>
+                                        <g></g>
+                                    </g>
+                                </svg>
+                            </span>
+
+                            <div id="validation-ShortName">
+                            </div>
+                        </div>
+
                         @* Description *@
                         <div class="flex flex-col col-span-full gap-1 relative">
                             <label for="description" class="text-xs text-coffee-900">Description</label>
-                            <textarea type="text" autocomplete="off" autofocus class="input-coffee p-2 scrollbar-thin"
+                            <textarea type="text" autocomplete="off" class="input-coffee p-2 scrollbar-thin"
                                 maxlength="500" rows="3" id="description" style="resize: none;" asp-for="Description"
                                 placeholder="Describe what kind of event this will be or how your attendees are going to enjoy this."></textarea>
 
@@ -66,7 +89,7 @@
                         @* Entry Fee *@
                         <div class="flex flex-col col-span-2 gap-1 relative">
                             <label for="entryfeestring" class="text-xs text-coffee-900">Entry Fee</label>
-                            <input type="text" x-mask:dynamic="$money($input)" autocomplete="off" autofocus
+                            <input type="text" x-mask:dynamic="$money($input)" autocomplete="off"
                                 class="input-coffee p-2" id="entryfeestring" asp-for="EntryFeeString"
                                 placeholder="Type fee here" />
 
@@ -89,8 +112,8 @@
                                                 </path>
                                             </svg>
                                         </span>
-                                        <input type="text" class="input-coffee ps-12 pe-2 py-2 cursor-pointer" id="startat"
-                                            asp-for="StartAtString" placeholder="Select a start time" />
+                                        <input type="text" class="input-coffee ps-12 pe-2 py-2 cursor-pointer"
+                                            id="startat" asp-for="StartAtString" placeholder="Select a start time" />
                                     </div>
                                     <div id="validation-StartAtString">
                                     </div>
@@ -114,8 +137,8 @@
                                                 </path>
                                             </svg>
                                         </span>
-                                        <input type="text" class="input-coffee ps-12 pe-2 py-2 cursor-pointer" id="endat"
-                                            asp-for="EndAtString" placeholder="Select an end time" />
+                                        <input type="text" class="input-coffee ps-12 pe-2 py-2 cursor-pointer"
+                                            id="endat" asp-for="EndAtString" placeholder="Select an end time" />
                                     </div>
                                     <div id="validation-EndAtString">
                                     </div>
@@ -126,12 +149,12 @@
                 </div>
 
                 @* Footer *@
-                <div class="mt-4 flex items-center justify-center gap-2 w-full py-3 px-4"   >
+                <div class="mt-4 flex items-center justify-center gap-2 w-full py-3 px-4">
                     <button type="submit"
                         class="duration-200 ease-in-out text-sm py-2 w-full font-medium text-coffee-50 bg-coffee-700 hover:bg-coffee-800 active:bg-coffee-900 rounded-md">
                         SAVE
-                        
-                        <svg class="htmx-indicator size-5 animate-spin" xmlns="http://www.w3.org/2000/svg"
+
+                        <svg id="create-event-loader" class="htmx-indicator size-5 animate-spin" xmlns="http://www.w3.org/2000/svg"
                             viewBox="0 0 100 100" preserveAspectRatio="xMidYMid"
                             xmlns:xlink="http://www.w3.org/1999/xlink">
                             <g>
@@ -155,20 +178,20 @@
             dateFormat: "Y-m-d H:i",
             appendTo: document.body,
             defaultDate: new Date().fp_incr(1),
-            @* minDate: new Date().fp_incr(1), // Tomorrow
+            minDate: new Date().fp_incr(1), // Tomorrow
             onChange: function (selectedDates) {
                 if (selectedDates.length > 0) {
                     endPicker.set("minDate", selectedDates[0]); // Set end date min to start date
                 }
-            } *@
+            }
         });
 
-        let endPicker = flatpickr("#endat", {
-            enableTime: true,
-            dateFormat: "Y-m-d H:i",
-            appendTo: document.body,
-            @* minDate: new Date().fp_incr(1), // Tomorrow *@
-            defaultDate: new Date().fp_incr(1), // Tomorrow
+    let endPicker = flatpickr("#endat", {
+        enableTime: true,
+        dateFormat: "Y-m-d H:i",
+        appendTo: document.body,
+        minDate: new Date().fp_incr(1), // Tomorrow
+        defaultDate: new Date().fp_incr(1), // Tomorrow
         });
     });
 </script>

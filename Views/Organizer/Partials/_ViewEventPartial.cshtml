@@ -54,22 +54,21 @@
                                 Venue
                             </span>
                             first before opening this event.
+                            <span>
+                                You can add a venue in the
+                                <a href="/organizer/resources"
+                                    class="inline-flex hover:underline hover:underline-offset-4 decoration-pumpkin-600 text-pumpkin-600">
+                                    <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                                        fill="currentColor" viewBox="0 0 256 256">
+                                        <path
+                                            d="M223.68,66.15,135.68,18a15.88,15.88,0,0,0-15.36,0l-88,48.17a16,16,0,0,0-8.32,14v95.64a16,16,0,0,0,8.32,14l88,48.17a15.88,15.88,0,0,0,15.36,0l88-48.17a16,16,0,0,0,8.32-14V80.18A16,16,0,0,0,223.68,66.15ZM128,32l80.34,44-29.77,16.3-80.35-44ZM128,120,47.66,76l33.9-18.56,80.34,44ZM40,90l80,43.78v85.79L40,175.82Zm176,85.78h0l-80,43.79V133.82l32-17.51V152a8,8,0,0,0,16,0V107.55L216,90v85.77Z">
+                                        </path>
+                                    </svg>
+                                    Resources
+                                </a>
+                                page.
+                            </span>
                         </div>
-
-                        <span class="inline-flex gap-1">
-                            You can find venues in the
-                            <a href="/organizer/resources"
-                                class="inline-flex hover:underline hover:underline-offset-4 decoration-pumpkin-600 text-pumpkin-600">
-                                <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-                                    fill="currentColor" viewBox="0 0 256 256">
-                                    <path
-                                        d="M223.68,66.15,135.68,18a15.88,15.88,0,0,0-15.36,0l-88,48.17a16,16,0,0,0-8.32,14v95.64a16,16,0,0,0,8.32,14l88,48.17a15.88,15.88,0,0,0,15.36,0l88-48.17a16,16,0,0,0,8.32-14V80.18A16,16,0,0,0,223.68,66.15ZM128,32l80.34,44-29.77,16.3-80.35-44ZM128,120,47.66,76l33.9-18.56,80.34,44ZM40,90l80,43.78v85.79L40,175.82Zm176,85.78h0l-80,43.79V133.82l32-17.51V152a8,8,0,0,0,16,0V107.55L216,90v85.77Z">
-                                    </path>
-                                </svg>
-                                Resources
-                            </a>
-                            page.
-                        </span>
                     </div>
                 }
 
@@ -130,6 +129,18 @@
                 hx-get="/organizer/show-postpone-event/@Model.Id" hx-swap="innerHTML" hx-target="#viewEventModalContent">
                 POSTPONE
             </button>
+            <button
+                class="flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold duration-200 ease-in-out rounded-md text-coffee-50 bg-coffee-700 hover:bg-coffee-800 active:bg-coffee-700"
+                hx-post="/organizer/resources/set-event" hx-vals='{"eventId": "@Model.Id"}' hx-swap="none"
+                hx-on:htmx:after-request="window.location.href='/organizer/resources'">
+                <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                    viewBox="0 0 256 256">
+                    <path
+                        d="M223.68,66.15,135.68,18a15.88,15.88,0,0,0-15.36,0l-88,48.17a16,16,0,0,0-8.32,14v95.64a16,16,0,0,0,8.32,14l88,48.17a15.88,15.88,0,0,0,15.36,0l88-48.17a16,16,0,0,0,8.32-14V80.18A16,16,0,0,0,223.68,66.15ZM128,32l80.34,44-29.77,16.3-80.35-44ZM128,120,47.66,76l33.9-18.56,80.34,44ZM40,90l80,43.78v85.79L40,175.82Zm176,85.78h0l-80,43.79V133.82l32-17.51V152a8,8,0,0,0,16,0V107.55L216,90v85.77Z">
+                    </path>
+                </svg>
+                VIEW RESOURCES
+            </button>
         }
         else if (@Model.Status == EventStatus.Ongoing)
         {
@@ -143,6 +154,18 @@
                 class="flex flex-1 items-center justify-center p-2 text-sm font-semibold duration-200 ease-in-out rounded-md border bg-coffee-700 hover:bg-coffee-800 active:bg-coffee-900 text-coffee-50"
                 hx-get="/organizer/show-postpone-event/@Model.Id" hx-swap="innerHTML" hx-target="#viewEventModalContent">
                 POSTPONE
+            </button>
+            <button
+                class="flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold duration-200 ease-in-out rounded-md text-coffee-50 bg-coffee-700 hover:bg-coffee-800 active:bg-coffee-700"
+                hx-post="/organizer/resources/set-event" hx-vals='{"eventId": "@Model.Id"}' hx-swap="none"
+                hx-on:htmx:after-request="window.location.href='/organizer/resources'">
+                <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                    viewBox="0 0 256 256">
+                    <path
+                        d="M223.68,66.15,135.68,18a15.88,15.88,0,0,0-15.36,0l-88,48.17a16,16,0,0,0-8.32,14v95.64a16,16,0,0,0,8.32,14l88,48.17a15.88,15.88,0,0,0,15.36,0l88-48.17a16,16,0,0,0,8.32-14V80.18A16,16,0,0,0,223.68,66.15ZM128,32l80.34,44-29.77,16.3-80.35-44ZM128,120,47.66,76l33.9-18.56,80.34,44ZM40,90l80,43.78v85.79L40,175.82Zm176,85.78h0l-80,43.79V133.82l32-17.51V152a8,8,0,0,0,16,0V107.55L216,90v85.77Z">
+                    </path>
+                </svg>
+                VIEW RESOURCES
             </button>
         }
         else if (@Model.Status == EventStatus.Completed)
@@ -199,40 +222,40 @@
         @* Status *@
         <div class="flex flex-col col-span-full relative">
             <p class="text-xs text-coffee-900">Status</p>
-            <span class="p-2 font-semibold uppercase">
+            <span class="p-2 font-medium uppercase text-sm">
                 @if (@Model.Status == EventStatus.Draft)
                 {
-                    <span class="rounded-md py-1 px-3 text-zinc-700 bg-zinc-300">
+                    <span class="rounded-md py-1 px-2 text-zinc-500 bg-zinc-100">
                         @Model.Status
                     </span>
                 }
                 else if (@Model.Status == EventStatus.Open)
                 {
-                    <span class="rounded-md py-1 px-3 text-yellow-700 bg-yellow-300">
+                    <span class="rounded-md py-1 px-2 text-blue-500 bg-blue-100">
                         @Model.Status
                     </span>
                 }
                 else if (@Model.Status == EventStatus.Ongoing)
                 {
-                    <span class="rounded-md py-1 px-3 text-green-700 bg-green-300">
+                    <span class="rounded-md py-1 px-2 text-green-500 bg-green-100">
                         @Model.Status
                     </span>
                 }
                 else if (@Model.Status == EventStatus.Completed)
                 {
-                    <span class="rounded-md py-1 px-3 text-blue-700 bg-blue-300">
+                    <span class="rounded-md py-1 px-2 text-indigo-500 bg-indigo-100">
                         @Model.Status
                     </span>
                 }
                 else if (@Model.Status == EventStatus.Cancelled)
                 {
-                    <span class="rounded-md py-1 px-3 text-red-700 bg-red-300">
+                    <span class="rounded-md py-1 px-2 text-red-500 bg-red-100">
                         @Model.Status
                     </span>
                 }
                 else if (@Model.Status == EventStatus.Postponed)
                 {
-                    <span class="rounded-md py-1 px-3 text-fuchsia-700 bg-fuchsia-300">
+                    <span class="rounded-md py-1 px-2 text-orange-500 bg-orange-100">
                         @Model.Status
                     </span>
                 }

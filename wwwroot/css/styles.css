@@ -7,13 +7,15 @@
 }
 
 .htmx-indicator {
-  display: none;
+  display: none !important;
 }
-.htmx-request .htmx-indicator {
-  display: inline;
-}
+
 .htmx-request.htmx-indicator {
-  display: inline;
+  display: inline !important;
+}
+
+:has(.htmx-indicator.htmx-request) .icon-default{
+  display: none !important;
 }
 
 textarea {

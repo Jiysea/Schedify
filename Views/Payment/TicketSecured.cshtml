@@ -1,0 +1,65 @@
+@{
+    ViewData["Title"] = "Successfully Confirmed | Schedify";
+    var RedirectUrl = Url.Action("Index", "Home");
+}
+
+<div class="min-h-screen bg-[#F9FBFA]">
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+
+        @* Center Box *@
+        <div
+            class="relative flex flex-col items-center gap-8 py-10 rounded-lg border border-charcoal-300 md:min-w-[28rem] md:max-w-md bg-charcoal-50 text-charcoal-900">
+
+            @* 1st Part / Header or the Payment Message *@
+            <div class="flex flex-col items-center gap-2 px-5 z-10">
+                @* Check Mark SVG *@
+                <span class="p-1.5 bg-coffee-600 rounded-2xl">
+                    <svg class="size-10 text-coffee-50" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                        fill="currentColor" viewBox="0 0 256 256">
+                        <path
+                            d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm45.66,85.66-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35a8,8,0,0,1,11.32,11.32Z">
+                        </path>
+                    </svg>
+                </span>
+
+                <div class="flex flex-col items-center px-5">
+                    <span class="font-semibold text-xl">Successfully Confirmed</span>
+
+                </div>
+            </div>
+
+            <div class="flex flex-col items-center gap-2 px-5 z-10">
+                <span>
+                    The attendee can now enjoy the event.
+                </span>
+                <span>
+                    You will be redirected in <span id="countdown">5</span> seconds...
+                </span>
+
+                <span class="text-xs text-charcoal-500">Didn't work?
+                    <a class="underline underline-offset-4 decoration-coffee-600 text-coffee-600"
+                        href="/home/index">Click here</a>
+                </span>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const countdownEl = document.getElementById("countdown");
+    let timeLeft = 5.9; // 5 seconds
+    const interval = 10; // Update every 10ms
+
+    const timer = setInterval(() => {
+        timeLeft -= interval / 1000; // Convert ms to seconds
+        if (timeLeft <= 0) {
+            countdownEl.textContent = "0";
+            clearInterval(timer);
+            window.location.href = '@RedirectUrl';
+        } else {
+            countdownEl.textContent = Math.floor(timeLeft.toFixed(1));
+        }
+    }, interval);
+</script>

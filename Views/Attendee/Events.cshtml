@@ -8,9 +8,9 @@
     var currentFormatted = currentDate.ToString("MM-dd-YYYY");
 }
 
-<partial name="~/Views/Attendee/Partials/_TopbarPartial.cshtml" />
+<div x-data="{ viewEventModal: false, checkoutModal: false }" class="min-h-screen bg-[#F9FBFA]">
+    <partial name="~/Views/Attendee/Partials/_TopbarPartial.cshtml" />
 
-<div x-data="{viewEventModal: false}" class="min-h-screen bg-[#F9FBFA]">
     <header class="flex flex-col items-center w-full h-[8vh]">
 
         @* Sub Header (My Events, Date Range, Filter, & Create New Event Button) *@
@@ -35,12 +35,16 @@
     @* Events List Bars *@
     <main>
         <div id="events-list"
-            class="flex flex-col gap-3 p-4 my-4 overflow-y-auto min-h-[80vh] max-h-[80vh] scrollbar-thin scrollbar-track-transparent scrollbar-thumb-coffee-700">
-
+            class="flex flex-col gap-3 p-4 my-4 overflow-y-auto size-full min-h-[80vh] max-h-[80vh] scrollbar-thin scrollbar-track-transparent scrollbar-thumb-coffee-700">
             @await Html.PartialAsync("~/Views/Attendee/Partials/_EventsListPartial.cshtml", Model)
         </div>
     </main>
 
-    @* View Events *@
-    @await Html.PartialAsync("~/Views/Organizer/Partials/ViewEventModal.cshtml", Model.ViewEventViewModel)
+    <div id="all-modals">
+        @* View Events *@
+        @await Html.PartialAsync("~/Views/Attendee/Partials/ViewEventModal.cshtml", Model.ViewEventViewModel)
+
+        @* Payments Checkout *@
+        @await Html.PartialAsync("~/Views/Attendee/Partials/CheckoutModal.cshtml", Model.CheckoutViewModel)
+    </div>
 </div>

@@ -36,8 +36,8 @@ public class User : IdentityUser<Guid>
     // Dependents
     public Image? Image { get; set; }
     public ICollection<Event> Events { get; } = new List<Event>();
+    public ICollection<Payment> Payments { get; } = new List<Payment>();
     public ICollection<ActivityLog> ActivityLogs { get; } = new List<ActivityLog>();
-    public ICollection<BillingAddress> BillingAddresses { get; } = new List<BillingAddress>();
     public ICollection<ConversationUser> ConversationUsers { get; } = new List<ConversationUser>();
     public ICollection<Feedback> Feedbacks { get; } = new List<Feedback>();
     public ICollection<Message> Messages { get; } = new List<Message>();

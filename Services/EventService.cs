@@ -37,7 +37,7 @@ public class EventService
     public async Task<Event?> GetEventByIdAsync(Guid Id)
     {
         return await _context.Events
-            .Where(e => e.UserId == Guid.Parse(_userService.GetUserId()!) && e.Id == Id)
+            .Where(e => e.Id == Id)
             .FirstOrDefaultAsync();
     }
 
@@ -199,6 +199,7 @@ public class EventService
             {
                 UserId = user.Id,
                 Name = model.Name,
+                ShortName = model.ShortName,
                 Description = model.Description,
                 StartAt = model.StartAt,
                 EndAt = model.EndAt,
@@ -440,6 +441,81 @@ public class EventService
             await transaction.RollbackAsync();
             return (false, new Dictionary<string, string> { { "Exception", $"An error occurred: {ex.Message}" } }, null);
         }
+    }
+
+    // Attendees
+    public List<Event> GetOpenedEvents(DateTime? startDate, DateTime? endDate)
+    {
+        var eventsQuery = _context.Events.AsQueryable();
+
+        if (startDate.HasValue)
+        {
+            eventsQuery = eventsQuery.Where(e => e.CreatedAt >= startDate.Value);
+        }
+
+        if (endDate.HasValue)
+        {
+            eventsQuery = eventsQuery.Where(e => e.CreatedAt <= endDate.Value);
+        }
+
+        return eventsQuery
+            .Include(e => e.User)
+            .Include(e => e.Resources)
+                .ThenInclude(e => e.ResourceVenue)
+            .Where(e => e.Status == EventStatus.Open)
+            .OrderByDescending(e => e.UpdatedAt)
+            .ToList();
+    }
+
+    public Dictionary<Guid, string?> GetEventVenueImages(List<Event> events)
+    {
+        // Get (EventId, VenueResourceId)
+        var eventVenueResources = events
+            .Select(e => new
+            {
+                EventId = e.Id,
+                VenueResourceId = e.Resources.FirstOrDefault(r => r.ResourceType == ResourceType.Venue)?.Id
+            })
+            .Where(x => x.VenueResourceId.HasValue)
+            .ToList();
+
+        var venueResourceIds = eventVenueResources
+        .Select(x => x.VenueResourceId!.Value)
+        .ToList();
+
+        // Get images for those venue resource IDs
+        var images = _context.Images
+            .Where(img => img.ResourceId.HasValue && venueResourceIds.Contains(img.ResourceId.Value))
+            .ToList();
+
+        // Match EventId to ImageFileName (can be null if no image found)
+        var result = eventVenueResources
+            .ToDictionary(
+                ev => ev.EventId,
+                ev =>
+                {
+                    var image = images.FirstOrDefault(img => img.ResourceId == ev.VenueResourceId);
+                    return image?.ImageFileName;
+                });
+
+        return result;
+    }
+
+    public Dictionary<Guid, string?> GetOrganizerImages(List<Event> events)
+    {
+        var organizerIds = events
+            .Select(u => u.User!.Id)
+            .ToList();
+
+        // Get images for those user IDs
+        return organizerIds
+            .ToDictionary(
+                organizerId => organizerId,
+                organizerId => _context.Images
+                    .Where(img => img.UserId == organizerId)
+                    .Select(img => img.ImageFileName)
+                    .FirstOrDefault() // returns null if not found
+            );
     }
 
 }

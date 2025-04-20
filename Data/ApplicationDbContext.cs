@@ -17,7 +17,6 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
     public DbSet<Event> Events { get; set; }
     public DbSet<EventBooking> EventBookings { get; set; }
     public DbSet<ActivityLog> ActivityLogs { get; set; }
-    public DbSet<BillingAddress> BillingAddresses { get; set; }
     public DbSet<Conversation> Conversations { get; set; }
     public DbSet<ConversationUser> ConversationUsers { get; set; }
     public DbSet<Feedback> Feedbacks { get; set; }
@@ -28,11 +27,11 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
     public DbSet<ResourceFurniture> ResourceFurnitures { get; set; }
     public DbSet<ResourceCatering> ResourceCaterings { get; set; }
     public DbSet<ResourcePersonnel> ResourcePersonnels { get; set; }
+    public DbSet<Payment> Payments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
 
         // Configure EventBookings -> Events relationship to restrict cascading delete.
         modelBuilder.Entity<EventBooking>()
@@ -112,6 +111,13 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
             .HasForeignKey<ResourcePersonnel>(e => e.ResourceId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        // Configure Payments -> Events relationship to restrict cascading delete.
+        modelBuilder.Entity<Payment>()
+            .HasOne(e => e.EventBooking)
+            .WithMany(e => e.Payments)
+            .HasForeignKey(e => e.EventBookingId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         // CreatedAt (ActivityLogs)
         modelBuilder.Entity<ActivityLog>()
             .Property(u => u.LoggedAt)
@@ -124,16 +130,6 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
 
         // UpdatedAt (AspNetUsers)
         modelBuilder.Entity<User>()
-            .Property(u => u.UpdatedAt)
-            .HasDefaultValueSql("GETUTCDATE()");
-
-        // CreatedAt (BillingAddresses)
-        modelBuilder.Entity<BillingAddress>()
-            .Property(u => u.CreatedAt)
-            .HasDefaultValueSql("GETUTCDATE()");
-
-        // UpdatedAt (BillingAddresses)
-        modelBuilder.Entity<BillingAddress>()
             .Property(u => u.UpdatedAt)
             .HasDefaultValueSql("GETUTCDATE()");
 
@@ -250,7 +246,10 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
                v => (ActivityLogType)Enum.Parse(typeof(ActivityLogType), v))
            .HasMaxLength(15);
 
-
+        // CreatedAt (Payments)
+        modelBuilder.Entity<Payment>()
+            .Property(u => u.CreatedAt)
+            .HasDefaultValueSql("GETUTCDATE()");
 
     }
 }

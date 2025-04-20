@@ -1,10 +1,10 @@
 @using Schedify.Data
 @model ResourceViewModel
 
-<div x-data="{ open: false }" class="relative">
+<div x-data="{ open: false }" class="relative w-60">
     <h3 class="text-xs text-zinc-500 font-semibold">Selected Event</h3>
     <button type="button" x-on:click="open = !open"
-        class="w-60 lg:w-96 select-none duration-200 ease-in-out flex items-center justify-between gap-2 px-3 py-1 rounded-md border border-zinc-300 hover:bg-zinc-500 active:bg-zinc-600 text-zinc-500 hover:text-zinc-50 active:text-zinc-50">
+        class="w-full select-none duration-200 ease-in-out flex items-center justify-between gap-2 px-3 py-1 rounded-md border border-zinc-300 hover:bg-zinc-500 active:bg-zinc-600 text-zinc-500 hover:text-zinc-50 active:text-zinc-50">
         <span class="w-full text-left truncate text-xs font-medium ">@(Model.SelectedName ?? "None")</span>
         <svg class="size-3" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
             viewBox="0 0 256 256">
@@ -16,14 +16,14 @@
 
     <!-- Dropdown Menu -->
     <div x-cloak x-show="open" x-on:click.away="open = false"
-        class="absolute bg-white border border-zinc-300 rounded-md mt-2 min-h-60 max-h-60 overflow-y-auto shadow-md z-20">
+        class="absolute bg-white border border-zinc-300 rounded-md mt-2 min-h-60 max-h-60 overflow-y-auto shadow-md w-full z-20">
         @if (Model.SelectedName != null)
         {
             @foreach (var evt in Model.Events)
             {
                 <div x-on:click="open = false" hx-get="/organizer/select-event-dropdown/@evt.Id" hx-swap="none"
-                    class="w-96 duration-200 ease-in-out px-4 py-2 hover:bg-zinc-100 cursor-pointer">
-                    <span class="truncate text-xs">@evt.Name</span>
+                    class="duration-200 ease-in-out px-4 py-2 hover:bg-zinc-100 cursor-pointer">
+                    <span class="truncate text-xs">@evt.ShortName</span>
                 </div>
             }
         }
@@ -36,9 +36,9 @@
     </div>
 </div>
 
-<button type="button" hx-get="/organizer/open-create-resource-modal/@Model.EventId" hx-swap="outerHTML" hx-target="#createResourceModal"
-    x-on:click="createResourceModal = !createResourceModal"
-    class="flex items-center justify-center px-3 py-2 gap-2 text-sm font-medium rounded-md bg-coffee-600 hover:bg-coffee-700 active:bg-coffee-900 text-coffee-50">
+<button type="button"
+    x-on:click="createResourceModal = !createResourceModal" @(Model.IsEventOnDraft ? $"hx-get=/organizer/open-create-resource-modal/{@Model.EventId} hx-swap=outerHTML hx-target=#createResourceModal" : "disabled")
+    class="duration-200 ease-in-out flex items-center justify-center px-3 py-2 gap-2 text-sm font-medium rounded-md @(Model.IsEventOnDraft ? "bg-coffee-600 hover:bg-coffee-700 active:bg-coffee-900 text-coffee-50" : "cursor-not-allowed bg-zinc-300 text-zinc-500")">
     <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
         viewBox="0 0 256 256">
         <path

@@ -120,6 +120,8 @@
                     </span>
 
                     <div class="flex items-center justify-start gap-2 text-xs">
+                        
+                        @* Date / Time Left For the Event *@
                         @if (evt.Status == EventStatus.Open)
                         {
                             <span class="flex items-center justify-center gap-2 text-zinc-500 font-medium">
@@ -129,14 +131,41 @@
                                         d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z">
                                     </path>
                                 </svg>
-                                @if ((evt.StartAt - DateTime.Today).Days == 0)
+
+                                @if ((evt.StartAt - DateTime.Now).TotalHours < 48 && (evt.StartAt - DateTime.Now).TotalHours > 24)
                                 {
-                                    TimeSpan ts = evt.StartAt - DateTime.Today;
-                                    <p>Starts In @ts</p>
+                                    <p>1 Day Left</p>
+                                }
+                                else if ((evt.StartAt - DateTime.Now).TotalHours < 24 && (evt.StartAt - DateTime.Now).TotalHours > 2)
+                                {
+                                    TimeSpan ts = evt.StartAt - DateTime.Now;
+                                    <p>Starts in @($"{(int)ts.TotalHours} hours")</p>
+                                }
+                                else if ((evt.StartAt - DateTime.Now).TotalHours < 2 && (evt.StartAt - DateTime.Now).TotalHours > 1)
+                                {
+                                    <p>Starts in 1 hour</p>
+                                }
+                                else if ((evt.StartAt - DateTime.Now).TotalMinutes < 60 && (evt.StartAt - DateTime.Now).TotalMinutes > 2)
+                                {
+                                    TimeSpan ts = evt.StartAt - DateTime.Now;
+                                    <p>Starts in @($"{(int)ts.Minutes:D2} minutes")</p>
+                                }
+                                else if ((evt.StartAt - DateTime.Now).TotalMinutes < 2 && (evt.StartAt - DateTime.Now).TotalMinutes > 1)
+                                {
+                                    <p>Starts in 1 minute</p>
+                                }
+                                else if ((evt.StartAt - DateTime.Now).TotalSeconds < 60 && (evt.StartAt - DateTime.Now).TotalSeconds > 2)
+                                {
+                                    TimeSpan ts = evt.StartAt - DateTime.Now;
+                                    <p>Starts in @($"{(int)ts.TotalSeconds:D2} seconds")</p>
+                                }
+                                else if ((evt.StartAt - DateTime.Now).TotalSeconds < 2)
+                                {
+                                    <p>Starts in 1 second</p>
                                 }
                                 else
                                 {
-                                    <p>@((evt.StartAt - DateTime.Today).Days) Days Left</p>
+                                    <p>@((evt.StartAt - DateTime.Now).Days) Days Left</p>
                                 }
                             </span>
                         }
@@ -161,13 +190,48 @@
                                         d="M128,40a96,96,0,1,0,96,96A96.11,96.11,0,0,0,128,40Zm0,176a80,80,0,1,1,80-80A80.09,80.09,0,0,1,128,216ZM173.66,90.34a8,8,0,0,1,0,11.32l-40,40a8,8,0,0,1-11.32-11.32l40-40A8,8,0,0,1,173.66,90.34ZM96,16a8,8,0,0,1,8-8h48a8,8,0,0,1,0,16H104A8,8,0,0,1,96,16Z">
                                     </path>
                                 </svg>
-                                @evt.StartAt.ToString("MMM dd") - @evt.EndAt.ToString("MMM dd")
+                                @if ((evt.StartAt - DateTime.Now).TotalHours < 48 && (evt.StartAt - DateTime.Now).TotalHours > 24)
+                                {
+                                    <p>1 Day Left</p>
+                                }
+                                else if ((evt.StartAt - DateTime.Now).TotalHours < 24 && (evt.StartAt - DateTime.Now).TotalHours > 2)
+                                {
+                                    TimeSpan ts = evt.StartAt - DateTime.Now;
+                                    <p>Starts in @($"{(int)ts.TotalHours} hours")</p>
+                                }
+                                else if ((evt.StartAt - DateTime.Now).TotalHours < 2 && (evt.StartAt - DateTime.Now).TotalHours > 1)
+                                {
+                                    <p>Starts in 1 hour</p>
+                                }
+                                else if ((evt.StartAt - DateTime.Now).TotalMinutes < 60 && (evt.StartAt - DateTime.Now).TotalMinutes > 2)
+                                {
+                                    TimeSpan ts = evt.StartAt - DateTime.Now;
+                                    <p>Starts in @($"{(int)ts.Minutes:D2} minutes")</p>
+                                }
+                                else if ((evt.StartAt - DateTime.Now).TotalMinutes < 2 && (evt.StartAt - DateTime.Now).TotalMinutes > 1)
+                                {
+                                    <p>Starts in 1 minute</p>
+                                }
+                                else if ((evt.StartAt - DateTime.Now).TotalSeconds < 60 && (evt.StartAt - DateTime.Now).TotalSeconds > 2)
+                                {
+                                    TimeSpan ts = evt.StartAt - DateTime.Now;
+                                    <p>Starts in @($"{(int)ts.TotalSeconds:D2} seconds")</p>
+                                }
+                                else if ((evt.StartAt - DateTime.Now).TotalSeconds < 2)
+                                {
+                                    <p>Starts in 1 second</p>
+                                }
+                                else
+                                {
+                                    <p>@((evt.StartAt - DateTime.Now).Days) Days Left</p>
+                                }
                             </span>
                         }
 
+                        @* Statuses *@
                         @if (evt.Status == EventStatus.Open)
                         {
-                            <span class="bg-amber-100 text-amber-500 rounded-md font-semibold px-3 py-1">
+                            <span class="bg-blue-100 text-blue-500 rounded-md font-semibold px-3 py-1">
                                 OPEN
                             </span>
                         }
@@ -247,7 +311,7 @@
 
                         @if (evt.Status == EventStatus.Completed)
                         {
-                            <span class="bg-blue-100 text-blue-500 rounded-md font-semibold px-3 py-1">
+                            <span class="bg-indigo-100 text-indigo-500 rounded-md font-semibold px-3 py-1">
                                 COMPLETED
                             </span>
                         }

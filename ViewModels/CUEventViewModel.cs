@@ -12,6 +12,10 @@ public class CUEventViewModel
     public string Name { get; set; } = null!;
 
     [Required(ErrorMessage = "This field is required.")]
+    [StringLength(20)]
+    public string ShortName { get; set; } = null!;
+
+    [Required(ErrorMessage = "This field is required.")]
     [StringLength(500)]
     public string Description { get; set; } = null!;
 
@@ -67,4 +71,6 @@ public class CUEventViewModel
 
         return DateTime.MinValue; // Default value if parsing fails
     }
+
+    public bool IsEdit { get; set; } = false;
 }

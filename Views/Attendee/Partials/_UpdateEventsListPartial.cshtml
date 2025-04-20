@@ -1,0 +1,13 @@
+@model EventsViewModel
+
+<div id="events-list" hx-swap-oob="innerHTML">
+    @await Html.PartialAsync("~/Views/Attendee/Partials/_EventsListPartial.cshtml", Model)
+</div>
+
+<div id="all-modals" hx-swap-oob="true">
+    @* View Events *@
+    @await Html.PartialAsync("~/Views/Attendee/Partials/ViewEventModal.cshtml", Model.ViewEventViewModel)
+
+    @* Payments Checkout *@
+    @await Html.PartialAsync("~/Views/Attendee/Partials/CheckoutModal.cshtml", Model.CheckoutViewModel)
+</div>
