@@ -1,0 +1,15 @@
+@model ViewBookingViewModel
+
+<div x-cloak x-show="viewBookingModal" x-transition.opacity
+    class="fixed inset-0 flex justify-center items-start bg-black/50 backdrop-blur-sm overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-coffee-700 z-50 p-4">
+    
+    @* White Box *@
+    <div id="viewBookingModalContent" x-data x-trap.noscroll="viewBookingModal" @@keydown.escape="viewBookingModal = false;"
+        @@close-view-event-modal="viewBookingModal = false;"
+        class="bg-coffee-50 rounded-lg shadow-lg min-w-[45rem] max-w-[45rem]">
+
+        @* The Partials will be swapped here *@
+        @await Html.PartialAsync("~/Views/Attendee/Partials/_ViewBookingPartial.cshtml", Model)
+
+    </div>
+</div>

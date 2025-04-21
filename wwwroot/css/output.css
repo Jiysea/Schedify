@@ -575,33 +575,6 @@ video {
     font-weight: 900;
     src: url("../fonts/Poppins-Black.ttf") format("truetype");
   }
-.container {
-  width: 100%;
-}
-@media (min-width: 640px) {
-
-  .container {
-    max-width: 640px;
-  }
-}
-@media (min-width: 768px) {
-
-  .container {
-    max-width: 768px;
-  }
-}
-@media (min-width: 1024px) {
-
-  .container {
-    max-width: 1024px;
-  }
-}
-@media (min-width: 1280px) {
-
-  .container {
-    max-width: 1280px;
-  }
-}
 .button-coffee {
   display: flex;
   align-items: center;
@@ -842,10 +815,6 @@ video {
   width: 2.5rem;
   height: 2.5rem;
 }
-.size-14 {
-  width: 3.5rem;
-  height: 3.5rem;
-}
 .size-16 {
   width: 4rem;
   height: 4rem;
@@ -903,6 +872,12 @@ video {
 }
 .h-36 {
   height: 9rem;
+}
+.h-52 {
+  height: 13rem;
+}
+.h-56 {
+  height: 14rem;
 }
 .h-8 {
   height: 2rem;
@@ -1268,6 +1243,10 @@ video {
   --tw-bg-opacity: 1;
   background-color: rgb(220 252 231 / var(--tw-bg-opacity, 1));
 }
+.bg-green-200 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(187 247 208 / var(--tw-bg-opacity, 1));
+}
 .bg-indigo-100 {
   --tw-bg-opacity: 1;
   background-color: rgb(224 231 255 / var(--tw-bg-opacity, 1));
@@ -1494,10 +1473,6 @@ video {
 .leading-tight {
   line-height: 1.25;
 }
-.text-\[\#6860FF\] {
-  --tw-text-opacity: 1;
-  color: rgb(104 96 255 / var(--tw-text-opacity, 1));
-}
 .text-amber-500 {
   --tw-text-opacity: 1;
   color: rgb(245 158 11 / var(--tw-text-opacity, 1));
@@ -1546,6 +1521,10 @@ video {
   --tw-text-opacity: 1;
   color: rgb(106 69 57 / var(--tw-text-opacity, 1));
 }
+.text-coffee-800 {
+  --tw-text-opacity: 1;
+  color: rgb(80 51 43 / var(--tw-text-opacity, 1));
+}
 .text-coffee-900 {
   --tw-text-opacity: 1;
   color: rgb(53 34 29 / var(--tw-text-opacity, 1));
@@ -1557,6 +1536,10 @@ video {
 .text-green-500 {
   --tw-text-opacity: 1;
   color: rgb(34 197 94 / var(--tw-text-opacity, 1));
+}
+.text-green-700 {
+  --tw-text-opacity: 1;
+  color: rgb(21 128 61 / var(--tw-text-opacity, 1));
 }
 .text-indigo-500 {
   --tw-text-opacity: 1;
@@ -1605,11 +1588,11 @@ video {
 .underline {
   text-decoration-line: underline;
 }
-.decoration-pumpkin-600 {
-  text-decoration-color: #E05600;
-}
 .decoration-coffee-600 {
   text-decoration-color: #8D5B4C;
+}
+.decoration-pumpkin-600 {
+  text-decoration-color: #E05600;
 }
 .underline-offset-4 {
   text-underline-offset: 4px;
@@ -2092,6 +2075,10 @@ textarea {
   .md\:max-w-md {
     max-width: 28rem;
   }
+
+  .md\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (min-width: 1024px) {
@@ -2109,6 +2096,10 @@ textarea {
 
   .xl\:max-w-5xl {
     max-width: 64rem;
+  }
+
+  .xl\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 

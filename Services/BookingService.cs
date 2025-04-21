@@ -24,14 +24,114 @@ public class BookingService
     public List<EventBooking> GetBookingsByUser()
     {
         return _context.EventBookings
+            .Include(eb => eb.Event)
             .Where(e => e.UserId == Guid.Parse(_userService.GetUserId()!))
             .OrderByDescending(e => e.CreatedAt)
             .ToList();
     }
 
-    public async Task<EventBooking?> GetBookingByIdAsync(Guid EventId)
+    public List<Event> GetEventsByBooking(List<EventBooking> bookings)
+    {
+        var eventIds = bookings
+            .Select(b => b.EventId)
+            .ToList();
+
+        return _context.Events
+            .Include(e => e.Resources)
+            .Where(e => eventIds.Contains(e.Id))
+            .ToList();
+    }
+
+    public Dictionary<Guid, Resource?> GetResourceByEvents(List<Event> events)
+    {
+        var eventIds = events
+            .Select(e => e.Id)
+            .ToList();
+
+        var resources = _context.Resources
+            .Include(r => r.ResourceVenue)
+            .Where(r => eventIds.Contains(r.EventId))
+            .ToList();
+
+        var result = events
+            .ToDictionary(
+                e => e.Id,
+                e => resources.FirstOrDefault(r => r.EventId == e.Id)
+            );
+
+        return result;
+    }
+
+    public Dictionary<Guid, string?> GetEventVenueImages(List<EventBooking> bookings)
+    {
+        // Get (EventId, VenueResourceId)
+        var eventIds = bookings
+            .Select(b => b.EventId)
+            .ToList();
+
+        var events = _context.Events
+            .Where(e => eventIds.Contains(e.Id))
+            .ToList();
+
+        var eventVenueResources = events
+            .Select(e => new
+            {
+                EventId = e.Id,
+                VenueResourceId = e.Resources.FirstOrDefault(r => r.ResourceType == ResourceType.Venue)?.Id
+            })
+            .Where(x => x.VenueResourceId.HasValue)
+            .ToList();
+
+        var venueResourceIds = eventVenueResources
+        .Select(x => x.VenueResourceId!.Value)
+        .ToList();
+
+        // Get images for those venue resource IDs
+        var images = _context.Images
+            .Where(img => img.ResourceId.HasValue && venueResourceIds.Contains(img.ResourceId.Value))
+            .ToList();
+
+        // Match EventId to ImageFileName (can be null if no image found)
+        var result = eventVenueResources
+            .ToDictionary(
+                ev => ev.EventId,
+                ev =>
+                {
+                    var image = images.FirstOrDefault(img => img.ResourceId == ev.VenueResourceId);
+                    return image?.ImageFileName;
+                });
+
+        return result;
+    }
+
+    public async Task<string?> GetImageByResourceIdAsync(Guid ResourceId)
+    {
+        var image = await _context.Images
+             .FirstOrDefaultAsync(e => e.ResourceId == ResourceId);
+        return image != null ? image.ImageFileName : null;
+    }
+
+    public async Task<EventBooking?> GetBookingByIdAsync(Guid EventBookingId)
+    {
+        return await _context.EventBookings.FindAsync(EventBookingId);
+    }
+
+    public async Task<EventBooking?> GetBookingByEventIdAsync(Guid EventId)
     {
         return await _context.EventBookings.FirstOrDefaultAsync(eb => eb.EventId == EventId);
+    }
+
+    public async Task<Event?> GetEventByIdAsync(Guid EventId)
+    {
+        return await _context.Events
+            .Include(e => e.Resources)
+                .ThenInclude(r => r.ResourceVenue)
+            .FirstOrDefaultAsync(e => e.Id == EventId);
+    }
+
+    public async Task<Payment?> GetPaymentByIdAsync(Guid EventBookingId)
+    {
+        return await _context.Payments.FirstOrDefaultAsync(eb => eb.EventBookingId == EventBookingId);
     }
 
     public async Task<CheckoutViewModel?> PrepareBookingDetailsAsync(Guid EventId)

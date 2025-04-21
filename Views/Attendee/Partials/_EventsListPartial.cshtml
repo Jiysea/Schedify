@@ -8,6 +8,7 @@
         @foreach (var evt in Model.OpenedEvents)
         {
             var venueResource = evt.Resources.FirstOrDefault(r => r.ResourceType == ResourceType.Venue);
+            bool isBooked = Model.BookedEvents.Any(b => b.EventId == evt.Id);
 
             string? fullAddress = venueResource!.ResourceVenue.AddressLine1 + ", " + (venueResource.ResourceVenue.AddressLine2
             != null
@@ -122,7 +123,6 @@
                             }
                         </span>
 
-
                         @* Full Address *@
                         <span class="duration-200 ease-in-out flex items-center gap-2 px-2 py-1 rounded-md bg-zinc-100 group-hover:bg-coffee-100 text-zinc-500 group-hover:text-coffee-500">
                             <span class="size-4">
@@ -151,6 +151,15 @@
                     </div>
                 </div>
 
+                <div class="flex items-start justify-start h-full text-xs">
+                    @if(isBooked)
+                    {
+                        <span class="flex items-center justify-center gap-1 bg-green-200 text-green-700 rounded-md px-2 py-1 font-medium">
+                            <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256"><path d="M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z"></path></svg>
+                            This event is already booked.
+                        </span>
+                    }
+                </div>
             </div>
         }
     </div>

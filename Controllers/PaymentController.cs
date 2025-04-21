@@ -87,6 +87,40 @@ public class PaymentController : Controller
         }
     }
 
+    [HttpGet("payment/view-ticket")]
+    public async Task<IActionResult> ViewTicket([FromQuery] string token)
+    {
+        if (string.IsNullOrEmpty(token))
+            return RedirectToAction("Bookings", "Attendee");
+
+        // 1. Decode Base64 token to get the GUID string
+        var base64Bytes = Convert.FromBase64String(token);
+        var guidString = Encoding.UTF8.GetString(base64Bytes);
+
+        Guid eventBookingId = Guid.Parse(guidString);
+
+        var payment = await _context.Payments
+            .FirstOrDefaultAsync(p => p.EventBookingId == eventBookingId);
+
+        if (payment == null) return RedirectToAction("Bookings", "Attendee");
+
+        var viewModel = new ReceiptViewModel
+        {
+            ReferenceNumber = payment.SessionId,
+            PaymentMethod = payment!.PaymentMethod, // e.g. CARD
+            CardBrand = payment!.CardBrand,
+            Last4 = payment.PANLastDigits,
+            Amount = payment.Amount,
+            EventShortName = payment.EventShortName,
+            CreatedAt = payment.CreatedAt.ToLocalTime()
+        };
+
+        var baseUrl = $"{_httpContextAccessor.HttpContext?.Request.Scheme}://{_httpContextAccessor.HttpContext?.Request.Host}";
+        ViewBag.QRContent = $"{baseUrl}/payment/verify-ticket?token={token}";
+        return View(viewModel);
+
+    }
+
 
     [HttpGet("payment/verify-ticket")]
     public async Task<IActionResult> VerifyTicket(string token)
@@ -124,7 +158,7 @@ public class PaymentController : Controller
                 return RedirectToAction("Denied", "Payment");
 
             // 5. Check if the ticket is already used
-            if(booking.Status != BookingStatus.Paid)
+            if (booking.Status != BookingStatus.Paid)
                 return RedirectToAction("Denied", "Payment");
 
             // 6. Update status of booking and its payment

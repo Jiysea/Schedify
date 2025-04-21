@@ -8,7 +8,7 @@
     var currentFormatted = currentDate.ToString("MM-dd-YYYY");
 }
 
-<div x-data="{ viewEventModal: false, checkoutModal: false }" class="min-h-screen bg-[#F9FBFA]">
+<div x-data="{ viewEventModal: false }" class="min-h-screen bg-[#F9FBFA]">
     <partial name="~/Views/Attendee/Partials/_TopbarPartial.cshtml" />
 
     <header class="flex flex-col items-center w-full h-[8vh]">
@@ -43,8 +43,5 @@
     <div id="all-modals">
         @* View Events *@
         @await Html.PartialAsync("~/Views/Attendee/Partials/ViewEventModal.cshtml", Model.ViewEventViewModel)
-
-        @* Payments Checkout *@
-        @await Html.PartialAsync("~/Views/Attendee/Partials/CheckoutModal.cshtml", Model.CheckoutViewModel)
     </div>
 </div>

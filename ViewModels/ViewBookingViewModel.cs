@@ -1,25 +1,22 @@
-using Schedify.Models;
 
 namespace Schedify.ViewModels;
 
-public class ViewEventViewModel
+public class ViewBookingViewModel
 {
     public Guid Id { get; set; }
+    public Guid EventId { get; set; }
     public string Name { get; set; } = null!;
+    public string ShortName { get; set; } = null!;
     public string Description { get; set; } = null!;
+    public string? PaymentMethod { get; set; }
+    public string? PANLastDigits { get; set; }
     public DateTime StartAt { get; set; }
     public DateTime EndAt { get; set; }
     public EventStatus Status { get; set; }
-    public string EntryFee { get; set; } = null!;
+    public string TotalCost { get; set; } = null!;
+    public string FullAddress { get; set; } = null!;
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 
-    // To Check whether the event has a venue or not (for Draft only)
-    public bool EventHasVenue { get; set; }
-    public bool IsEventOpenable { get; set; }
-
-    // Only for attendees
-    public bool IsEventBooked { get; set; }
     public string? ImageFileName { get; set; }
-    public string? FullAddress { get; set; }
 }

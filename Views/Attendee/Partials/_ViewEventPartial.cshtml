@@ -15,11 +15,21 @@
 <hr class="w-full border-coffee-100">
 
 <main class="flex flex-col gap-10 p-6 relative">
+
+    @* Resource Image *@
+    @if (Model.ImageFileName != null)
+    {
+        <div class="flex items-center justify-center gap-2 w-full h-56 py-6">
+            <img src="/resources/@Model.ImageFileName" alt="Resource Image" class="w-full h-56 object-cover rounded-md">
+        </div>
+    }
+
     <div class="flex items-center justify-end gap-2 w-full">
 
         <button type="button"
             class="flex flex-1 items-center justify-center gap-2 p-2 text-sm font-semibold duration-200 ease-in-out rounded-md border @(Model.IsEventBooked ? "bg-zinc-300 text-zinc-500 cursor-not-allowed" : "bg-coffee-700 hover:bg-coffee-800 active:bg-coffee-900 text-coffee-50")"
-            @(!Model.IsEventBooked ? $"hx-get=/attendee/checkout/{@Model.Id} hx-swap=none hx-indicator=#book-loader" : "disabled")>
+            @(!Model.IsEventBooked ? $"hx-get=/attendee/checkout/{@Model.Id} hx-swap=none hx-indicator=#book-loader" :
+                        "disabled")>
             <span>
                 BOOK THIS EVENT
             </span>
@@ -45,7 +55,7 @@
     </div>
 
     @* General Information *@
-    <div class="relative grid grid-cols-2 gap-3 p-5 border rounded-xl border-coffee-300">
+    <div class="relative flex flex-col gap-3 p-5 border rounded-xl border-coffee-300">
         <h3
             class="select-none flex items-center gap-2 absolute start-4 -top-3 px-2 font-medium text-sm text-pumpkin-600 bg-coffee-50">
             <svg class="size-6" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
@@ -57,77 +67,115 @@
             General Information
         </h3>
 
-        @* Event Name *@
-        <div class="flex flex-col col-span-full relative">
-            <p class="text-xs text-coffee-900">Event Name</p>
-            <span class="p-2 text-coffee-700">
-                @Model.Name
-            </span>
-        </div>
+        @* Event Full Name *@
+        <span class="w-full text-xl font-semibold text-coffee-900">
+            @Model.Name
+        </span>
 
         @* Description *@
-        <div class="flex flex-col col-span-full relative">
-            <p class="text-xs text-coffee-900">Description</p>
-            <span class="p-2 text-coffee-700">
-                @Model.Description
-            </span>
+        <div class="flex items-center w-full p-2 text-sm rounded-lg bg-coffee-100 text-coffee-900">
+            @Model.Description
         </div>
 
-        @* Entry Fee *@
-        <div class="flex flex-col col-span-full relative">
-            <p class="text-xs text-coffee-900">Entry Fee</p>
-            <span class="p-2 text-coffee-700">
-                @Model.EntryFee
+        @* Full Address *@
+        <div class="flex items-center justify-between text-sm">
+            <span class="flex items-center gap-1.5  text-coffee-600">
+                <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                    viewBox="0 0 256 256">
+                    <path
+                        d="M112,80a16,16,0,1,1,16,16A16,16,0,0,1,112,80ZM64,80a64,64,0,0,1,128,0c0,59.95-57.58,93.54-60,94.95a8,8,0,0,1-7.94,0C121.58,173.54,64,140,64,80Zm16,0c0,42.2,35.84,70.21,48,78.5,12.15-8.28,48-36.3,48-78.5a48,48,0,0,0-96,0Zm122.77,67.63a8,8,0,0,0-5.54,15C213.74,168.74,224,176.92,224,184c0,13.36-36.52,32-96,32s-96-18.64-96-32c0-7.08,10.26-15.26,26.77-21.36a8,8,0,0,0-5.54-15C29.22,156.49,16,169.41,16,184c0,31.18,57.71,48,112,48s112-16.82,112-48C240,169.41,226.78,156.49,202.77,147.63Z">
+                    </path>
+                </svg>
+                Event Venue
+            </span>
+            <span class=" text-coffee-700">
+                @Model.FullAddress
             </span>
         </div>
 
         @* Status *@
-        <div class="flex flex-col col-span-full relative">
-            <p class="text-xs text-coffee-900">Status</p>
-            <span class="p-2 font-medium uppercase text-sm">
-                @if (@Model.Status == EventStatus.Draft)
-                {
-                    <span class="rounded-md py-1 px-2 text-zinc-500 bg-zinc-100">
-                        @Model.Status
-                    </span>
-                }
-                else if (@Model.Status == EventStatus.Open)
-                {
-                    <span class="rounded-md py-1 px-2 text-blue-500 bg-blue-100">
-                        @Model.Status
-                    </span>
-                }
-                else if (@Model.Status == EventStatus.Ongoing)
-                {
-                    <span class="rounded-md py-1 px-2 text-green-500 bg-green-100">
-                        @Model.Status
-                    </span>
-                }
-                else if (@Model.Status == EventStatus.Completed)
-                {
-                    <span class="rounded-md py-1 px-2 text-indigo-500 bg-indigo-100">
-                        @Model.Status
-                    </span>
-                }
-                else if (@Model.Status == EventStatus.Cancelled)
-                {
-                    <span class="rounded-md py-1 px-2 text-red-500 bg-red-100">
-                        @Model.Status
-                    </span>
-                }
-                else if (@Model.Status == EventStatus.Postponed)
-                {
-                    <span class="rounded-md py-1 px-2 text-orange-500 bg-orange-100">
-                        @Model.Status
-                    </span>
-                }
-            </span>
+        <div class="flex items-center justify-between text-sm">
+            <div class="flex items-center justify-start gap-2">
+                <span class="flex items-center gap-1.5  text-coffee-600">
+                    <svg class="size-4" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                        width="400" height="400" viewBox="0, 0, 400,400">
+                        <g>
+                            <path
+                                d="M201.128 1.474 C 197.276 3.223,192.460 8.661,191.407 12.449 C 189.709 18.563,190.456 94.473,192.253 98.438 C 198.711 112.682,219.476 112.950,225.870 98.872 C 227.572 95.126,228.160 16.339,226.519 11.965 C 222.775 1.984,210.852 -2.943,201.128 1.474 M72.054 55.135 C 62.045 60.123,59.006 72.885,65.581 82.315 C 68.879 87.044,120.248 137.865,123.284 139.402 C 138.286 146.995,154.641 132.279,149.275 116.016 C 147.777 111.475,94.378 57.711,88.672 54.998 C 83.266 52.427,77.391 52.476,72.054 55.135 M23.047 181.964 C 6.260 186.170,3.761 208.374,19.141 216.673 C 22.230 218.340,22.739 218.359,63.672 218.359 C 104.605 218.359,105.114 218.340,108.203 216.673 C 121.856 209.306,121.856 190.694,108.203 183.327 C 104.948 181.571,29.440 180.362,23.047 181.964 M330.755 182.337 C 312.992 188.046,314.143 213.985,332.338 218.007 C 334.935 218.581,343.556 218.797,357.031 218.624 C 379.577 218.336,380.215 218.218,385.423 213.387 C 394.821 204.670,392.325 189.412,380.469 183.097 C 376.888 181.190,336.257 180.569,330.755 182.337 M126.517 259.335 C 125.418 259.668,123.660 260.386,122.611 260.929 C 120.015 262.274,68.403 313.638,65.581 317.685 C 54.561 333.490,71.282 353.271,88.672 345.002 C 94.378 342.289,147.777 288.525,149.275 283.984 C 154.162 269.173,141.017 254.935,126.517 259.335 M278.516 260.406 C 269.027 265.013,265.242 275.501,269.584 285.156 C 272.108 290.766,325.642 343.835,330.666 345.706 C 346.642 351.656,361.857 335.263,354.298 320.244 C 352.512 316.695,299.758 263.724,295.477 261.181 C 290.498 258.224,283.654 257.911,278.516 260.406 M201.172 292.482 C 190.633 297.452,190.662 297.310,190.647 344.922 C 190.633 388.244,190.661 388.561,195.070 393.712 C 204.194 404.370,221.568 401.234,226.519 388.035 C 228.160 383.661,227.572 304.874,225.870 301.128 C 221.804 292.177,210.334 288.162,201.172 292.482 "
+                                stroke="none" fill="currentColor" fill-rule="evenodd"></path>
+                        </g>
+                    </svg>
+                    Status
+                </span>
+                <span class="p-2 font-medium uppercase text-sm">
+                    @if (@Model.Status == EventStatus.Draft)
+                    {
+                        <span class="rounded-md py-1 px-2 text-zinc-500 bg-zinc-100">
+                            @Model.Status
+                        </span>
+                    }
+                    else if (@Model.Status == EventStatus.Open)
+                    {
+                        <span class="rounded-md py-1 px-2 text-blue-500 bg-blue-100">
+                            @Model.Status
+                        </span>
+                    }
+                    else if (@Model.Status == EventStatus.Ongoing)
+                    {
+                        <span class="rounded-md py-1 px-2 text-green-500 bg-green-100">
+                            @Model.Status
+                        </span>
+                    }
+                    else if (@Model.Status == EventStatus.Completed)
+                    {
+                        <span class="rounded-md py-1 px-2 text-indigo-500 bg-indigo-100">
+                            @Model.Status
+                        </span>
+                    }
+                    else if (@Model.Status == EventStatus.Cancelled)
+                    {
+                        <span class="rounded-md py-1 px-2 text-red-500 bg-red-100">
+                            @Model.Status
+                        </span>
+                    }
+                    else if (@Model.Status == EventStatus.Postponed)
+                    {
+                        <span class="rounded-md py-1 px-2 text-orange-500 bg-orange-100">
+                            @Model.Status
+                        </span>
+                    }
+                </span>
+            </div>
+
+            @* Entry Fee *@
+            <div class="flex items-center justify-end gap-3 text-sm">
+                <span class="flex items-center gap-1.5  text-coffee-600">
+                    <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                        viewBox="0 0 256 256">
+                        <path
+                            d="M184,89.57V84c0-25.08-37.83-44-88-44S8,58.92,8,84v40c0,20.89,26.25,37.49,64,42.46V172c0,25.08,37.83,44,88,44s88-18.92,88-44V132C248,111.3,222.58,94.68,184,89.57ZM232,132c0,13.22-30.79,28-72,28-3.73,0-7.43-.13-11.08-.37C170.49,151.77,184,139,184,124V105.74C213.87,110.19,232,122.27,232,132ZM72,150.25V126.46A183.74,183.74,0,0,0,96,128a183.74,183.74,0,0,0,24-1.54v23.79A163,163,0,0,1,96,152,163,163,0,0,1,72,150.25Zm96-40.32V124c0,8.39-12.41,17.4-32,22.87V123.5C148.91,120.37,159.84,115.71,168,109.93ZM96,56c41.21,0,72,14.78,72,28s-30.79,28-72,28S24,97.22,24,84,54.79,56,96,56ZM24,124V109.93c8.16,5.78,19.09,10.44,32,13.57v23.37C36.41,141.4,24,132.39,24,124Zm64,48v-4.17c2.63.1,5.29.17,8,.17,3.88,0,7.67-.13,11.39-.35A121.92,121.92,0,0,0,120,171.41v23.46C100.41,189.4,88,180.39,88,172Zm48,26.25V174.4a179.48,179.48,0,0,0,24,1.6,183.74,183.74,0,0,0,24-1.54v23.79a165.45,165.45,0,0,1-48,0Zm64-3.38V171.5c12.91-3.13,23.84-7.79,32-13.57V172C232,180.39,219.59,189.4,200,194.87Z">
+                        </path>
+                    </svg>
+                    Entry Fee
+                </span>
+                <span class="text-coffee-700">
+                    ₱@Model.EntryFee
+                </span>
+            </div>
         </div>
 
         @* Event Duration *@
-        <div class="flex flex-col col-span-full relative">
-            <p class="text-xs text-coffee-900">Event Duration</p>
-            <span class="p-2 text-coffee-700">
+        <div class="flex items-center w-full gap-3 text-sm">
+            <span class="flex items-center gap-1.5 text-coffee-600">
+                <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                    viewBox="0 0 256 256">
+                    <path
+                        d="M136,80v43.47l36.12,21.67a8,8,0,0,1-8.24,13.72l-40-24A8,8,0,0,1,120,128V80a8,8,0,0,1,16,0Zm-8-48A95.44,95.44,0,0,0,60.08,60.15C52.81,67.51,46.35,74.59,40,82V64a8,8,0,0,0-16,0v40a8,8,0,0,0,8,8H72a8,8,0,0,0,0-16H49c7.15-8.42,14.27-16.35,22.39-24.57a80,80,0,1,1,1.66,114.75,8,8,0,1,0-11,11.64A96,96,0,1,0,128,32Z">
+                    </path>
+                </svg>
+                Event Duration
+            </span>
+            <span class="text-coffee-700">
                 @Model.StartAt.ToString("MMMM dd, yyyy") - @Model.EndAt.ToString("MMMM dd, yyyy")
             </span>
         </div>

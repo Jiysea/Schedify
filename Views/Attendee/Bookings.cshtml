@@ -1,17 +1,49 @@
-@model BookingViewModel
+@model BookingsViewModel
 
 @{
     ViewData["Title"] = "My Bookings";
 }
 
-<partial name="~/Views/Attendee/Partials/_TopbarPartial.cshtml" />
 
-<div x-data="{viewEventModal: false}" class="min-h-screen bg-[#F9FBFA]">
-    <header class="flex flex-col items-center w-full h-[8vh]">
+<div x-data="{viewBookingModal: false}" class="min-h-screen bg-[#F9FBFA]">
 
+    @* Main Header & Avatar *@
+    <partial name="~/Views/Attendee/Partials/_TopbarPartial.cshtml" />
+
+    <header class="flex items-center w-full px-4 py-2 border-b-2 border-zinc-100">
+        @* Sub Header (Your Bookings, Search) *@
+        <div class="flex items-center justify-between w-full h-[8vh] gap-1">
+
+            @* 1st Col *@
+            <div class="flex items-center gap-3">
+                <span class="flex items-center justify-center bg-pumpkin-500 text-pumpkin-50 p-1 size-8 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256">
+                        <path
+                            d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Zm-38.34-85.66a8,8,0,0,1,0,11.32l-48,48a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L116,164.69l42.34-42.35A8,8,0,0,1,169.66,122.34Z">
+                        </path>
+                    </svg>
+                </span>
+                <h2 class="font-semibold text-2xl text-coffee-900">Your Bookings</h2>
+            </div>
+
+            @* 2nd Col *@
+            <div class="flex items-center gap-3">
+                @* Search??? *@
+            </div>
+        </div>
     </header>
 
-    <main>
-        
+    @* Bookings List Bars *@
+    <main class="h-[80vh]">
+        <div id="events-list"
+            class="relative p-4 overflow-y-auto h-full scrollbar-thin scrollbar-track-transparent scrollbar-thumb-coffee-700">
+            @await Html.PartialAsync("~/Views/Attendee/Partials/_BookingsListPartial.cshtml", Model)
+        </div>
     </main>
+
+    <div id="all-modals">
+        @* View Bookings *@
+        @await Html.PartialAsync("~/Views/Attendee/Partials/ViewBookingModal.cshtml", Model.ViewBookingViewModel)
+    </div>
+
 </div>
