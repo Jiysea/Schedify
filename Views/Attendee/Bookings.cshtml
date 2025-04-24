@@ -5,21 +5,22 @@
 }
 
 
-<div x-data="{viewBookingModal: false}" class="min-h-screen bg-[#F9FBFA]">
+<div x-data="{ viewBookingModal: false, createFeedbackModal: false, updateFeedbackModal: false }" class="min-h-screen bg-[#F9FBFA]">
 
     @* Main Header & Avatar *@
     <partial name="~/Views/Attendee/Partials/_TopbarPartial.cshtml" />
 
-    <header class="flex items-center w-full px-4 py-2 border-b-2 border-zinc-100">
+    <header class="flex flex-col items-center w-full h-[8vh]">
         @* Sub Header (Your Bookings, Search) *@
-        <div class="flex items-center justify-between w-full h-[8vh] gap-1">
+        <div class="flex items-center w-full p-4 border-b-2 gap-3 border-zinc-100">
 
             @* 1st Col *@
             <div class="flex items-center gap-3">
                 <span class="flex items-center justify-center bg-pumpkin-500 text-pumpkin-50 p-1 size-8 rounded-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                        viewBox="0 0 256 256">
                         <path
-                            d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Zm-38.34-85.66a8,8,0,0,1,0,11.32l-48,48a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L116,164.69l42.34-42.35A8,8,0,0,1,169.66,122.34Z">
+                            d="M208,24H72A32,32,0,0,0,40,56V224a8,8,0,0,0,8,8H192a8,8,0,0,0,0-16H56a16,16,0,0,1,16-16H208a8,8,0,0,0,8-8V32A8,8,0,0,0,208,24ZM120,40h48v72L148.79,97.6a8,8,0,0,0-9.6,0L120,112Zm80,144H72a31.82,31.82,0,0,0-16,4.29V56A16,16,0,0,1,72,40h32v88a8,8,0,0,0,12.8,6.4L144,114l27.21,20.4A8,8,0,0,0,176,136a8,8,0,0,0,8-8V40h16Z">
                         </path>
                     </svg>
                 </span>
@@ -44,6 +45,12 @@
     <div id="all-modals">
         @* View Bookings *@
         @await Html.PartialAsync("~/Views/Attendee/Partials/ViewBookingModal.cshtml", Model.ViewBookingViewModel)
+
+        @* Create Feedback *@
+        @await Html.PartialAsync("~/Views/Attendee/Partials/CreateFeedbackModal.cshtml", Model.FeedbackViewModel)
+
+        @* Update Feedback *@
+        @await Html.PartialAsync("~/Views/Attendee/Partials/UpdateFeedbackModal.cshtml", Model.FeedbackViewModel)
     </div>
 
 </div>

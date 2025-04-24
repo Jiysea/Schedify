@@ -1,0 +1,82 @@
+@model FeedbackViewModel
+
+<header class="flex items-center justify-between text-lg font-medium py-3 px-4">
+    <h1 class="text-pumpkin-900">Edit Feedback</h1>
+    <button x-on:click="updateFeedbackModal = false"
+        class="flex items-center justify-center size-8 p-1 rounded-md text-pumpkin-500 hover:bg-pumpkin-100 active:bg-pumpkin-200 hover:text-pumpkin-700 active:text-pumpkin-900 duration-200 ease-in-out">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256">
+            <path
+                d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z">
+            </path>
+        </svg>
+    </button>
+</header>
+
+<hr class="w-full border-pumpkin-100">
+
+<main class="">
+    <form id="update-feedback-modal" action="post" hx-post="/attendee/update-feedback" hx-swap="none"
+        hx-indicator="#update-feedback-loader">
+
+        <input type="hidden" asp-for="Id">
+
+        @* Body *@
+        <div class="flex flex-col gap-10 px-6 py-10">
+           
+            @* Stars Thingy *@
+            <div class="relative flex flex-col items-center justify-center gap-2">
+                <p class="text-pumpkin-900 text-sm">
+                    How was the quality of the event?
+                </p>
+                <div x-data="{ rating: @Model.Rating, hoverRating: 0 }" class="flex items-center justify-center w-full">
+                    <span class="relative flex items-center justify-center gap-1">
+                        <template x-for="i in 5">
+                            <svg x-on:click="rating = i" @@mouseenter="hoverRating = i" @@mouseleave="hoverRating = 0"
+                                :class="(hoverRating >= i || rating >= i) ? 'fill-yellow-400' : 'fill-zinc-400'"
+                                class="size-8 cursor-pointer transition-colors duration-200 ease-in-out"
+                                viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.97c.3.921-.755 1.688-1.54 1.118L10 13.347l-3.38 2.455c-.784.57-1.838-.197-1.54-1.118l1.287-3.97a1 1 0 00-.364-1.118L2.623 9.397c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.97z" />
+                            </svg>
+                        </template>
+                        <span class="absolute start-0 top-full text-zinc-500 text-xs">Awful</span>
+                        <span class="absolute end-0 top-full text-zinc-500 text-xs">Brilliant</span>
+                    </span>
+                    <input type="hidden" id="edit-rating" asp-for="Rating" :value="rating">
+                </div>
+
+                <div id="edit-validation-Rating"></div>
+            </div>
+
+            @* Comments *@
+            <div class="flex flex-col col-span-full gap-1 relative">
+                <textarea type="text" autocomplete="off"
+                    class="selection:bg-pumpkin-700 selection:text-pumpkin-100 bg-pumpkin-100 border-pumpkin-500 focus:ring-pumpkin-500 focus:border-pumpkin-600 text-pumpkin-950 placeholder-pumpkin-600 block text-sm border rounded-md outline-none w-full duration-200 ease-in-out p-2 scrollbar-thin"
+                    maxlength="500" rows="3" id="edit-comments" style="resize: none;" asp-for="Comments"
+                    placeholder="Leave a message, suggestions, or anything that can help us improve your experience. Your feedback matters to us!"></textarea>
+
+                <div id="edit-validation-Comments">
+                </div>
+            </div>
+        </div>
+
+        @* Footer *@
+        <div class="flex items-center justify-center gap-2 w-full py-3 px-4">
+            <button type="submit"
+                class="duration-200 ease-in-out text-sm py-2 w-full font-medium text-pumpkin-50 bg-pumpkin-700 hover:bg-pumpkin-800 active:bg-pumpkin-900 rounded-md">
+                SAVE
+
+                <svg id="update-feedback-loader" class="htmx-indicator size-5 animate-spin"
+                    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid"
+                    xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <g>
+                        <circle stroke-dasharray="164.93361431346415 56.97787143782138" r="35" stroke-width="10"
+                            stroke="currentColor" fill="none" cy="50" cx="50" transform="matrix(1,0,0,1,0,0)">
+                        </circle>
+                        <g></g>
+                    </g>
+                </svg>
+            </button>
+        </div>
+    </form>
+</main>

@@ -30,7 +30,7 @@ public class BookingService
             .ToList();
     }
 
-    public List<Event> GetEventsByBooking(List<EventBooking> bookings)
+    public List<Event> GetEventsByBooking(List<EventBooking> bookings) // Assuming the Bookings are filtered by user
     {
         var eventIds = bookings
             .Select(b => b.EventId)

@@ -1,0 +1,14 @@
+@model FeedbackViewModel
+
+<div x-cloak x-show="updateFeedbackModal" x-transition.opacity
+    class="fixed inset-0 flex justify-center items-start bg-black/50 backdrop-blur-sm overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-pumpkin-700 z-50 p-4">
+
+    @* White Box *@
+    <div id="updateFeedbackModalContent" x-data x-trap.noscroll="updateFeedbackModal"
+        @@keydown.escape="updateFeedbackModal = false;" @@close-modal.camel="updateFeedbackModal = false;"
+        class="bg-pumpkin-50 rounded-lg shadow-lg min-w-[45rem] max-w-[45rem]">
+
+        @* The Partials will be swapped here *@
+
+    </div>
+</div>

@@ -7,6 +7,7 @@ public class BookingsViewModel
 {
     // Initialize
     public ViewBookingViewModel ViewBookingViewModel = new ViewBookingViewModel();
+    public FeedbackViewModel FeedbackViewModel = new FeedbackViewModel();
 
     // Important Stuffs
     public List<EventBooking> BookedEvents { get; set; } = new List<EventBooking>();

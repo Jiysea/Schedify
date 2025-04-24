@@ -1,0 +1,16 @@
+@model BookingsViewModel
+
+<div id="events-list" hx-swap-oob="innerHTML">
+    @await Html.PartialAsync("~/Views/Attendee/Partials/_BookingsListPartial.cshtml", Model)
+</div>
+
+<div id="all-modals" hx-swap-oob="true">
+    @* View Bookings *@
+    @await Html.PartialAsync("~/Views/Attendee/Partials/ViewBookingModal.cshtml", Model.ViewBookingViewModel)
+
+    @* Create Feedback *@
+    @await Html.PartialAsync("~/Views/Attendee/Partials/CreateFeedbackModal.cshtml", Model.FeedbackViewModel)
+
+    @* Update Feedback *@
+    @await Html.PartialAsync("~/Views/Attendee/Partials/UpdateFeedbackModal.cshtml", Model.FeedbackViewModel)
+</div>

@@ -72,6 +72,7 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ResourceService>();
 builder.Services.AddScoped<StripeService>();
 builder.Services.AddScoped<BookingService>();
+builder.Services.AddScoped<FeedbackService>();
 builder.Services.AddScoped<Schedify.Services.EventService>();
 
 var app = builder.Build();

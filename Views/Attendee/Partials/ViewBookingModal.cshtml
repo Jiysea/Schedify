@@ -5,7 +5,7 @@
     
     @* White Box *@
     <div id="viewBookingModalContent" x-data x-trap.noscroll="viewBookingModal" @@keydown.escape="viewBookingModal = false;"
-        @@close-view-event-modal="viewBookingModal = false;"
+        @@close-modal.camel="viewBookingModal = false;"
         class="bg-coffee-50 rounded-lg shadow-lg min-w-[45rem] max-w-[45rem]">
 
         @* The Partials will be swapped here *@

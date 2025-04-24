@@ -17,7 +17,7 @@ public class Feedback
     [Required]
     public required int Rating { get; set; }
 
-    [StringLength(100)]
+    [StringLength(500)]
     public string? Comments { get; set; }
 
     [Column(TypeName = "datetime2")]

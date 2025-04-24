@@ -18,7 +18,10 @@
 
     @* Resource Image *@
     <div class="flex items-center justify-center gap-2 w-full h-56 py-6">
-        <img src="/resources/@Model.ImageFileName" alt="Resource Image" class="w-full h-56 object-cover rounded-md">
+        @if (Model.ImageFileName != null)
+        {
+            <img src="/resources/@Model.ImageFileName" alt="Resource Image" class="w-full h-56 object-cover rounded-md">
+        }
     </div>
 
     @* Short Name *@
@@ -42,18 +45,76 @@
             </span>
         </div>
 
-        @* See Ticket button *@
+        @* Buttons after ShortName *@
         <div class="flex items-center justify-center gap-3">
-            <button type="button" hx-get="/attendee/view-ticket/@Model.Id" hx-swap="none"
-                class="duration-200 ease-in-out flex items-center justify-center gap-1 font-medium text-base rounded-md px-2 py-1 bg-coffee-600 hover:bg-coffee-700 active:bg-coffee-800 text-coffee-50 active:text-coffee-100">
-                <svg class="size-6" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
-                    viewBox="0 0 256 256">
-                    <path
-                        d="M104,40H56A16,16,0,0,0,40,56v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V56A16,16,0,0,0,104,40Zm0,64H56V56h48v48Zm0,32H56a16,16,0,0,0-16,16v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V152A16,16,0,0,0,104,136Zm0,64H56V152h48v48ZM200,40H152a16,16,0,0,0-16,16v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V56A16,16,0,0,0,200,40Zm0,64H152V56h48v48Zm-64,72V144a8,8,0,0,1,16,0v32a8,8,0,0,1-16,0Zm80-16a8,8,0,0,1-8,8H184v40a8,8,0,0,1-8,8H144a8,8,0,0,1,0-16h24V144a8,8,0,0,1,16,0v8h24A8,8,0,0,1,216,160Zm0,32v16a8,8,0,0,1-16,0V192a8,8,0,0,1,16,0Z">
-                    </path>
-                </svg>
-                See Ticket
-            </button>
+            @if (Model.Status == EventStatus.Open || Model.Status == EventStatus.Ongoing)
+            {
+                <button type="button" hx-get="/attendee/view-ticket/@Model.Id" hx-swap="none"
+                    class="duration-200 ease-in-out flex items-center justify-center gap-1 font-medium text-sm rounded-md px-2 py-1 bg-coffee-600 hover:bg-coffee-700 active:bg-coffee-800 text-coffee-50 active:text-coffee-100">
+                    <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                        viewBox="0 0 256 256">
+                        <path
+                            d="M104,40H56A16,16,0,0,0,40,56v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V56A16,16,0,0,0,104,40Zm0,64H56V56h48v48Zm0,32H56a16,16,0,0,0-16,16v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V152A16,16,0,0,0,104,136Zm0,64H56V152h48v48ZM200,40H152a16,16,0,0,0-16,16v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V56A16,16,0,0,0,200,40Zm0,64H152V56h48v48Zm-64,72V144a8,8,0,0,1,16,0v32a8,8,0,0,1-16,0Zm80-16a8,8,0,0,1-8,8H184v40a8,8,0,0,1-8,8H144a8,8,0,0,1,0-16h24V144a8,8,0,0,1,16,0v8h24A8,8,0,0,1,216,160Zm0,32v16a8,8,0,0,1-16,0V192a8,8,0,0,1,16,0Z">
+                        </path>
+                    </svg>
+                    See Ticket
+                </button>
+            }
+            else
+            {
+                if (!Model.IsFeedbackGiven)
+                {
+                    <button type="button" hx-get="/attendee/open-create-feedback-modal/{@Model.EventId}" hx-swap="innerHTML"
+                        hx-target="#createFeedbackModalContent" x-on:click="createFeedbackModal = true"
+                        class="duration-200 ease-in-out flex items-center justify-center gap-1 font-medium text-sm rounded-md px-2 py-1 bg-pumpkin-600 hover:bg-pumpkin-700 active:bg-pumpkin-800 text-pumpkin-50 active:text-pumpkin-100">
+                        <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                            viewBox="0 0 256 256">
+                            <path
+                                d="M248,120a48.05,48.05,0,0,0-48-48H160.2c-2.91-.17-53.62-3.74-101.91-44.24A16,16,0,0,0,32,40V200a16,16,0,0,0,26.29,12.25c37.77-31.68,77-40.76,93.71-43.3v31.72A16,16,0,0,0,159.12,214l11,7.33A16,16,0,0,0,194.5,212l11.77-44.36A48.07,48.07,0,0,0,248,120ZM48,199.93V40h0c42.81,35.91,86.63,45,104,47.24v65.48C134.65,155,90.84,164.07,48,199.93Zm131,8,0,.11-11-7.33V168h21.6ZM200,152H168V88h32a32,32,0,1,1,0,64Z">
+                            </path>
+                        </svg>
+                        Leave a Feedback
+                    </button>
+                }
+                else
+                {
+                    if (Model.Feedback != null)
+                    {
+                        <div x-data="{ hover: false }" class="relative">
+
+                            <span x-data="{ rating: @Model.Feedback.Rating }" @@mouseenter="hover = true" @@mouseleave="hover = false"
+                                class="relative flex items-center justify-center gap-1 overflow-hidden group">
+
+                                <template x-for="i in 5">
+                                    <svg :class="(rating >= i) ? 'fill-yellow-400 group-hover:fill-yellow-400/50' : 'fill-zinc-400 group-hover:fill-zinc-400/50'"
+                                        class="size-6 duration-200 ease-in-out" viewBox="0 0 20 20" fill="currentColor"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.97c.3.921-.755 1.688-1.54 1.118L10 13.347l-3.38 2.455c-.784.57-1.838-.197-1.54-1.118l1.287-3.97a1 1 0 00-.364-1.118L2.623 9.397c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.97z" />
+                                    </svg>
+                                </template>
+
+                                @* Edit Feedback Button *@
+                                <button type="button" x-on:click="updateFeedbackModal = true" hx-get="/attendee/open-edit-feedback-modal/@Model.Feedback.Id" hx-swap="innerHTML" hx-target="#updateFeedbackModalContent"
+                                    class="duration-200 ease-in-out z-10 absolute right-1/2 p-1 rounded-md bg-coffee-600 text-coffee-50 translate-x-1/2 -translate-y-10 group-hover:translate-y-0">
+                                    <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                                        fill="currentColor" viewBox="0 0 256 256">
+                                        <path
+                                            d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.68,147.31,64l24-24L216,84.68Z">
+                                        </path>
+                                    </svg>
+                                </button>
+                            </span>
+
+                            <div x-show="hover" x-transition.opacity class="absolute bottom-full left-0 w-full rounded-lg p-2 mb-2 border bg-coffee-50 border-coffee-500 text-xs line-clamp-3">
+                                @Model.Feedback.Comments
+                            </div>
+                        </div>
+
+                    }
+                }
+            }
+
         </div>
     </div>
 
@@ -124,7 +185,8 @@
             @* Payment Method *@
             <div class="flex items-center justify-between text-sm">
                 <span class="flex items-center gap-1.5 font-normal text-coffee-600">
-                    <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256">
+                    <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                        viewBox="0 0 256 256">
                         <path
                             d="M216,64H56a8,8,0,0,1,0-16H192a8,8,0,0,0,0-16H56A24,24,0,0,0,32,56V184a24,24,0,0,0,24,24H216a16,16,0,0,0,16-16V80A16,16,0,0,0,216,64Zm0,128H56a8,8,0,0,1-8-8V78.63A23.84,23.84,0,0,0,56,80H216Zm-48-60a12,12,0,1,1,12,12A12,12,0,0,1,168,132Z">
                         </path>
@@ -133,6 +195,7 @@
                 </span>
                 <div class="flex items-center gap-2 font-light text-coffee-700">
                     <span class="capitalize">@Model.PaymentMethod</span>
+                    <span class="capitalize">@Model.CardBrand</span>
                     <span>**** @Model.PANLastDigits</span>
                 </div>
             </div>

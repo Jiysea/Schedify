@@ -1,0 +1,15 @@
+@model FeedbackViewModel
+
+<div x-cloak x-show="createFeedbackModal" x-transition.opacity
+    class="fixed inset-0 flex justify-center items-start bg-black/50 backdrop-blur-sm overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-pumpkin-700 z-50 p-4">
+
+    @* White Box *@
+    <div id="createFeedbackModalContent" x-data x-trap.noscroll="createFeedbackModal"
+        @@keydown.escape="createFeedbackModal = false;" @@close-modal.camel="createFeedbackModal = false;"
+        class="bg-pumpkin-50 rounded-lg shadow-lg min-w-[45rem] max-w-[45rem]">
+
+        @* The Partials will be swapped here *@
+        @* @await Html.PartialAsync("~/Views/Attendee/Partials/_CreateFeedbackPartial.cshtml", Model) *@
+
+    </div>
+</div>
