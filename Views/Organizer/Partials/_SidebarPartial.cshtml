@@ -2,68 +2,70 @@
     var currentUrl = Context.Request.Path;
 }
 
-<div class="absolute start-0 top-0 w-[250px] h-full bg-white text-zinc-500 border-r-2 border-zinc-100">
+<div
+    class="duration-500 ease-in-out absolute start-0 top-0 w-[80px] lg:w-[250px] h-full bg-white text-zinc-500 border-r-2 border-zinc-100">
 
-    <a href="/" class="flex items-center justify-center py-6 border-b-2 border-zinc-100">
-        <img class="w-[70%]" src="~/images/logo_landscape.png" alt="Schedify Logo">
+    <a href="/" class="flex items-center justify-center py-6 h-28 border-b-2 border-zinc-100">
+        <img class="duration-500 ease-in-out w-[70%] lg:w-0" src="~/images/logo.png" alt="Schedify Small Logo">
+        <img class="duration-500 ease-in-out w-0 lg:w-[70%]" src="~/images/logo_landscape.png" alt="Schedify Logo">
     </a>
 
     <ul class="flex flex-col gap-3 mt-3">
         @* Events *@
         <li>
             <a href="/organizer/events"
-                class="flex items-center justify-start gap-2 mx-2 p-2 font-medium rounded-md duration-200 ease-in-out @(currentUrl == "/organizer/events" ? "bg-coffee-600 hover:bg-coffee-700 active:bg-coffee-900 text-coffee-50" : "text-zinc-500 hover:bg-zinc-50")">
-                <svg class="size-5 " xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                class="relative flex items-center justify-start gap-2 mx-2 p-2 h-10 font-medium rounded-md duration-200 ease-in-out @(currentUrl == "/organizer/events" ? "bg-coffee-600 hover:bg-coffee-700 active:bg-coffee-900 text-coffee-50" : "text-zinc-500 hover:bg-zinc-50")">
+                <svg class="absolute duration-500 ease-in-out left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-2 size-6 lg:size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
                     viewBox="0 0 256 256">
                     <path
                         d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Zm-68-76a12,12,0,1,1-12-12A12,12,0,0,1,140,132Zm44,0a12,12,0,1,1-12-12A12,12,0,0,1,184,132ZM96,172a12,12,0,1,1-12-12A12,12,0,0,1,96,172Zm44,0a12,12,0,1,1-12-12A12,12,0,0,1,140,172Zm44,0a12,12,0,1,1-12-12A12,12,0,0,1,184,172Z">
                     </path>
                 </svg>
 
-                My Events
+                <span class="absolute left-9 whitespace-nowrap duration-500 ease-in-out opacity-0 lg:opacity-100 -translate-x-36 lg:translate-x-0">My Events</span>
             </a>
         </li>
 
         @* Resources *@
         <li>
             <a href="/organizer/resources" @(currentUrl != "/organizer/resources" ? "hx-boost=true" : "")
-                class="flex items-center justify-start gap-2 mx-2 p-2 font-medium rounded-md duration-200 ease-in-out @(currentUrl == "/organizer/resources" ? "bg-coffee-600 hover:bg-coffee-700 active:bg-coffee-900 text-coffee-50" : "text-zinc-500 hover:bg-zinc-50")">
-                <svg class="size-5  " xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                class="relative flex items-center justify-start gap-2 mx-2 p-2 h-10 font-medium rounded-md duration-200 ease-in-out @(currentUrl == "/organizer/resources" ? "bg-coffee-600 hover:bg-coffee-700 active:bg-coffee-900 text-coffee-50" : "text-zinc-500 hover:bg-zinc-50")">
+                <svg class="absolute duration-500 ease-in-out left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-2 size-6 lg:size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
                     viewBox="0 0 256 256">
                     <path
                         d="M223.68,66.15,135.68,18a15.88,15.88,0,0,0-15.36,0l-88,48.17a16,16,0,0,0-8.32,14v95.64a16,16,0,0,0,8.32,14l88,48.17a15.88,15.88,0,0,0,15.36,0l88-48.17a16,16,0,0,0,8.32-14V80.18A16,16,0,0,0,223.68,66.15ZM128,32l80.34,44-29.77,16.3-80.35-44ZM128,120,47.66,76l33.9-18.56,80.34,44ZM40,90l80,43.78v85.79L40,175.82Zm176,85.78h0l-80,43.79V133.82l32-17.51V152a8,8,0,0,0,16,0V107.55L216,90v85.77Z">
                     </path>
                 </svg>
 
-                Resources
+                <span class="absolute left-9 whitespace-nowrap duration-500 ease-in-out opacity-0 lg:opacity-100 -translate-x-36 lg:translate-x-0">Resources</span>
             </a>
         </li>
 
         @* Feedbacks *@
         <li>
-            <a href="/organizer/feedbacks"
-                class="flex items-center justify-start gap-2 mx-2 p-2 font-medium rounded-md duration-200 ease-in-out @(currentUrl == "/organizer/feedbacks" ? "bg-coffee-600 hover:bg-coffee-700 active:bg-coffee-900 text-coffee-50" : "text-zinc-500 hover:bg-zinc-50")">
-                <svg class="size-5  " xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+            <a href="/organizer/feedbacks" @(currentUrl != "/organizer/feedbacks" ? "hx-boost=true" : "")
+                class="relative flex items-center justify-start gap-2 mx-2 p-2 h-10 font-medium rounded-md duration-200 ease-in-out @(currentUrl == "/organizer/feedbacks" ? "bg-coffee-600 hover:bg-coffee-700 active:bg-coffee-900 text-coffee-50" : "text-zinc-500 hover:bg-zinc-50")">
+                <svg class="absolute duration-500 ease-in-out left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-2 size-6 lg:size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
                     viewBox="0 0 256 256">
                     <path
                         d="M88,104a8,8,0,0,1,8-8h64a8,8,0,0,1,0,16H96A8,8,0,0,1,88,104Zm8,40h64a8,8,0,0,0,0-16H96a8,8,0,0,0,0,16ZM232,56V184a16,16,0,0,1-16,16H155.57l-13.68,23.94a16,16,0,0,1-27.78,0L100.43,200H40a16,16,0,0,1-16-16V56A16,16,0,0,1,40,40H216A16,16,0,0,1,232,56Zm-16,0H40V184h65.07a8,8,0,0,1,7,4l16,28,16-28a8,8,0,0,1,7-4H216Z">
                     </path>
                 </svg>
-                Feedbacks
+                <span class="absolute left-9 whitespace-nowrap duration-500 ease-in-out opacity-0 lg:opacity-100 -translate-x-36 lg:translate-x-0">Feedbacks</span>
             </a>
         </li>
 
-        @* Stats *@
+        @* Metrics *@
         <li>
-            <a href="/organizer/stats"
-                class="flex items-center justify-start gap-2 mx-2 p-2 font-medium rounded-md duration-200 ease-in-out @(currentUrl == "/organizer/stats" ? "bg-coffee-600 hover:bg-coffee-700 active:bg-coffee-900 text-coffee-50" : "text-zinc-500 hover:bg-zinc-50")">
-                <svg class="size-5  " xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+            <a href="/organizer/metrics"
+                class="relative flex items-center justify-start gap-2 mx-2 p-2 h-10 font-medium rounded-md duration-200 ease-in-out @(currentUrl == "/organizer/metrics" ? "bg-coffee-600 hover:bg-coffee-700 active:bg-coffee-900 text-coffee-50" : "text-zinc-500 hover:bg-zinc-50")">
+                <svg class="absolute duration-500 ease-in-out left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-2 size-6 lg:size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
                     viewBox="0 0 256 256">
                     <path
                         d="M224,200h-8V40a8,8,0,0,0-8-8H152a8,8,0,0,0-8,8V80H96a8,8,0,0,0-8,8v40H48a8,8,0,0,0-8,8v64H32a8,8,0,0,0,0,16H224a8,8,0,0,0,0-16ZM160,48h40V200H160ZM104,96h40V200H104ZM56,144H88v56H56Z">
                     </path>
                 </svg>
-                Stats
+                <span class="absolute left-9 whitespace-nowrap duration-500 ease-in-out opacity-0 lg:opacity-100 -translate-x-36 lg:translate-x-0">Metrics</span>
             </a>
         </li>
     </ul>

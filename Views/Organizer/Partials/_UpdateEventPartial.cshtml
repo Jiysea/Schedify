@@ -93,27 +93,71 @@
 
                 @* Event Duration *@
                 <div class="flex flex-col col-span-4 gap-1 relative w-full">
-                    <p for="shift" class="text-xs text-coffee-900">Event Duration</p>
-                    <span class="flex items-center gap-2 w-full">
-                        <div class="flex flex-col gap-1">
-                            <span class="flex items-start gap-2 w-full">
-                                <label for="edit-startat" class="text-xs text-coffee-500 whitespace-nowrap">
-                                    Start At</label>
-                                <input type="text" class="input-coffee p-2" id="edit-startat" asp-for="StartAtString"
-                                    placeholder="Select a start time">
+                    <p class="text-xs text-coffee-900">Event Duration</p>
+                    <div class="flex flex-col gap-4 relative w-full">
+                        <span class="flex items-center gap-2 w-full">
+                            <div class="flex flex-col gap-1">
+                                <div class="relative w-full">
+                                    <span
+                                        class="absolute start-0 top-0 p-2 rounded-l-md text-xs border border-transparent bg-coffee-500 text-coffee-100 pointer-events-none">
+                                        <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32"
+                                            height="32" fill="currentColor" viewBox="0 0 256 256">
+                                            <path
+                                                d="M136,80v43.47l36.12,21.67a8,8,0,0,1-8.24,13.72l-40-24A8,8,0,0,1,120,128V80a8,8,0,0,1,16,0Zm88-24a8,8,0,0,0-8,8V82c-6.35-7.36-12.83-14.45-20.12-21.83a96,96,0,1,0-2,137.7,8,8,0,0,0-11-11.64A80,80,0,1,1,184.54,71.4C192.68,79.64,199.81,87.58,207,96H184a8,8,0,0,0,0,16h40a8,8,0,0,0,8-8V64A8,8,0,0,0,224,56Z">
+                                            </path>
+                                        </svg>
+                                    </span>
+                                    <input type="text" class="input-coffee ps-12 pe-2 py-2 cursor-pointer"
+                                        id="edit-startat" asp-for="StartAtString" placeholder="Select a start time" />
+                                </div>
+                                <div id="edit-validation-StartAtString">
+                                </div>
+                            </div>
+                            <div class="relative text-coffee-500">
+                                <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                                    fill="currentColor" viewBox="0 0 256 256">
+                                    <path
+                                        d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <div class="relative w-full">
+                                    <span
+                                        class="absolute start-0 top-0 p-2 rounded-l-md text-xs border border-transparent bg-coffee-500 text-coffee-100 pointer-events-none">
+                                        <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32"
+                                            height="32" fill="currentColor" viewBox="0 0 256 256">
+                                            <path
+                                                d="M136,80v43.47l36.12,21.67a8,8,0,0,1-8.24,13.72l-40-24A8,8,0,0,1,120,128V80a8,8,0,0,1,16,0Zm-8-48A95.44,95.44,0,0,0,60.08,60.15C52.81,67.51,46.35,74.59,40,82V64a8,8,0,0,0-16,0v40a8,8,0,0,0,8,8H72a8,8,0,0,0,0-16H49c7.15-8.42,14.27-16.35,22.39-24.57a80,80,0,1,1,1.66,114.75,8,8,0,1,0-11,11.64A96,96,0,1,0,128,32Z">
+                                            </path>
+                                        </svg>
+                                    </span>
+                                    <input type="text" class="input-coffee ps-12 pe-2 py-2 cursor-pointer"
+                                        id="edit-endat" asp-for="EndAtString" placeholder="Select an end time" />
+                                </div>
+                                <div id="edit-validation-EndAtString">
+                                </div>
+                            </div>
+                        </span>
+                        
+                        @* Time Schedule *@
+                        <div class="flex flex-col col-span-3 gap-1 relative w-full">
+                            <p for="shift" class="text-xs text-coffee-700">Time Schedule</p>
+                            <span class="flex items-center gap-2 w-full">
+                                <span class="flex flex-col items-start gap-2 w-full">
+                                    <input type="text" class="input-coffee p-2" id="edit-timestartdate" asp-for="TimeStartString"
+                                        placeholder="Select a start time" />
+                                    <div class="absolute top-full" id="edit-validation-TimeStartString"></div>    
+                                </span>
+                                <span class="text-coffee-700 text-xs">To</span>
+                                <span class="flex flex-col items-start gap-2 w-full">
+                                    <input type="text" class="input-coffee p-2" id="edit-timeenddate" asp-for="TimeEndString"
+                                        placeholder="Select an end time" />
+                                    <div class="absolute top-full" id="edit-validation-TimeEndString"></div>
+                                </span>
                             </span>
-                            <div id="edit-validation-StartAtString"></div>
                         </div>
-                        <div class="flex flex-col gap-1">
-                            <span class="flex items-start gap-2 w-full">
-                                <label for="edit-endat" class="text-xs text-coffee-500 whitespace-nowrap">
-                                    End At</label>
-                                <input type="text" class="input-coffee p-2" id="edit-endat" asp-for="EndAtString"
-                                    placeholder="Select an end time">
-                            </span>
-                            <div id="edit-validation-EndAtString"></div>
-                        </div>
-                    </span>
+                    </div>
                 </div>
             </div>
 
@@ -145,8 +189,8 @@
 <script>
     document.addEventListener("htmx:afterSwap", () => {
         let startPicker = flatpickr("#edit-startat", {
-            enableTime: true,
-            dateFormat: "Y-m-d H:i",
+            enableTime: false,
+            dateFormat: "Y-m-d",
             appendTo: document.body,
             minDate: new Date().fp_incr(1), // Tomorrow
             onChange: function (selectedDates) {
@@ -157,10 +201,46 @@
         });
 
         let endPicker = flatpickr("#edit-endat", {
-            enableTime: true,
-            dateFormat: "Y-m-d H:i",
+            enableTime: false,
+            dateFormat: "Y-m-d",
             appendTo: document.body,
             minDate: new Date().fp_incr(1), // Tomorrow
+        });
+
+        const timeFromInstance = flatpickr("#edit-timestartdate", {
+            enableTime: true,
+            dateFormat: "h:i K",
+            noCalendar: true,
+            onChange: function (selectedDates, dateStr) {
+                const timeEndInstance = document.querySelector("#edit-timeenddate")._flatpickr;
+                if (timeEndInstance) {
+                    let fromDate = timeFromInstance.parseDate(dateStr, "h:i K");
+                    let toDate = timeEndInstance.selectedDates[0];
+                    if (!toDate || fromDate >= toDate) {
+                        let adjustedDate = new Date(fromDate);
+                        adjustedDate.setHours(fromDate.getHours() + 1);
+                        timeEndInstance.setDate(adjustedDate);
+                    }
+                }
+            }
+        });
+
+        const timeEndInstance = flatpickr("#edit-timeenddate", {
+            enableTime: true,
+            dateFormat: "h:i K",
+            noCalendar: true,
+            onChange: function (selectedDates, dateStr) {
+                const timeFromInstance = document.querySelector("#edit-timestartdate")._flatpickr;
+                if (timeFromInstance) {
+                    let toDate = timeEndInstance.parseDate(dateStr, "h:i K");
+                    let fromDate = timeFromInstance.selectedDates[0];
+                    if (!fromDate || toDate <= fromDate) {
+                        let adjustedDate = new Date(toDate);
+                        adjustedDate.setHours(toDate.getHours() - 1);
+                        timeFromInstance.setDate(adjustedDate);
+                    }
+                }
+            }
         });
     });
 </script>

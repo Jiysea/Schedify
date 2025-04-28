@@ -8,6 +8,9 @@ namespace Schedify.ViewModels;
 
 public class ResourceViewModel
 {
+    // Avatar
+    public string? AvatarFileName { get; set; }
+    
     // List of Resources
     public List<Resource> Resources { get; set; } = new List<Resource>();
 

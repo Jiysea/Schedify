@@ -3,6 +3,7 @@
 
 
 using System.ComponentModel.DataAnnotations;
+using Schedify.Attributes;
 
 namespace Schedify.ViewModels;
 
@@ -52,4 +53,8 @@ public class RegisterViewModel
 
     [Range(1, 2, ErrorMessage = "Invalid role.")]
     public int Role { get; set; } = 1;
+
+    [AllowedExtensions([".jpg", ".jpeg", ".png"])]
+    [MaxFileSize(5)]
+    public IFormFile? ImageFile { get; set; }
 }

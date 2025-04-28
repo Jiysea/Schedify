@@ -1,0 +1,17 @@
+@using System.Text.Json
+@using System.Globalization
+@model EventFeedbacksViewModel
+@{
+    bool isHtmxRequest = Context.Request.Headers.ContainsKey("HX-Request");
+}
+
+@if (isHtmxRequest)
+{
+    <div id="feedback-events-dropdown" class="flex items-center justify-end gap-3" hx-swap-oob="true">
+        @await Html.PartialAsync("~/Views/Organizer/Partials/_FeedbackEventsDropdown.cshtml", Model)
+    </div>
+}
+
+<div id="feedbacks-list" hx-swap-oob="innerHTML">
+    @await Html.PartialAsync("~/Views/Organizer/Partials/_FeedbackListPartial.cshtml", Model)
+</div>

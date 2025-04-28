@@ -203,6 +203,8 @@ public class EventService
                 Description = model.Description,
                 StartAt = model.StartAt,
                 EndAt = model.EndAt,
+                TimeStart = model.TimeStart,
+                TimeEnd = model.TimeEnd,
                 Status = model.Status,
                 EntryFee = model.EntryFee,
                 CreatedAt = DateTime.UtcNow,

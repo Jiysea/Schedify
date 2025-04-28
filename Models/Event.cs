@@ -32,6 +32,15 @@ public class Event
     [Column(TypeName = "datetime2")]
     [DataType(DataType.DateTime)]
     public required DateTime EndAt { get; set; }
+
+    [Required]
+    [Column(TypeName = "time")]
+    public required TimeSpan TimeStart { get; set; }
+
+    [Required]
+    [Column(TypeName = "time")]
+    public required TimeSpan TimeEnd { get; set; }
+
     public EventStatus Status { get; set; }
 
     [Required]

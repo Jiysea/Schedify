@@ -73,6 +73,7 @@ builder.Services.AddScoped<ResourceService>();
 builder.Services.AddScoped<StripeService>();
 builder.Services.AddScoped<BookingService>();
 builder.Services.AddScoped<FeedbackService>();
+builder.Services.AddScoped<MetricService>();
 builder.Services.AddScoped<Schedify.Services.EventService>();
 
 var app = builder.Build();
@@ -85,49 +86,49 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-// async Task CreateAdmin(UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager)
-// {
+async Task CreateAdmin(UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager)
+{
 
-//     if (!await roleManager.RoleExistsAsync("Admin"))
-//     {
-//         await roleManager.CreateAsync(new IdentityRole<Guid>("Admin"));
-//     }
+    if (!await roleManager.RoleExistsAsync("Admin"))
+    {
+        await roleManager.CreateAsync(new IdentityRole<Guid>("Admin"));
+    }
 
-//     // Create an admin user
-//     var adminEmail = "admin@gmail.com";
-//     var adminUser = await userManager.FindByEmailAsync(adminEmail);
+    // Create an admin user
+    var adminEmail = "admin@gmail.com";
+    var adminUser = await userManager.FindByEmailAsync(adminEmail);
 
-//     if (adminUser == null)
-//     {
-//         var user = new User
-//         {
-//             FirstName = "Vincent",
-//             MiddleName = "Van",
-//             LastName = "Gogh",
-//             ExtensionName = null,
-//             Birthdate = DateTime.UtcNow,
-//             Email = adminEmail,
-//             UserName = adminEmail,
-//             PhoneNumber = "+639123456789",
-//         };
+    if (adminUser == null)
+    {
+        var user = new User
+        {
+            FirstName = "Vincent",
+            MiddleName = "Van",
+            LastName = "Gogh",
+            ExtensionName = null,
+            Birthdate = DateTime.UtcNow,
+            Email = adminEmail,
+            UserName = adminEmail,
+            PhoneNumber = "+639123456789",
+        };
 
-//         var result = await userManager.CreateAsync(user, "Password123"); // Change password
+        var result = await userManager.CreateAsync(user, "Password123"); // Change password
 
-//         if (result.Succeeded)
-//         {
-//             await userManager.AddToRoleAsync(user, "Admin");
-//         }
-//     }
-// }
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(user, "Admin");
+        }
+    }
+}
 
-// using (var scope = app.Services.CreateScope())
-// {
-//     var services = scope.ServiceProvider;
-//     var userManager = services.GetRequiredService<UserManager<User>>();
-//     var roleManager = services.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var userManager = services.GetRequiredService<UserManager<User>>();
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
 
-//     CreateAdmin(userManager, roleManager).Wait();
-// }
+    CreateAdmin(userManager, roleManager).Wait();
+}
 
 app.Use(async (context, next) =>
 {

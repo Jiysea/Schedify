@@ -35,11 +35,37 @@ public class CUEventViewModel
         }
     }
 
+    public TimeSpan TimeStart
+    {
+        get
+        {
+            return DateTime.TryParseExact(TimeStartString, "h:mm tt", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime shiftDateTime)
+                ? shiftDateTime.TimeOfDay
+                : TimeSpan.Zero; // Default to 00:00 if parsing fails
+        }
+    }
+
+    public TimeSpan TimeEnd
+    {
+        get
+        {
+            return DateTime.TryParseExact(TimeEndString, "h:mm tt", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime shiftDateTime)
+                ? shiftDateTime.TimeOfDay
+                : TimeSpan.Zero; // Default to 00:00 if parsing fails
+        }
+    }
+
     [Required(ErrorMessage = "This field is required.")]
     public string? StartAtString { get; set; }
 
     [Required(ErrorMessage = "This field is required.")]
     public string? EndAtString { get; set; }
+
+    [Required(ErrorMessage = "This field is required.")]
+    public string? TimeStartString { get; set; }
+
+    [Required(ErrorMessage = "This field is required.")]
+    public string? TimeEndString { get; set; }
 
     public EventStatus Status { get; set; } = EventStatus.Draft;
 
@@ -64,12 +90,12 @@ public class CUEventViewModel
     private DateTime ParseDateTimeOrDefault(string? dateString)
     {
         if (!string.IsNullOrEmpty(dateString) &&
-            DateTime.TryParseExact(dateString, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDate))
+            DateTime.TryParseExact(dateString, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDate))
         {
             return parsedDate;
         }
 
-        return DateTime.MinValue; // Default value if parsing fails
+        return DateTime.UtcNow; // Default value if parsing fails
     }
 
     public bool IsEdit { get; set; } = false;

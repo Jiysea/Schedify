@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Schedify.Data;
@@ -14,12 +15,14 @@ public class FeedbackService
     private readonly ApplicationDbContext _context;
     private readonly UserService _userService;
     private readonly IWebHostEnvironment _environment;
+    private readonly UserManager<User> _userManager;
 
-    public FeedbackService(ApplicationDbContext context, UserService userService, IWebHostEnvironment environment)
+    public FeedbackService(ApplicationDbContext context, UserService userService, IWebHostEnvironment environment, UserManager<User> userManager)
     {
         _context = context;
         _userService = userService;
         _environment = environment;
+        _userManager = userManager;
     }
 
     public async Task<Feedback?> GetFeedbackByIdAsync(Guid FeedbackId)
@@ -33,6 +36,54 @@ public class FeedbackService
         if (user == null) return null;
 
         return await _context.Feedbacks.FirstOrDefaultAsync(f => f.EventId == EventId && f.UserId == user.Id);
+    }
+
+    public async Task<List<Feedback>?> GetFeedbacksByEventIdAsync(Guid EventId)
+    {
+        return await _context.Feedbacks
+            .Where(f => f.EventId == EventId)
+            .ToListAsync();
+    }
+
+    public async Task<Dictionary<Guid, string?>?> GetAvatarImagesAsync(List<Feedback>? feedbacks)
+    {
+        var userIds = feedbacks?
+            .Select(f => f.UserId)
+            .Distinct()
+            .ToList();
+
+        var images = await _context.Images
+            .Where(i => i.UserId != null && userIds!.Contains(i.UserId.Value))
+            .ToDictionaryAsync(i => i.UserId!.Value, i => i.ImageFileName);
+
+        var avatars = feedbacks?.ToDictionary(
+            feedback => feedback.Id,
+            feedback => images.TryGetValue(feedback.UserId, out var image) ? image : null
+            );
+
+        return avatars;
+    }
+
+    public async Task<Dictionary<Guid, string?>> GetUserAsync(List<Feedback>? feedbacks)
+    {
+        if (feedbacks == null || feedbacks.Count == 0)
+            return new Dictionary<Guid, string?>();
+
+        var userIds = feedbacks
+            .Select(f => f.UserId)
+            .Distinct()
+            .ToList();
+
+        var usersById = await _userManager.Users
+            .Where(u => userIds.Contains(u.Id))
+            .ToDictionaryAsync(u => u.Id, u => (User?)u);
+
+        var userMap = feedbacks.ToDictionary(
+            feedback => feedback.Id,
+            feedback => usersById.TryGetValue(feedback.UserId, out var user) ? GetFullName(user!.FirstName, user?.MiddleName, user!.LastName, user?.ExtensionName) : null
+        );
+
+        return userMap;
     }
 
     public async Task<(bool IsSuccess, Dictionary<string, string>? Error, Feedback? Feedback)> CreateFeedbackAsync(FeedbackViewModel model)
@@ -150,5 +201,23 @@ public class FeedbackService
         }
 
         return errors;
+    }
+
+    private string GetFullName(string firstName, string? middleName, string lastName, string? extensionName)
+    {
+        var parts = new List<string>
+        {
+            firstName
+        };
+
+        if (!string.IsNullOrWhiteSpace(middleName))
+            parts.Add(middleName);
+
+        parts.Add(lastName);
+
+        if (!string.IsNullOrWhiteSpace(extensionName))
+            parts.Add(extensionName);
+
+        return string.Join(" ", parts);
     }
 }

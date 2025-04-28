@@ -282,6 +282,12 @@ namespace Schedify.Migrations
                         .HasMaxLength(15)
                         .HasColumnType("nvarchar(15)");
 
+                    b.Property<TimeSpan>("TimeEnd")
+                        .HasColumnType("time");
+
+                    b.Property<TimeSpan>("TimeStart")
+                        .HasColumnType("time");
+
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")

@@ -1,4 +1,5 @@
 @model EventsViewModel
+
 @{
     ViewData["Title"] = "Events";
     var firstDate = new DateTime(DateTime.UtcNow.Year, 1, 1);
@@ -9,9 +10,10 @@
 
 <partial name="~/Views/Organizer/Partials/_SidebarPartial.cshtml" />
 
-<div x-data="{viewEventModal: false, createEventModal: false}" class="min-h-screen bg-[#F9FBFA] ms-[250px]">
+<div x-data="{viewEventModal: false, createEventModal: false}" class="duration-500 ease-in-out min-h-screen bg-[#F9FBFA] ms-[80px] lg:ms-[250px]">
     @* Main Header (Search & Avatar) *@
-    <partial name="~/Views/Organizer/Partials/_TopbarPartial.cshtml" />
+
+    <partial name="~/Views/Organizer/Partials/_TopbarPartial.cshtml" model="Model.AvatarFileName" />
 
     <header class="flex flex-col items-center w-full px-4 py-2 border-b-2 border-zinc-100">
 
@@ -39,8 +41,8 @@
                             d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Z">
                         </path>
                     </svg>
-                    <input type="text" hx-get="/organizer/event-filter-date" hx-trigger="change" hx-target="#events-list"
-                        name="startDate"
+                    <input type="text" hx-get="/organizer/event-filter-date" hx-trigger="change"
+                        hx-target="#events-list" name="startDate"
                         class="duration-200 ease-in-out appearance-none w-36 text-sm font-medium outline-none px-3 py-1 rounded-md border-2 focus:ring-0 bg-white border-zinc-300 focus:border-coffee-700 text-zinc-500 focus:text-coffee-500 selection:text-coffee-50 selection:bg-coffee-700 placeholder-zinc-500"
                         id="startDate" placeholder="Start date" />
                 </span>
@@ -53,8 +55,8 @@
                             d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Z">
                         </path>
                     </svg>
-                    <input type="text" hx-get="/organizer/event-filter-date" hx-trigger="change" hx-target="#events-list"
-                        name="endDate"
+                    <input type="text" hx-get="/organizer/event-filter-date" hx-trigger="change"
+                        hx-target="#events-list" name="endDate"
                         class="duration-200 ease-in-out appearance-none w-36 text-sm font-medium outline-none px-2 py-1 rounded-md border-2 focus:ring-0 bg-white border-zinc-300 focus:border-coffee-700 text-zinc-500 focus:text-coffee-500 selection:text-coffee-50 selection:bg-coffee-700 placeholder-zinc-500"
                         id="endDate" placeholder="End date" />
                 </span>
@@ -137,30 +139,67 @@
         document.body.addEventListener("htmx:afterSwap", () => {
             // Check if the new content includes the modal
             if (event.target.id === "all-modals") {
-                console.log("Reinitializing Flatpickr...");
                 initializeFlatpickr(); // Reinitialize Flatpickr
             }
 
             function initializeFlatpickr() {
                 let startPicker = flatpickr("#startat", {
-                    enableTime: true,
-                    dateFormat: "Y-m-d H:i",
+                    enableTime: false,
+                    dateFormat: "Y-m-d",
                     appendTo: document.body,
                     defaultDate: new Date().fp_incr(1),
-                    @* minDate: new Date().fp_incr(1), // Tomorrow
+                    minDate: new Date().fp_incr(1), // Tomorrow
                     onChange: function (selectedDates) {
                         if (selectedDates.length > 0) {
                             endPicker.set("minDate", selectedDates[0]); // Set end date min to start date
                         }
-                    } *@
+                    }
                 });
 
                 let endPicker = flatpickr("#endat", {
-                    enableTime: true,
-                    dateFormat: "Y-m-d H:i",
+                    enableTime: false,
+                    dateFormat: "Y-m-d",
                     appendTo: document.body,
-                    @* minDate: new Date().fp_incr(1), // Tomorrow *@
+                    minDate: new Date().fp_incr(1), // Tomorrow
                     defaultDate: new Date().fp_incr(1), // Tomorrow
+                });
+
+                const timeFromInstance = flatpickr("#timestartdate", {
+                    enableTime: true,
+                    dateFormat: "h:i K",
+                    defaultDate: "00:00",
+                    noCalendar: true,
+                    onChange: function (selectedDates, dateStr) {
+                        const timeEndInstance = document.querySelector("#timeenddate")._flatpickr;
+                        if (timeEndInstance) {
+                            let fromDate = timeFromInstance.parseDate(dateStr, "h:i K");
+                            let toDate = timeEndInstance.selectedDates[0];
+                            if (!toDate || fromDate >= toDate) {
+                                let adjustedDate = new Date(fromDate);
+                                adjustedDate.setHours(fromDate.getHours() + 1);
+                                timeEndInstance.setDate(adjustedDate);
+                            }
+                        }
+                    }
+                });
+
+                const timeEndInstance = flatpickr("#timeenddate", {
+                    enableTime: true,
+                    dateFormat: "h:i K",
+                    defaultDate: "01:00",
+                    noCalendar: true,
+                    onChange: function (selectedDates, dateStr) {
+                        const timeFromInstance = document.querySelector("#timestartdate")._flatpickr;
+                        if (timeFromInstance) {
+                            let toDate = timeEndInstance.parseDate(dateStr, "h:i K");
+                            let fromDate = timeFromInstance.selectedDates[0];
+                            if (!fromDate || toDate <= fromDate) {
+                                let adjustedDate = new Date(toDate);
+                                adjustedDate.setHours(toDate.getHours() - 1);
+                                timeFromInstance.setDate(adjustedDate);
+                            }
+                        }
+                    }
                 });
             }
         });

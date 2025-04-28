@@ -12,8 +12,8 @@ using Schedify.Data;
 namespace Schedify.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250424042539_MoreFeedbackComments")]
-    partial class MoreFeedbackComments
+    [Migration("20250428021911_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -284,6 +284,12 @@ namespace Schedify.Migrations
                         .IsRequired()
                         .HasMaxLength(15)
                         .HasColumnType("nvarchar(15)");
+
+                    b.Property<TimeSpan>("TimeEnd")
+                        .HasColumnType("time");
+
+                    b.Property<TimeSpan>("TimeStart")
+                        .HasColumnType("time");
 
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAddOrUpdate()

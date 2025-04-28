@@ -4,6 +4,9 @@ namespace Schedify.ViewModels;
 
 public class EventsViewModel
 {
+    // Avatar
+    public string? AvatarFileName { get; set; }
+
     public List<Event> DraftEvents { get; set; } = new List<Event>();
     public List<Event> PublishedEvents { get; set; } = new List<Event>();
     public List<Event> ConcludedEvents { get; set; } = new List<Event>();
@@ -20,7 +23,7 @@ public class EventsViewModel
 
     // Attendee
     public List<Event> OpenedEvents { get; set; } = new List<Event>();
-    public List<EventBooking> BookedEvents {get;set;} = new List<EventBooking>();
+    public List<EventBooking> BookedEvents { get; set; } = new List<EventBooking>();
     public Dictionary<Guid, string?> EventImages { get; set; } = new Dictionary<Guid, string?>();
     public Dictionary<Guid, string?> OrganizerImages { get; set; } = new Dictionary<Guid, string?>();
 }

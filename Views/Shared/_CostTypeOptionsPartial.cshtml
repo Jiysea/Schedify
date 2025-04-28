@@ -1,9 +1,22 @@
 @model ResourceType
 @{
     string savedCostType = ViewBag.SavedCostType;
-}
+    var options = new Dictionary<ResourceType, List<string>>
+    {
+        { ResourceType.Venue, new List<string> { "Per Hour", "Per Day", "Fixed Rate" } },
+        { ResourceType.Equipment, new List<string> { "Per Unit", "In Bulk" } },
+        { ResourceType.Furniture, new List<string> { "Per Unit", "In Bulk" } },
+        { ResourceType.Catering, new List<string> { "Per Serving", "In Bulk" } },
+        { ResourceType.Personnel, new List<string> { "Per Hour", "Per Day", "Fixed Rate" } }
+    };
 
-@if (Model == ResourceType.Venue)
+    var selectedOptions = options.ContainsKey(Model) ? options[Model] : new List<string>();
+}
+@foreach (var costType in selectedOptions)
+{
+    <option value="@costType" selected="@(savedCostType == costType)">@costType</option>
+}
+@* @if (Model == ResourceType.Venue)
 {
     <option value="Per Hour" selected="@(savedCostType == "Per Hour")">Per Hour</option>
     <option value="Per Day" selected="@(savedCostType == "Per Day")">Per Day</option>
@@ -29,4 +42,4 @@ else if (Model == ResourceType.Personnel)
     <option value="Per Hour" selected="@(savedCostType == "Per Hour")">Per Hour</option>
     <option value="Per Day" selected="@(savedCostType == "Per Day")">Per Day</option>
     <option value="Fixed Rate" selected="@(savedCostType == "Fixed Rate")">Fixed Rate</option>
-}
+} *@

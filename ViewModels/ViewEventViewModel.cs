@@ -9,6 +9,8 @@ public class ViewEventViewModel
     public string Description { get; set; } = null!;
     public DateTime StartAt { get; set; }
     public DateTime EndAt { get; set; }
+    public TimeSpan TimeStart { get; set; }
+    public TimeSpan TimeEnd { get; set; }
     public EventStatus Status { get; set; }
     public string EntryFee { get; set; } = null!;
     public DateTime CreatedAt { get; set; }

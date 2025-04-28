@@ -1,0 +1,95 @@
+@using System.Text.Json
+@using System.Globalization
+@model EventFeedbacksViewModel
+
+@if (Model.Feedbacks.Any())
+{
+    <div class="grid md:grid-cols-2 gap-3 p-2 select-none">
+        @foreach (var feedback in Model.Feedbacks)
+        {
+            <div
+                class="flex items-center justify-between w-full p-2 rounded-lg border-2 border-zinc-300 hover:border-coffee-300 bg-white hover:bg-coffee-50 duration-200 ease-in-out group">
+                <div class="flex flex-col w-full">
+
+                    <div class="flex items-center justify-between gap-1">
+
+                        <div class="flex flex-1 items-center gap-2">
+                            @* Avatar Image *@
+                            @if (!string.IsNullOrEmpty(Model.AvatarImages.GetValueOrDefault(feedback.Id, "")))
+                            {
+                                <span class="flex items-center justify-start flex-shrink size-6">
+                                    <img class="object-cover size-6 rounded-full"
+                                        src="/resources/@(Model.AvatarImages.GetValueOrDefault(feedback.Id, ""))" loading="lazy"
+                                        alt="User Avatar">
+                                </span>
+                            }
+                            else
+                            {
+                                <svg class="size-6 pointer-events-none rounded-full text-zinc-600"
+                                    xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="400"
+                                    height="400" viewBox="0, 0, 400,400">
+                                    <g>
+                                        <path
+                                            d="M176.172 0.866 C 93.868 10.736,25.169 71.441,5.478 151.697 C -3.051 186.459,-1.676 227.565,9.147 261.328 C 20.494 296.728,48.476 337.791,73.179 355.294 L 75.655 357.048 76.178 351.766 C 80.395 309.166,106.791 270.961,145.195 251.873 L 153.280 247.854 150.273 245.639 C 83.673 196.571,114.046 92.549,196.154 88.509 C 281.749 84.297,319.310 194.390,249.756 245.617 L 246.777 247.810 254.834 251.851 C 293.358 271.172,319.608 309.189,323.822 351.766 L 324.345 357.048 326.821 355.335 C 332.287 351.554,353.875 328.959,360.283 320.313 C 450.002 199.243,381.887 29.005,233.012 2.229 C 222.507 0.340,187.549 -0.499,176.172 0.866 M187.891 112.092 C 147.646 119.548,124.716 163.943,141.811 201.308 C 164.580 251.077,235.420 251.077,258.189 201.308 C 279.667 154.363,238.910 102.639,187.891 112.092 M187.500 262.241 C 134.297 270.665,98.469 311.641,98.442 364.095 L 98.438 373.112 106.836 377.516 C 164.632 407.823,234.656 407.835,293.164 377.547 L 301.563 373.199 301.558 364.139 C 301.527 302.684,245.905 252.993,187.500 262.241 "
+                                            stroke="none" fill="currentColor" fill-rule="evenodd"></path>
+                                    </g>
+                                </svg>
+                            }
+
+                            <div class="text-base text-coffee-900">
+                                @if (!string.IsNullOrEmpty(Model.UserFullname.GetValueOrDefault(feedback.Id, "")))
+                                {
+                                    @Model.UserFullname[feedback.Id]
+                                }
+
+                            </div>
+                        </div>
+
+                        <div x-data="{ rating: @feedback.Rating }" @@mouseenter="hover = true" @@mouseleave="hover = false"
+                            class="relative flex items-center justify-center gap-1 overflow-hidden">
+                            <template x-for="i in 5">
+                                <svg :class="(rating >= i) ? 'fill-yellow-400' : 'fill-zinc-400'"
+                                    class="size-6 duration-200 ease-in-out" viewBox="0 0 20 20" fill="currentColor"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.97c.3.921-.755 1.688-1.54 1.118L10 13.347l-3.38 2.455c-.784.57-1.838-.197-1.54-1.118l1.287-3.97a1 1 0 00-.364-1.118L2.623 9.397c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.97z" />
+                                </svg>
+                            </template>
+                        </div>
+                    </div>
+
+                    @* Date of Feedback *@
+                    <span class="ms-8 flex items-center text-xs text-zinc-500">
+                        @feedback.UpdatedAt.ToString("MMM dd, yyyy")
+
+                        @if(feedback.UpdatedAt.ToString("MMM dd, yyyy HH:mm:ss") != feedback.CreatedAt.ToString("MMM dd, yyyy HH:mm:ss"))
+                        {
+                            <p>(edited)</p>
+                        }
+                    </span>
+                    
+                    @* Comments *@
+                    <div class="mt-4 ms-2 flex items-center text-sm text-coffee-700">
+                        @feedback.Comments
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="flex flex-col items-center justify-center size-full font-medium text-coffee-600">
+        <svg class="size-24" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="400"
+            height="400" viewBox="0, 0, 400,400">
+            <g>
+                <path
+                    d="M354.282 26.156 C 349.621 28.543,28.397 350.838,27.336 354.193 C 24.638 362.726,30.526 371.094,39.229 371.094 C 44.906 371.094,43.741 372.104,81.741 334.196 L 116.998 299.024 119.669 303.613 C 121.138 306.138,127.205 316.709,133.150 327.105 C 148.268 353.540,154.894 360.821,170.660 368.324 C 200.653 382.597,247.985 371.387,244.145 350.920 C 243.751 348.822,215.625 298.133,206.956 283.897 C 205.516 281.534,207.031 282.045,261.917 302.464 C 292.960 314.012,319.502 323.878,320.898 324.387 C 323.371 325.290,323.438 325.434,323.438 329.922 C 323.438 344.164,340.176 349.495,347.223 337.497 C 348.823 334.774,348.829 334.350,349.032 200.804 L 349.236 66.842 360.880 55.101 C 373.370 42.506,374.268 41.002,373.082 34.680 C 371.672 27.160,361.410 22.507,354.282 26.156 M210.156 81.377 C 164.585 98.467,164.643 98.456,114.019 99.115 L 76.086 99.609 70.146 102.546 C 59.897 107.614,53.297 116.602,51.548 127.876 C 50.994 131.450,50.787 151.157,50.940 185.978 L 51.172 238.672 53.045 243.359 C 58.969 258.188,72.324 266.671,81.984 261.743 C 91.256 257.012,90.451 243.404,80.598 238.316 C 76.587 236.245,76.562 235.907,76.563 182.422 C 76.563 129.052,76.561 129.075,80.560 126.274 C 82.164 125.151,85.893 124.999,112.088 124.993 C 150.916 124.985,163.599 123.856,182.112 118.763 C 192.240 115.976,248.764 94.961,251.642 92.912 C 258.087 88.323,257.663 76.828,250.879 72.218 C 245.445 68.525,242.903 69.097,210.156 81.377 M323.248 246.408 L 323.047 297.503 261.328 274.490 C 191.551 248.474,187.017 246.850,178.622 244.871 L 172.574 243.445 247.810 168.205 L 323.047 92.965 323.248 144.139 C 323.358 172.284,323.358 218.305,323.248 246.408 M163.683 268.087 L 168.587 268.990 190.872 308.128 C 216.209 352.627,214.998 348.582,203.125 349.069 C 180.456 350.000,172.213 343.189,150.833 305.859 L 136.067 280.078 142.838 273.176 L 149.609 266.274 154.195 266.729 C 156.716 266.979,160.986 267.590,163.683 268.087 "
+                    stroke="none" fill="currentColor" fill-rule="evenodd"></path>
+            </g>
+        </svg>
+        <p class="text-base mt-4">No feedbacks found.</p>
+
+        <p class="text-sm text-coffee-500">Maybe your events made them speechless.</p>
+    </div>
+}

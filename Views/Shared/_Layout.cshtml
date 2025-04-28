@@ -15,7 +15,14 @@
     <script src="~/lib/jquery/jquery-3.7.1.min.js"></script>
 </head>
 
-<body class="font-poppins subpixel-antialiased">
+<body class="font-poppins subpixel-antialiased" x-data="{
+    width: window.innerWidth,
+    init() {
+        window.addEventListener('resize', () => {
+            this.width = window.innerWidth;
+        });
+    }
+}">
     @RenderBody()
     <script src="~/lib/htmx/htmx.min.js"></script>
     <script src="~/lib/sweetalert2/sweetalert2.all.min.js"></script>

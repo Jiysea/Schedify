@@ -223,37 +223,37 @@
         <div class="flex flex-col col-span-full relative">
             <p class="text-xs text-coffee-900">Status</p>
             <span class="p-2 font-medium uppercase text-sm">
-                @if (@Model.Status == EventStatus.Draft)
+                @if (Model.Status == EventStatus.Draft)
                 {
                     <span class="rounded-md py-1 px-2 text-zinc-500 bg-zinc-100">
                         @Model.Status
                     </span>
                 }
-                else if (@Model.Status == EventStatus.Open)
+                else if (Model.Status == EventStatus.Open)
                 {
                     <span class="rounded-md py-1 px-2 text-blue-500 bg-blue-100">
                         @Model.Status
                     </span>
                 }
-                else if (@Model.Status == EventStatus.Ongoing)
+                else if (Model.Status == EventStatus.Ongoing)
                 {
                     <span class="rounded-md py-1 px-2 text-green-500 bg-green-100">
                         @Model.Status
                     </span>
                 }
-                else if (@Model.Status == EventStatus.Completed)
+                else if (Model.Status == EventStatus.Completed)
                 {
                     <span class="rounded-md py-1 px-2 text-indigo-500 bg-indigo-100">
                         @Model.Status
                     </span>
                 }
-                else if (@Model.Status == EventStatus.Cancelled)
+                else if (Model.Status == EventStatus.Cancelled)
                 {
                     <span class="rounded-md py-1 px-2 text-red-500 bg-red-100">
                         @Model.Status
                     </span>
                 }
-                else if (@Model.Status == EventStatus.Postponed)
+                else if (Model.Status == EventStatus.Postponed)
                 {
                     <span class="rounded-md py-1 px-2 text-orange-500 bg-orange-100">
                         @Model.Status
@@ -266,7 +266,19 @@
         <div class="flex flex-col col-span-full relative">
             <p class="text-xs text-coffee-900">Event Duration</p>
             <span class="p-2 text-coffee-700">
-                @Model.StartAt.ToString("MMMM dd, yyyy (hh:mm tt)") - @Model.EndAt.ToString("MMMM dd, yyyy (hh:mm tt)")
+                @Model.StartAt.ToString("MMMM dd, yyyy") - @Model.EndAt.ToString("MMMM dd, yyyy")
+            </span>
+        </div>
+
+        @* Time Schedule *@
+        @{
+            var startTime = DateTime.Today.Add(Model.TimeStart);
+            var endTime = DateTime.Today.Add(Model.TimeEnd);
+        }
+        <div class="flex flex-col col-span-full relative">
+            <p class="text-xs text-coffee-900">Time Schedule</p>
+            <span class="p-2 text-coffee-700">
+                @startTime.ToString("hh:mm tt") - @endTime.ToString("hh:mm tt")
             </span>
         </div>
     </div>

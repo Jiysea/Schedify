@@ -18,7 +18,8 @@
                 </div>
             </div>
 
-            <form hx-post="/auth/register" hx-swap="none" method="post" class="flex flex-col w-full gap-10 px-4">
+            <form hx-post="/auth/register" hx-swap="none" method="post" class="flex flex-col w-full gap-10 px-4"
+                enctype="multipart/form-data">
                 @Html.AntiForgeryToken()
 
                 <div class="flex flex-col items-center justify-center gap-2">
@@ -75,6 +76,38 @@
                         </svg>
                         Personal Information
                     </span>
+
+                    @* User Avatar *@
+                    <div x-data="{ previewUrl: null }"
+                        class="flex flex-col items-center justify-center col-span-full gap-1 relative w-full">
+                        <p class="relative select-none font-medium text-xs text-coffee-500">Avatar</p>
+                        <label for="image"
+                            class="flex items-center justify-center relative text-xs overflow-hidden border-2 border-dashed border-coffee-500 bg-coffee-200 rounded-full size-52 text-coffee-700 cursor-pointer">
+                            <input type="file" class="hidden absolute inset-0" id="image" asp-for="ImageFile"
+                                accept="image/*"
+                                x-on:change="previewUrl = URL.createObjectURL($event.target.files[0])" />
+                            <template x-if="previewUrl">
+                                <img :src="previewUrl" alt="Preview" class="size-52 object-cover rounded-full p-2">
+                            </template>
+                            <template x-if="!previewUrl">
+                                <div class="flex flex-col items-center justify-center gap-1">
+                                    <svg class="size-28"
+                                        xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                                        width="400" height="400" viewBox="0, 0, 400,400">
+                                        <g>
+                                            <path
+                                                d="M176.172 0.866 C 93.868 10.736,25.169 71.441,5.478 151.697 C -3.051 186.459,-1.676 227.565,9.147 261.328 C 20.494 296.728,48.476 337.791,73.179 355.294 L 75.655 357.048 76.178 351.766 C 80.395 309.166,106.791 270.961,145.195 251.873 L 153.280 247.854 150.273 245.639 C 83.673 196.571,114.046 92.549,196.154 88.509 C 281.749 84.297,319.310 194.390,249.756 245.617 L 246.777 247.810 254.834 251.851 C 293.358 271.172,319.608 309.189,323.822 351.766 L 324.345 357.048 326.821 355.335 C 332.287 351.554,353.875 328.959,360.283 320.313 C 450.002 199.243,381.887 29.005,233.012 2.229 C 222.507 0.340,187.549 -0.499,176.172 0.866 M187.891 112.092 C 147.646 119.548,124.716 163.943,141.811 201.308 C 164.580 251.077,235.420 251.077,258.189 201.308 C 279.667 154.363,238.910 102.639,187.891 112.092 M187.500 262.241 C 134.297 270.665,98.469 311.641,98.442 364.095 L 98.438 373.112 106.836 377.516 C 164.632 407.823,234.656 407.835,293.164 377.547 L 301.563 373.199 301.558 364.139 C 301.527 302.684,245.905 252.993,187.500 262.241 "
+                                                stroke="none" fill="currentColor" fill-rule="evenodd"></path>
+                                        </g>
+                                    </svg>
+                                    <span>Upload an avatar</span>
+                                    <span>Max size 5MB</span>
+                                </div>
+                            </template>
+                        </label>
+                        <div id="validation-ImageFile">
+                        </div>
+                    </div>
 
                     <div class="relative">
                         <label class="relative select-none font-medium text-xs text-coffee-500">
@@ -166,11 +199,13 @@
                             </span>
                         </label>
                         <div class="relative">
-                            <span class="absolute start-0 top-0 border border-transparent text-sm rounded-l-md p-2 bg-coffee-500 text-coffee-100">
+                            <span
+                                class="absolute start-0 top-0 border border-transparent text-sm rounded-l-md p-2 bg-coffee-500 text-coffee-100">
                                 +63
                             </span>
                             <input type="text" x-mask="9999999999" autocomplete="off" maxlength="10" id="PhoneNumber"
-                                asp-for="PhoneNumber" class="input-coffee ps-12 pe-3 py-2 focus:ring-2 focus:ring-offset-2"
+                                asp-for="PhoneNumber"
+                                class="input-coffee ps-12 pe-3 py-2 focus:ring-2 focus:ring-offset-2"
                                 placeholder="ex. 9123456789">
                         </div>
                         <div id="validation-PhoneNumber">
