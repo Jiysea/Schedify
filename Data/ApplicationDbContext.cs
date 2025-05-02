@@ -251,5 +251,9 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
             .Property(u => u.CreatedAt)
             .HasDefaultValueSql("GETUTCDATE()");
 
+        // Create Unique Index for EventBookings to prevent duplication on Development (when paying with Stripe offline)
+        modelBuilder.Entity<EventBooking>()
+            .HasIndex(b => new { b.EventId, b.UserId })
+            .IsUnique();
     }
 }

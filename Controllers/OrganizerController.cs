@@ -23,8 +23,9 @@ public class OrganizerController : Controller
     private readonly ResourceService _resourceService;
     private readonly FeedbackService _feedbackService;
     private readonly MetricService _metricService;
+    private readonly ChatService _chatService;
     private readonly UserService _userService;
-    public OrganizerController(ApplicationDbContext context, EventService eventService, ResourceService resourceService, FeedbackService feedbackService, MetricService metricService, UserService userService, IHubContext<AlertHub> hubContext)
+    public OrganizerController(ApplicationDbContext context, EventService eventService, ResourceService resourceService, FeedbackService feedbackService, MetricService metricService, UserService userService, ChatService chatService, IHubContext<AlertHub> hubContext)
     {
         _context = context;
         _eventService = eventService;
@@ -32,6 +33,7 @@ public class OrganizerController : Controller
         _feedbackService = feedbackService;
         _metricService = metricService;
         _userService = userService;
+        _chatService = chatService;
         _hubContext = hubContext;
     }
 
@@ -66,11 +68,6 @@ public class OrganizerController : Controller
     public async Task<IActionResult> Events()
     {
         var viewModel = await GetEventsViewModel(null, null);
-
-        // if (Request.Headers.ContainsKey("HX-Request"))
-        // {
-        //     return PartialView("~/Views/Organizer/Partials/_EventsListPartial.cshtml", viewModel);
-        // }
 
         return View(viewModel);
     }
@@ -326,6 +323,9 @@ public class OrganizerController : Controller
             return PartialView("~/Views/Organizer/Partials/_UpdateEventsListPartial.cshtml", viewModel);
         }
 
+        var startTime = DateTime.Today.Add(evt.TimeStart);
+        var endTime = DateTime.Today.Add(evt.TimeEnd);
+
         if (evt.Status == EventStatus.Open || evt.Status == EventStatus.Ongoing)
         {
             var viewModel = new CUEventViewModel()
@@ -334,8 +334,10 @@ public class OrganizerController : Controller
                 Name = evt.Name,
                 ShortName = evt.ShortName,
                 Description = evt.Description,
-                StartAtString = evt.StartAt.ToString("yyyy-MM-dd HH:mm"),
-                EndAtString = evt.EndAt.ToString("yyyy-MM-dd HH:mm"),
+                StartAtString = evt.StartAt.ToString("yyyy-MM-dd"),
+                EndAtString = evt.EndAt.ToString("yyyy-MM-dd"),
+                TimeStartString = startTime.ToString("HH:mm"),
+                TimeEndString = endTime.ToString("HH:mm"),
                 Status = evt.Status,
                 EntryFeeString = evt.EntryFee.ToString("N2"),
             };
@@ -356,7 +358,6 @@ public class OrganizerController : Controller
 
         if (!result.IsSuccess)
         {
-
             // Split error messages and add them to ModelState
             foreach (var error in result.Error!)
             {

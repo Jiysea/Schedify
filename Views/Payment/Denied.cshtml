@@ -8,13 +8,13 @@
 
         @* Center Box *@
         <div
-            class="relative flex flex-col items-center gap-8 py-10 rounded-lg border border-charcoal-300 md:min-w-[28rem] md:max-w-md bg-charcoal-50 text-charcoal-900">
+            class="relative flex flex-col items-center gap-4 py-10 rounded-lg border border-charcoal-300 md:min-w-[28rem] md:max-w-md bg-charcoal-50">
 
             @* 1st Part / Header or the Payment Message *@
             <div class="flex flex-col items-center gap-2 px-5 z-10">
                 @* X Mark SVG *@
-                <span class="p-1.5 bg-coffee-600 rounded-2xl">
-                    <svg class="size-10 text-coffee-50" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                <span class="p-1.5 bg-rose-600 rounded-2xl">
+                    <svg class="size-10 text-rose-50" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
                         fill="currentColor" viewBox="0 0 256 256">
                         <path
                             d="M208.49,191.51a12,12,0,0,1-17,17L128,145,64.49,208.49a12,12,0,0,1-17-17L111,128,47.51,64.49a12,12,0,0,1,17-17L128,111l63.51-63.52a12,12,0,0,1,17,17L145,128Z">
@@ -23,23 +23,34 @@
                 </span>
 
                 <div class="flex flex-col items-center px-5">
-                    <span class="font-semibold text-xl">Confirmation Denied</span>
-
+                    <span class="font-semibold text-2xl text-rose-600">Confirmation Denied</span>
                 </div>
             </div>
 
-            <div class="flex flex-col items-center gap-2 px-5 z-10">
-                <span>
-                    The ticket you're trying to scan is not valid. Either the ticket is used, the event has not started yet or the event has concluded.
-                </span>
-                <span>
-                    You will be redirected in <span id="countdown">5</span> seconds...
-                </span>
+            <div class="flex flex-col items-center gap-4 px-5 z-10">
+                <div class="flex flex-col text-charcoal-600 text-sm">
+                    <span class="text-center">
+                        The ticket you're trying to scan is invalid.
+                    </span>
 
-                <span class="text-xs text-charcoal-500">Didn't work?
-                    <a class="underline underline-offset-4 decoration-coffee-600 text-coffee-600"
-                        href="/home/index">Click here</a>
-                </span>
+                    <span class="text-center">
+                        Either the ticket is already used, 
+                        the event has not started yet
+                        or the event has concluded.
+                    </span>
+                </div>
+
+                <div class="flex flex-col text-charcoal-600 text-xs">
+                    <span class="text-center">
+                        You will be redirected in <span id="countdown" class="text-coffee-600">15</span> seconds...
+                    </span>
+
+                    <span class="text-center">Didn't work?
+                        <a class="underline underline-offset-4 decoration-coffee-600 text-coffee-600"
+                            href="/home/index">Click here</a>
+                    </span>
+                </div>
+
             </div>
 
         </div>
@@ -49,7 +60,7 @@
 
 <script>
     const countdownEl = document.getElementById("countdown");
-    let timeLeft = 5.9; // 5 seconds
+    let timeLeft = 15.9; // 5 seconds
     const interval = 10; // Update every 10ms
 
     const timer = setInterval(() => {

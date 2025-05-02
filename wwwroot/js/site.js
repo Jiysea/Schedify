@@ -1,6 +1,5 @@
 ﻿import Alpine from "alpinejs";
 import flatpickr from "flatpickr";
-import Chart from 'chart.js/auto';
 import "flatpickr/dist/flatpickr.css";
 import focus from '@alpinejs/focus'
 import mask from '@alpinejs/mask'
@@ -14,3 +13,4 @@ window.Alpine.plugin(intersect);
 window.Alpine.plugin(anchor);
 
 window.Alpine.start();
+

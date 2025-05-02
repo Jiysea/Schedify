@@ -225,6 +225,15 @@ public class EventService
             _context.Conversations.Add(conversation);
             await _context.SaveChangesAsync();
 
+            var userConversation = new ConversationUser
+            {
+                ConversationId = conversation.Id,
+                UserId = user.Id,
+                JoinedAt = DateTime.UtcNow
+            };
+
+            _context.ConversationUsers.Add(userConversation);
+
             await transaction.CommitAsync();
             return (true, null, _event);
         }
@@ -389,10 +398,15 @@ public class EventService
             .FindAsync(Id);
 
         if (_event == null) return (false, new Dictionary<string, string> { { "NullEvent", "Event does not exist." } });
+        
+        var eventBookings = await _context.EventBookings
+            .Where(eb => eb.EventId == _event.Id)
+            .ToListAsync();
 
         if (_event.Status == EventStatus.Open || _event.Status == EventStatus.Ongoing || _event.Status == EventStatus.Postponed)
-        {
+        {   
             _event.Status = EventStatus.Cancelled;
+            eventBookings.ForEach(eb => eb.Status = BookingStatus.Refunded);
             await _context.SaveChangesAsync();
             return (true, null);
         }
@@ -428,6 +442,8 @@ public class EventService
                 _event.Status = EventStatus.Postponed;
                 _event.StartAt = model.StartAt;
                 _event.EndAt = model.EndAt;
+                _event.TimeStart = model.TimeStart;
+                _event.TimeEnd = model.TimeEnd;
                 _event.UpdatedAt = DateTime.UtcNow;
 
                 await _context.SaveChangesAsync();

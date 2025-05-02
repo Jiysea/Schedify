@@ -5,13 +5,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Schedify.Data;
+using Schedify.Models;
 using Schedify.ViewModels;
 using Stripe;
 using Stripe.Checkout;
 
 namespace Schedify.Controllers;
 
-[Authorize(Roles = "Attendee")]
 public class PaymentController : Controller
 {
     private readonly ApplicationDbContext _context;
@@ -23,6 +23,7 @@ public class PaymentController : Controller
         _httpContextAccessor = httpContextAccessor;
     }
 
+    [Authorize(Roles = "Attendee")]
     [HttpGet("payment/success")]
     public async Task<IActionResult> Success([FromQuery] string SessionId)
     {
@@ -33,8 +34,8 @@ public class PaymentController : Controller
         try
         {
             var existingPayment = await _context.Payments
-            .Include(p => p.EventBooking)
-            .FirstOrDefaultAsync(p => p.SessionId == SessionId);
+                .Include(p => p.EventBooking)
+                .FirstOrDefaultAsync(p => p.SessionId == SessionId);
 
             if (existingPayment == null || existingPayment.Status == "Paid")
                 return RedirectToAction("Bookings", "Attendee");
@@ -58,6 +59,22 @@ public class PaymentController : Controller
 
             // Mark EventBooking as Paid
             existingPayment.EventBooking.Status = BookingStatus.Paid;
+            existingPayment.EventBooking.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            // Find Conversation
+            var conversation = await _context.Conversations.FirstOrDefaultAsync(c => c.EventId == existingPayment.EventBooking.EventId);
+            if (conversation == null)
+                return RedirectToAction("Bookings", "Attendee");
+
+            var userConversation = new ConversationUser
+            {
+                ConversationId = conversation.Id,
+                UserId = existingPayment.UserId,
+                JoinedAt = DateTime.UtcNow
+            };
+
+            _context.ConversationUsers.Add(userConversation);
             await _context.SaveChangesAsync();
 
             await transaction.CommitAsync();
@@ -87,6 +104,7 @@ public class PaymentController : Controller
         }
     }
 
+    [Authorize(Roles = "Attendee")]
     [HttpGet("payment/view-ticket")]
     public async Task<IActionResult> ViewTicket([FromQuery] string token)
     {
@@ -111,7 +129,7 @@ public class PaymentController : Controller
             CardBrand = payment!.CardBrand,
             Last4 = payment.PANLastDigits,
             Amount = payment.Amount,
-            EventShortName = payment.EventShortName,
+            EventShortName = payment.EventShortName + " (Event Ticket)",
             CreatedAt = payment.CreatedAt.ToLocalTime()
         };
 
@@ -121,7 +139,7 @@ public class PaymentController : Controller
 
     }
 
-
+    [Authorize(Roles = "Organizer")]
     [HttpGet("payment/verify-ticket")]
     public async Task<IActionResult> VerifyTicket(string token)
     {
@@ -134,7 +152,7 @@ public class PaymentController : Controller
             // 1. Decode Base64 token to get the GUID string
             var base64Bytes = Convert.FromBase64String(token);
             var guidString = Encoding.UTF8.GetString(base64Bytes);
-
+            Console.WriteLine("It Works");
             Guid eventBookingId = Guid.Parse(guidString);
 
             // 2. Fetch the EventBooking including related Event
@@ -144,6 +162,7 @@ public class PaymentController : Controller
 
             if (booking == null || booking.Event == null)
                 return RedirectToAction("Index", "Home"); // Booking not found
+            Console.WriteLine("Booking Found!");
 
             var evt = booking.Event;
 
@@ -151,15 +170,17 @@ public class PaymentController : Controller
             var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
             if (evt.UserId.ToString() != currentUserId)
                 return RedirectToAction("Index", "Home"); // Unauthorized access
+            Console.WriteLine("Authorized Organizer Checked!");
 
             // 4. Check if the event is currently ongoing
-
             if (evt.Status != EventStatus.Ongoing)
                 return RedirectToAction("Denied", "Payment");
+            Console.WriteLine("Event is ongoing, Check!");
 
             // 5. Check if the ticket is already used
             if (booking.Status != BookingStatus.Paid)
                 return RedirectToAction("Denied", "Payment");
+            Console.WriteLine("Ticket is Paid, Check!");
 
             // 6. Update status of booking and its payment
             booking.Status = BookingStatus.Confirmed;
@@ -168,6 +189,7 @@ public class PaymentController : Controller
             {
                 payment.Status = "Confirmed";
             }
+            Console.WriteLine("Your ticket is confirmed.");
 
             await _context.SaveChangesAsync();
 
@@ -217,7 +239,6 @@ public class PaymentController : Controller
             return RedirectToAction("Events", "Attendee");
         }
     }
-
 
     public IActionResult Denied()
     {

@@ -12,6 +12,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Add SignalR 
 builder.Services.AddSignalR();
 
 // Stripe configuration
@@ -68,12 +70,14 @@ builder.Services.AddSession(options =>
 builder.Services.AddDistributedMemoryCache();
 
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<AdminService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ResourceService>();
 builder.Services.AddScoped<StripeService>();
 builder.Services.AddScoped<BookingService>();
 builder.Services.AddScoped<FeedbackService>();
 builder.Services.AddScoped<MetricService>();
+builder.Services.AddScoped<ChatService>();
 builder.Services.AddScoped<Schedify.Services.EventService>();
 
 var app = builder.Build();
@@ -216,12 +220,11 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-app.MapHub<AlertHub>("/alerts");
 
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-// app.MapHub<ChatHub>("/chatHub");
+app.MapHub<ChatHub>("/chathub");
 app.Run();

@@ -40,7 +40,7 @@
             <div x-cloak x-show="open" x-on:click.outside="open = false"
                 class="absolute flex flex-col items-center text-sm end-0 top-full mt-2 bg-white rounded-lg border-2 border-zinc-300 ">
                 <ul class="flex flex-col w-full">
-                    <li>
+                    @* <li>
                         <a href="/attendee/profile"
                             class="first:rounded-t-md flex items-center justify-start w-full gap-2 p-2 font-medium duration-200 ease-in-out text-coffee-950 hover:text-coffee-50 active:text-coffee-50 hover:bg-coffee-700 active:bg-coffee-900">
                             <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
@@ -51,7 +51,7 @@
                             </svg>
                             Profile
                         </a>
-                    </li>
+                    </li> *@
                     <li class="flex items-center w-full">
                         <button hx-post="/logout" hx-swap="none" type="submit"
                             class="last:rounded-b-md flex items-center justify-start w-full gap-2 p-2 font-medium duration-200 ease-in-out text-coffee-950 hover:text-coffee-50 active:text-coffee-50 hover:bg-coffee-700 active:bg-coffee-900">

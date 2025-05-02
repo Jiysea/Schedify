@@ -4,6 +4,9 @@ namespace Schedify.ViewModels;
 
 public class EventsViewModel
 {
+    // Chat
+    public ChatViewModel ChatViewModel { get; set; } = new ChatViewModel();
+
     // Avatar
     public string? AvatarFileName { get; set; }
 

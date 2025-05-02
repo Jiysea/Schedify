@@ -1,0 +1,38 @@
+@model ChatViewModel
+
+@* Whole Block *@
+<div id="message-box" class="p-2">
+    @* Header *@
+    <div class="flex items-center justify-between p-2">
+
+        @* Title and Image *@
+        <div class="flex items-center gap-2">
+            <span class="">
+
+            </span>
+            <span class="font-semibold text-coffee-900">Laraveil: Exploring the Web Anatomy using Laravel</span>
+        </div>
+
+        @* Information Button *@
+        <div class="flex items-center justify-end gap-2">
+            <button class="duration-200 ease-in-out hover:bg-coffee-50 rounded-full p-1">
+                <svg class="size-6 text-coffee-600" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                    fill="currentColor" viewBox="0 0 256 256">
+                    <path
+                        d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm-4,48a12,12,0,1,1-12,12A12,12,0,0,1,124,72Zm12,112a16,16,0,0,1-16-16V128a8,8,0,0,1,0-16,16,16,0,0,1,16,16v40a8,8,0,0,1,0,16Z">
+                    </path>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    @* Message Body *@
+    <div class="relative overflow-y-auto h-[75vh] scrollbar-thin scrollbar-track-coffee-50 scrollbar-thumb-coffee-700">
+        Waow
+    </div>
+
+    @* Footer *@
+    <div class="">
+
+    </div>
+</div>

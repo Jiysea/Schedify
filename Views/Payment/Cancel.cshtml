@@ -8,7 +8,7 @@
 
         @* Center Box *@
         <div
-            class="relative flex flex-col items-center gap-8 py-10 rounded-lg border border-charcoal-300 md:min-w-[28rem] md:max-w-md bg-charcoal-50 text-charcoal-900">
+            class="relative flex flex-col items-center gap-8 py-10 rounded-lg border border-charcoal-300 md:min-w-[28rem] md:max-w-md bg-charcoal-50">
 
             @* 1st Part / Header or the Payment Message *@
             <div class="flex flex-col items-center gap-2 px-5 z-10">
@@ -23,20 +23,21 @@
                 </span>
 
                 <div class="flex flex-col items-center px-5">
-                    <span class="font-semibold text-xl">Payment Cancelled</span>
-
+                    <span class="font-semibold text-2xl text-coffee-600">Payment Cancelled</span>
                 </div>
             </div>
 
             <div class="flex flex-col items-center gap-2 px-5 z-10">
-                <span>
-                    Hold on! You will be redirected in <span id="countdown">5</span> seconds...
-                </span>
+                <div class="flex flex-col text-charcoal-600 text-xs">
+                    <span class="text-center">
+                        You will be redirected in <span id="countdown" class="text-coffee-600">5</span> seconds...
+                    </span>
 
-                <span class="text-xs text-charcoal-500">Didn't work?
-                    <a class="underline underline-offset-4 decoration-coffee-600 text-coffee-600"
-                        href="/attendee/events">Click here</a>
-                </span>
+                    <span class="text-center">Didn't work?
+                        <a class="underline underline-offset-4 decoration-coffee-600 text-coffee-600"
+                            href="/home/index">Click here</a>
+                    </span>
+                </div>
             </div>
 
         </div>

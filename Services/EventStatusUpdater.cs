@@ -38,13 +38,13 @@ namespace Schedify.Services
                         var now = DateTime.UtcNow;
                         var events = await dbContext.Events
                             .Where(e => (e.Status == EventStatus.Open) ||
-                                        (e.Status == EventStatus.Ongoing))
+                                        (e.Status == EventStatus.Ongoing) || (e.Status == EventStatus.Postponed))
                             .ToListAsync(stoppingToken);
 
                         foreach (var evt in events)
                         {
                         
-                            if (evt.Status == EventStatus.Open && evt.StartAt <= now)
+                            if (((evt.Status == EventStatus.Open) || (evt.Status == EventStatus.Postponed)) && evt.StartAt <= now)
                             {
                                 evt.Status = EventStatus.Ongoing;
                                 _logger.LogInformation($"Event {evt.Id} started.");

@@ -1,0 +1,38 @@
+@model ChatViewModel
+
+@* Messages Div *@
+<div id="messages-block" hx-swap-oob="outerHTML" x-cloak x-show="openChat"
+    x-transition:enter="transition transform ease-in-out duration-300" x-transition:enter-start="translate-x-full"
+    x-transition:enter-end="translate-x-0" x-transition:leave="transition transform ease-in-out duration-200"
+    x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full"
+    class="flex flex-col grow bg-white m-4 rounded-lg">
+
+    @* Whole Block *@
+    @await Html.PartialAsync("~/Views/Chat/Partials/_MessagesPartial.cshtml", Model)
+
+</div>
+
+@* Conversations BG White *@
+<div id="conversations-block" hx-swap-oob="outerHTML" x-cloak x-show="openChat"
+    x-transition:enter="transition transform ease-in-out duration-300" x-transition:enter-start="translate-x-full"
+    x-transition:enter-end="translate-x-0" x-transition:leave="transition transform ease-in-out duration-200"
+    x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full"
+    class="bg-white min-h-screen space-y-6 sm:w-96 lg:w-[450px] p-6">
+
+    @* Title *@
+    <span class="flex items-center gap-3 text-2xl font-semibold text-coffee-900">
+        <span class="bg-pumpkin-500 text-pumpkin-50 rounded-lg p-1.5">
+            <svg class="size-6" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                viewBox="0 0 256 256">
+                <path
+                    d="M232.07,186.76a80,80,0,0,0-62.5-114.17A80,80,0,1,0,23.93,138.76l-7.27,24.71a16,16,0,0,0,19.87,19.87l24.71-7.27a80.39,80.39,0,0,0,25.18,7.35,80,80,0,0,0,108.34,40.65l24.71,7.27a16,16,0,0,0,19.87-19.86Zm-16.25,1.47L224,216l-27.76-8.17a8,8,0,0,0-6,.63,64.05,64.05,0,0,1-85.87-24.88A79.93,79.93,0,0,0,174.7,89.71a64,64,0,0,1,41.75,92.48A8,8,0,0,0,215.82,188.23Z">
+                </path>
+            </svg>
+        </span>
+        Conversations
+    </span>
+
+    @* The Conversation Cards *@
+    @await Html.PartialAsync("~/Views/Chat/Partials/_ConversationsPartial.cshtml", Model)
+
+</div>

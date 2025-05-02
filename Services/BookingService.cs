@@ -118,7 +118,7 @@ public class BookingService
 
     public async Task<EventBooking?> GetBookingByEventIdAsync(Guid EventId)
     {
-        return await _context.EventBookings.FirstOrDefaultAsync(eb => eb.EventId == EventId);
+        return await _context.EventBookings.FirstOrDefaultAsync(eb => eb.EventId == EventId && eb.UserId == Guid.Parse(_userService.GetUserId()!));
     }
 
     public async Task<Event?> GetEventByIdAsync(Guid EventId)

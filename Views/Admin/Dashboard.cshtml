@@ -1,0 +1,1282 @@
+@model DashboardViewModel
+
+@{
+    ViewData["Title"] = "Events";
+    var firstDate = new DateTime(DateTime.UtcNow.Year, 1, 1);
+    var currentDate = DateTime.UtcNow;
+    var firstFormatted = firstDate.ToString("MM-dd-YYYY");
+    var currentFormatted = currentDate.ToString("MM-dd-YYYY");
+}
+
+<div x-data="{ openChat: false, viewEventModal: false, createEventModal: false }"
+    class="duration-500 ease-in-out bg-charcoal-950 min-h-screen max-h-[100vh] overflow-y-auto scrollbar-thin scrollbar-track-charcoal-950 scrollbar-thumb-charcoal-700 selection:text-pumpkin-50 selection:bg-pumpkin-700">
+
+    @* Top Bar (Logo & Avatar) *@
+    <partial name="~/Views/Admin/Partials/_TopbarPartial.cshtml" model="Model.AvatarFileName" />
+
+    @* Summary Container *@
+    <div class="flex items-center justify-center size-full sm:px-20">
+        <div class="flex flex-col items-center gap-6 w-full px-4 py-2">
+
+            @* Sub Header (Date Range) *@
+            <div class="flex items-center justify-between w-full h-[8vh] gap-3">
+                <div class="flex items-center gap-3">
+                    <span class="flex items-center justify-center bg-pumpkin-700 text-pumpkin-50 p-1 size-8 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                            viewBox="0 0 256 256">
+                            <path
+                                d="M232,208a8,8,0,0,1-8,8H32a8,8,0,0,1-8-8V48a8,8,0,0,1,16,0v94.37L90.73,98a8,8,0,0,1,10.07-.38l58.81,44.11L218.73,90a8,8,0,1,1,10.54,12l-64,56a8,8,0,0,1-10.07.38L96.39,114.29,40,163.63V200H224A8,8,0,0,1,232,208Z">
+                            </path>
+                        </svg>
+                    </span>
+                    <h2 class="font-semibold text-2xl text-charcoal-300">Summary</h2>
+                </div>
+
+                @* Date Range & Filter *@
+                <div class="flex items-center gap-3">
+                    <span class="relative">
+                        <svg class="absolute top-1/2 -translate-y-1/2 end-2 size-5 pointer-events-none text-pumpkin-600"
+                            xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                            viewBox="0 0 256 256">
+                            <path
+                                d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Z">
+                            </path>
+                        </svg>
+                        <input type="text" hx-get="/admin/summary-filter-date" hx-trigger="change" hx-swap="outerHTML"
+                            hx-target="#summary-counters" name="summaryStartDate"
+                            class="shadow duration-200 ease-in-out appearance-none w-36 text-sm outline-none px-3 py-1 rounded-md border focus:ring-0 bg-charcoal-900 border-pumpkin-800 focus:border-pumpkin-500 text-charcoal-300 focus:text-charcoal-300 selection:text-pumpkin-50 selection:bg-pumpkin-700 placeholder-charcoal-700"
+                            id="summaryStartDate" placeholder="Start date" />
+                    </span>
+
+                    <span class="relative">
+                        <svg class="absolute top-1/2 -translate-y-1/2 end-2 size-5 pointer-events-none text-pumpkin-600"
+                            xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                            viewBox="0 0 256 256">
+                            <path
+                                d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Z">
+                            </path>
+                        </svg>
+                        <input type="text" hx-get="/admin/summary-filter-date" hx-trigger="change" hx-swap="outerHTML"
+                            hx-target="#summary-counters" name="summaryEndDate"
+                            class="shadow duration-200 ease-in-out appearance-none w-36 text-sm outline-none px-2 py-1 rounded-md border focus:ring-0 bg-charcoal-900 border-pumpkin-800 focus:border-pumpkin-500 text-charcoal-300 focus:text-charcoal-300 selection:text-pumpkin-50 selection:bg-pumpkin-700 placeholder-charcoal-700"
+                            id="summaryEndDate" placeholder="End date" />
+                    </span>
+                </div>
+            </div>
+
+            @* Counters & Line Graphs *@   
+            <div id="summary-counters" class="grid md:grid-cols-2 xl:grid-cols-4 w-full gap-6">
+
+                @* Total Events *@
+                <div
+                    class="flex items-center justify-between gap-3 rounded-xl border-l-4 border-pumpkin-800 bg-charcoal-900">
+                    <span class="flex shrink items-center p-3 rounded-l-lg bg-charcoal-950 text-pumpkin-700">
+                        <svg class="size-10" xmlns="http://www.w3.org/2000/svg"
+                            xmlns:xlink="http://www.w3.org/1999/xlink" width="400" height="400" viewBox="0, 0, 400,400">
+                            <g>
+                                <path
+                                    d="M99.928 26.818 C 88.399 32.907,87.490 65.114,98.639 72.492 C 105.050 76.734,115.884 75.611,120.807 70.193 C 124.618 65.999,125.000 64.161,125.000 50.000 C 125.000 35.839,124.618 34.001,120.807 29.807 C 116.198 24.735,106.501 23.347,99.928 26.818 M283.984 26.257 C 280.511 28.149,278.153 30.508,276.486 33.758 C 274.430 37.768,274.262 61.899,276.263 65.859 C 282.514 78.231,300.512 78.412,306.615 66.165 C 309.662 60.049,309.618 39.863,306.545 33.695 C 302.762 26.104,291.238 22.305,283.984 26.257 M55.791 51.425 C 36.596 58.060,32.813 67.222,32.813 107.070 L 32.813 133.594 200.000 133.594 L 367.188 133.594 367.187 107.070 C 367.187 78.342,366.853 75.098,363.123 67.676 C 357.513 56.512,347.612 50.549,333.967 50.116 L 325.324 49.842 324.470 58.480 C 319.961 104.126,258.594 100.857,258.594 54.971 L 258.594 50.000 200.000 50.000 L 141.406 50.000 141.406 54.971 C 141.406 82.040,117.202 98.767,93.949 87.766 C 83.217 82.689,76.937 72.728,75.538 58.560 L 74.692 50.000 67.229 50.026 C 62.193 50.043,58.473 50.498,55.791 51.425 M32.813 247.227 C 32.813 316.287,33.067 345.654,33.692 348.594 C 35.839 358.708,42.578 367.318,51.962 371.938 L 57.389 374.609 200.000 374.609 L 342.611 374.609 348.038 371.938 C 357.422 367.318,364.161 358.708,366.308 348.594 C 366.933 345.654,367.188 316.287,367.188 247.227 L 367.188 150.000 200.000 150.000 L 32.813 150.000 32.813 247.227 M123.047 193.669 C 130.956 197.331,132.818 201.780,132.795 216.967 C 132.764 237.729,128.330 241.836,106.533 241.288 C 88.047 240.823,84.177 236.953,83.712 218.467 C 83.323 203.004,85.578 197.176,93.304 193.666 C 97.971 191.547,118.467 191.548,123.047 193.669 M217.276 194.929 C 223.334 199.191,224.609 202.989,224.609 216.776 C 224.609 237.009,220.223 241.398,200.000 241.398 C 180.996 241.398,175.921 237.013,175.192 219.963 C 174.214 197.055,178.981 191.935,200.912 192.338 L 213.934 192.578 217.276 194.929 M306.696 193.666 C 319.833 199.633,320.740 231.350,307.987 238.846 C 300.435 243.286,279.157 242.333,273.029 237.282 C 265.193 230.822,264.354 205.219,271.721 197.362 C 276.717 192.035,298.124 189.773,306.696 193.666 M121.154 284.485 C 130.173 287.188,132.778 292.503,132.778 308.203 C 132.778 329.011,128.940 332.826,108.033 332.795 C 87.271 332.764,83.164 328.330,83.712 306.533 C 84.072 292.222,86.900 287.085,95.909 284.372 C 99.165 283.391,117.783 283.475,121.154 284.485 M212.751 284.431 C 221.570 286.880,224.609 292.979,224.609 308.224 C 224.609 322.014,223.334 325.811,217.273 330.071 L 213.928 332.422 200.000 332.422 L 186.072 332.422 182.727 330.071 C 173.030 323.256,171.815 297.048,180.792 288.347 C 185.405 283.876,202.991 281.721,212.751 284.431 M307.987 286.154 C 317.611 291.811,320.288 317.257,312.282 326.971 C 305.822 334.807,280.219 335.646,272.362 328.279 C 264.464 320.872,264.853 294.266,272.956 287.801 C 279.280 282.755,300.507 281.757,307.987 286.154 "
+                                    stroke="none" fill="currentColor" fill-rule="evenodd"></path>
+                            </g>
+                        </svg>
+                    </span>
+
+                    <div class="flex grow flex-col items-start justify-center gap-0">
+                        <span class=" font-semibold text-charcoal-300">@Model.Summary.TotalEvents</span>
+                        <span class="text-sm text-pumpkin-600">Total Events</span>
+                    </div>
+                </div>
+
+                @* Total Users *@
+                <div
+                    class="flex items-center justify-between gap-3 rounded-xl border-l-4 border-pumpkin-800 bg-charcoal-900">
+                    <span class="flex shrink items-center p-3 rounded-l-lg bg-charcoal-950 text-pumpkin-700">
+                        <svg class="size-10" xmlns="http://www.w3.org/2000/svg"
+                            xmlns:xlink="http://www.w3.org/1999/xlink" width="400" height="400" viewBox="0, 0, 400,400">
+                            <g>
+                                <path
+                                    d="M107.047 51.574 C 61.611 63.791,45.185 119.477,76.916 153.722 C 85.875 163.391,105.960 174.874,104.381 169.425 C 92.656 128.949,109.266 82.691,143.760 59.759 C 150.240 55.451,150.211 55.338,141.961 52.633 C 133.032 49.706,115.925 49.187,107.047 51.574 M262.065 51.532 C 256.344 53.032,250.781 55.116,250.781 55.760 C 250.781 55.963,253.154 57.709,256.055 59.640 C 290.728 82.717,307.364 128.879,295.619 169.425 C 294.299 173.979,310.989 165.332,320.223 156.678 C 366.164 113.619,322.986 35.555,262.065 51.532 M185.808 67.578 C 126.918 78.743,104.439 151.084,146.408 194.372 C 182.028 231.112,244.123 221.551,267.145 175.781 C 295.158 120.089,246.969 55.983,185.808 67.578 M73.155 187.913 C 48.669 194.078,33.897 214.494,33.037 243.359 C 32.174 272.319,39.019 282.900,58.984 283.471 L 68.359 283.740 69.760 277.465 C 75.979 249.615,96.448 225.537,123.213 214.589 L 129.629 211.965 125.920 207.740 C 123.881 205.417,121.052 202.021,119.634 200.195 C 117.612 197.590,116.548 196.875,114.696 196.875 C 110.731 196.875,103.152 194.571,95.331 190.988 C 86.514 186.949,80.368 186.097,73.155 187.913 M313.672 187.527 C 311.953 187.877,307.559 189.568,303.906 191.284 C 296.903 194.574,289.249 196.875,285.304 196.875 C 283.452 196.875,282.388 197.590,280.366 200.195 C 278.948 202.021,276.119 205.417,274.080 207.740 L 270.371 211.965 276.722 214.564 C 304.278 225.844,326.543 252.911,330.954 280.491 L 331.450 283.594 339.414 283.594 C 360.378 283.594,367.838 272.700,366.963 243.359 C 365.943 209.105,340.189 182.123,313.672 187.527 M140.919 233.977 C 122.654 237.950,103.783 254.285,96.431 272.486 C 91.317 285.147,89.498 311.645,92.837 324.846 C 96.086 337.697,101.569 345.304,109.804 348.385 C 116.589 350.923,283.411 350.923,290.196 348.385 C 303.488 343.412,308.990 329.526,308.394 302.452 C 307.763 273.712,299.317 256.459,279.337 243.096 C 262.164 231.610,249.164 230.285,231.985 238.268 C 209.839 248.559,190.201 248.578,168.144 238.328 C 156.200 232.778,150.571 231.878,140.919 233.977 "
+                                    stroke="none" fill="currentColor" fill-rule="evenodd"></path>
+                            </g>
+                        </svg>
+                    </span>
+
+                    <div class="flex grow flex-col items-start justify-center gap-0">
+                        <span class="font-semibold text-charcoal-300">@Model.Summary.TotalUsers</span>
+                        <span class="text-sm text-pumpkin-600">Total Users</span>
+                    </div>
+                </div>
+
+                @* Total Bookings *@
+                <div
+                    class="flex items-center justify-between gap-3 rounded-xl border-l-4 border-pumpkin-800 bg-charcoal-900">
+                    <span class="flex shrink items-center p-3 rounded-l-lg bg-charcoal-950 text-pumpkin-700">
+                        <svg class="size-10" xmlns="http://www.w3.org/2000/svg"
+                            xmlns:xlink="http://www.w3.org/1999/xlink" width="400" height="400" viewBox="0, 0, 400,400">
+                            <g>
+                                <path
+                                    d="M90.011 64.168 C 84.424 66.315,78.750 72.067,76.630 77.733 C 74.064 84.591,74.064 265.409,76.630 272.267 C 80.561 282.773,88.015 286.892,105.514 288.225 C 135.464 290.508,158.818 300.975,179.102 321.207 L 187.500 329.583 187.500 211.417 L 187.500 93.251 181.836 89.015 C 155.491 69.310,109.216 56.788,90.011 64.168 M276.953 64.132 C 255.291 67.928,235.310 76.348,218.555 88.742 L 212.500 93.220 212.500 211.402 L 212.500 329.583 220.898 321.202 C 241.123 301.018,264.862 290.421,294.878 288.179 C 311.941 286.904,319.466 282.702,323.370 272.267 C 325.936 265.409,325.936 84.591,323.370 77.733 C 318.186 63.878,303.298 59.515,276.953 64.132 M44.560 91.841 C 35.882 96.478,29.785 103.714,26.607 113.150 C 24.391 119.726,24.050 303.492,26.239 310.991 C 29.611 322.544,39.339 332.437,50.852 336.020 C 55.325 337.412,58.771 337.499,108.859 337.488 L 162.109 337.477 158.984 334.738 C 141.817 319.694,127.181 314.223,97.542 311.772 C 74.917 309.901,58.234 296.322,51.811 274.552 C 50.556 270.299,50.411 262.558,50.027 179.532 L 49.609 89.143 44.560 91.841 M349.986 174.403 C 349.970 279.249,350.082 277.970,339.659 291.774 C 329.233 305.580,317.964 310.925,296.094 312.434 C 274.728 313.909,258.540 320.161,243.331 332.813 L 238.165 337.109 291.129 337.310 C 337.548 337.486,344.627 337.358,348.414 336.272 C 359.978 332.956,369.924 323.200,373.520 311.648 C 375.929 303.908,375.811 120.328,373.393 113.150 C 370.170 103.581,363.564 95.887,354.753 91.439 L 350.000 89.040 349.986 174.403 "
+                                    stroke="none" fill="currentColor" fill-rule="evenodd"></path>
+                            </g>
+                        </svg>
+                    </span>
+
+                    <div class="flex grow flex-col items-start justify-center gap-0">
+                        <span class="font-semibold text-charcoal-300">@Model.Summary.TotalBooked</span>
+                        <span class="text-sm text-pumpkin-600">Total Bookings</span>
+                    </div>
+                </div>
+
+                @* Total Revenue *@
+                <div
+                    class="flex items-center justify-between gap-3 rounded-xl border-l-4 border-pumpkin-800 bg-charcoal-900">
+                    <span class="flex shrink items-center p-3 rounded-l-lg bg-charcoal-950 text-pumpkin-700">
+                        <svg class="size-10" xmlns="http://www.w3.org/2000/svg"
+                            xmlns:xlink="http://www.w3.org/1999/xlink" width="400" height="400" viewBox="0, 0, 400,400">
+                            <g>
+                                <path
+                                    d="M84.400 0.871 C -17.156 9.882,-30.893 49.692,62.891 63.204 C 156.981 76.759,259.209 51.752,227.854 22.850 C 209.903 6.304,141.423 -4.188,84.400 0.871 M0.003 91.127 C 0.006 114.853,-0.076 114.481,6.359 119.709 C 45.670 151.643,212.141 147.798,231.651 114.505 C 233.407 111.509,234.945 70.313,233.301 70.313 C 233.139 70.312,230.395 71.503,227.202 72.958 C 175.401 96.565,61.814 97.230,9.343 74.235 C 5.279 72.454,1.514 70.805,0.977 70.571 C 0.209 70.236,0.001 74.635,0.003 91.127 M0.003 166.127 C 0.006 189.853,-0.076 189.481,6.359 194.709 C 45.670 226.643,212.141 222.798,231.651 189.505 C 233.407 186.509,234.945 145.313,233.301 145.313 C 233.139 145.312,230.395 146.503,227.202 147.958 C 175.401 171.565,61.814 172.230,9.343 149.235 C 5.279 147.454,1.514 145.805,0.977 145.571 C 0.209 145.236,0.001 149.635,0.003 166.127 M269.531 216.896 C 185.743 222.867,154.637 253.953,213.065 273.327 C 270.189 292.268,378.161 283.320,397.438 258.047 C 408.139 244.017,388.947 229.252,350.000 221.552 C 330.329 217.663,290.836 215.378,269.531 216.896 M0.000 241.054 C 0.000 264.284,-0.001 264.277,5.547 269.027 C 25.952 286.492,98.737 296.801,154.470 290.120 L 158.549 289.631 158.841 266.886 C 159.001 254.376,159.410 242.947,159.750 241.489 L 160.367 238.837 155.769 239.336 C 104.023 244.955,38.663 237.793,6.335 222.962 C 3.160 221.505,0.435 220.313,0.281 220.313 C 0.126 220.313,0.000 229.646,0.000 241.054 M182.813 298.516 C 182.813 312.711,183.700 315.383,190.097 320.439 C 229.413 351.517,375.849 347.871,397.977 315.263 C 399.950 312.356,400.000 311.965,400.000 299.489 L 400.000 286.696 395.342 289.048 C 346.890 313.506,239.560 314.079,190.234 290.142 C 186.797 288.474,183.721 286.992,183.398 286.849 C 183.076 286.706,182.813 291.956,182.813 298.516 M0.000 316.054 C 0.000 339.284,-0.001 339.277,5.547 344.027 C 25.956 361.496,98.735 371.801,154.492 365.118 L 158.594 364.626 158.594 339.244 L 158.594 313.861 154.883 314.340 C 108.351 320.349,38.297 312.625,6.335 297.962 C 3.160 296.505,0.435 295.313,0.281 295.313 C 0.126 295.313,0.000 304.646,0.000 316.054 M182.813 357.056 C 182.813 373.769,184.965 377.361,199.219 384.440 C 251.187 410.248,383.443 402.408,398.854 372.606 C 399.927 370.531,400.666 345.313,399.654 345.313 C 399.464 345.313,398.145 345.997,396.724 346.833 C 354.302 371.806,237.159 372.214,188.108 347.559 C 185.650 346.324,183.453 345.313,183.225 345.313 C 182.998 345.313,182.813 350.597,182.813 357.056 "
+                                    stroke="none" fill="currentColor" fill-rule="evenodd"></path>
+                            </g>
+                        </svg>
+                    </span>
+
+                    <div class="flex grow flex-col items-start justify-center gap-0">
+                        <span class="font-semibold text-charcoal-300">₱@Model.Summary.TotalRevenue.ToString("N2")</span>
+                        <span class="text-sm text-pumpkin-600">Total Revenue</span>
+                    </div>
+                </div>
+
+                @* Events per Month for the last 6 months *@
+                <div class="flex flex-col">
+                    <span
+                        class="flex items-center gap-2 text-sm font-semibold text-charcoal-300 bg-charcoal-900/75 rounded-t-lg px-4 py-2 border-b border-charcoal-950">
+                        <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                            fill="currentColor" viewBox="0 0 256 256">
+                            <path
+                                d="M232,208a8,8,0,0,1-8,8H32a8,8,0,0,1,0-16h8V136a8,8,0,0,1,8-8H72a8,8,0,0,1,8,8v64H96V88a8,8,0,0,1,8-8h32a8,8,0,0,1,8,8V200h16V40a8,8,0,0,1,8-8h40a8,8,0,0,1,8,8V200h8A8,8,0,0,1,232,208Z">
+                            </path>
+                        </svg>
+                        Events
+                    </span>
+                    <div class="flex items-center justify-center bg-charcoal-900 rounded-b-lg px-4 py-1 h-40">
+                        <canvas id="eventsChart" class="w-full"></canvas>
+                    </div>
+                </div>
+
+                @* Users per Month for the last 6 months *@
+                <div class="flex flex-col">
+                    <span
+                        class="flex items-center gap-2 text-sm font-semibold text-charcoal-300 bg-charcoal-900/75 rounded-t-lg px-4 py-2 border-b border-charcoal-950">
+                        <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                            fill="currentColor" viewBox="0 0 256 256">
+                            <path
+                                d="M232,208a8,8,0,0,1-8,8H32a8,8,0,0,1,0-16h8V136a8,8,0,0,1,8-8H72a8,8,0,0,1,8,8v64H96V88a8,8,0,0,1,8-8h32a8,8,0,0,1,8,8V200h16V40a8,8,0,0,1,8-8h40a8,8,0,0,1,8,8V200h8A8,8,0,0,1,232,208Z">
+                            </path>
+                        </svg>
+                        Users
+                    </span>
+                    <div class="flex items-center justify-center bg-charcoal-900 rounded-b-lg px-4 py-1 h-40">
+                        <canvas id="usersChart" class="w-full"></canvas>
+                    </div>
+                </div>
+
+                @* Bookings per Month for the last 6 months *@
+                <div class="flex flex-col">
+                    <span
+                        class="flex items-center gap-2 text-sm font-semibold text-charcoal-300 bg-charcoal-900/75 rounded-t-lg px-4 py-2 border-b border-charcoal-950">
+                        <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                            fill="currentColor" viewBox="0 0 256 256">
+                            <path
+                                d="M232,208a8,8,0,0,1-8,8H32a8,8,0,0,1,0-16h8V136a8,8,0,0,1,8-8H72a8,8,0,0,1,8,8v64H96V88a8,8,0,0,1,8-8h32a8,8,0,0,1,8,8V200h16V40a8,8,0,0,1,8-8h40a8,8,0,0,1,8,8V200h8A8,8,0,0,1,232,208Z">
+                            </path>
+                        </svg>
+                        Bookings
+                    </span>
+                    <div class="flex items-center justify-center bg-charcoal-900 rounded-b-lg px-4 py-1 h-40">
+                        <canvas id="bookingsChart" class="w-full"></canvas>
+                    </div>
+                </div>
+
+                @* Revenue per Month for the last 6 months *@
+                <div class="flex flex-col">
+                    <span
+                        class="flex items-center gap-2 text-sm font-semibold text-charcoal-300 bg-charcoal-900/75 rounded-t-lg px-4 py-2 border-b border-charcoal-950">
+                        <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                            fill="currentColor" viewBox="0 0 256 256">
+                            <path
+                                d="M232,208a8,8,0,0,1-8,8H32a8,8,0,0,1,0-16h8V136a8,8,0,0,1,8-8H72a8,8,0,0,1,8,8v64H96V88a8,8,0,0,1,8-8h32a8,8,0,0,1,8,8V200h16V40a8,8,0,0,1,8-8h40a8,8,0,0,1,8,8V200h8A8,8,0,0,1,232,208Z">
+                            </path>
+                        </svg>
+                        Revenue
+                    </span>
+                    <div class="flex items-center justify-center bg-charcoal-900 rounded-b-lg px-4 py-1 h-40">
+                        <canvas id="revenueChart" class="w-full"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="grid place-self-center border border-charcoal-900/65 my-16 w-1/2">
+
+    @* Events Container *@
+    <div class="flex items-center justify-center size-full sm:px-20">
+        <div class="flex flex-col items-center gap-6 w-full px-4 py-2">
+
+            @* Sub Header (Events) *@
+            <div class="flex items-center justify-between w-full h-[8vh] gap-3">
+                <div class="flex items-center gap-3">
+                    <span class="flex items-center justify-center bg-pumpkin-700 text-pumpkin-50 p-1 size-8 rounded-lg">
+                        <svg class="" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                            viewBox="0 0 256 256">
+                            <path
+                                d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Zm-64-56a16,16,0,1,1-16-16A16,16,0,0,1,144,152Z">
+                            </path>
+                        </svg>
+                    </span>
+                    <h2 class="font-semibold text-2xl text-charcoal-300">Events</h2>
+                </div>
+
+                @* Date Range & Filter *@
+                @* <div class="flex items-center gap-3">
+                    <span class="relative">
+                        <svg class="absolute top-1/2 -translate-y-1/2 end-2 size-5 pointer-events-none text-pumpkin-600"
+                            xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                            viewBox="0 0 256 256">
+                            <path
+                                d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Z">
+                            </path>
+                        </svg>
+                        <input type="text" hx-get="/admin/event-filter-date" hx-trigger="change" hx-swap="outerHTML"
+                            hx-target="#event-counters" name="eventsStartDate"
+                            class="duration-200 ease-in-out appearance-none w-36 text-sm outline-none px-3 py-1 rounded-md border focus:ring-0 bg-charcoal-900 border-pumpkin-800 focus:border-pumpkin-500 text-charcoal-300 focus:text-charcoal-300 selection:text-pumpkin-50 selection:bg-pumpkin-700 placeholder-charcoal-700"
+                            id="eventsStartDate" placeholder="Start date" />
+                    </span>
+
+                    <span class="relative">
+                        <svg class="absolute top-1/2 -translate-y-1/2 end-2 size-5 pointer-events-none text-pumpkin-600"
+                            xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                            viewBox="0 0 256 256">
+                            <path
+                                d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Z">
+                            </path>
+                        </svg>
+                        <input type="text" hx-get="/admin/event-filter-date" hx-trigger="change" hx-swap="outerHTML"
+                            hx-target="#event-counters" name="eventsEndDate"
+                            class="duration-200 ease-in-out appearance-none w-36 text-sm outline-none px-2 py-1 rounded-md border focus:ring-0 bg-charcoal-900 border-pumpkin-800 focus:border-pumpkin-500 text-charcoal-300 focus:text-charcoal-300 selection:text-pumpkin-50 selection:bg-pumpkin-700 placeholder-charcoal-700"
+                            id="eventsEndDate" placeholder="End date" />
+                    </span>
+
+                </div> *@
+            </div>
+
+            @* Event Counters & Graphs *@
+            <div id="event-counters" class="grid md:grid-cols-2 xl:grid-cols-3 w-full gap-6">
+
+                @* Drafted Events *@
+                <div
+                    class="flex items-center justify-between gap-3 rounded-xl border-l-4 border-pumpkin-800 bg-charcoal-900">
+                    <span class="flex shrink items-center p-3 rounded-l-lg bg-charcoal-950 text-pumpkin-700">
+                        <svg class="size-10" xmlns="http://www.w3.org/2000/svg"
+                            xmlns:xlink="http://www.w3.org/1999/xlink" width="400" height="400" viewBox="0, 0, 400,400">
+                            <g>
+                                <path
+                                    d="M58.984 51.292 C 46.749 57.774,46.661 75.548,58.835 81.615 L 62.807 83.594 141.755 83.577 C 216.933 83.560,220.852 83.490,223.828 82.113 C 235.521 76.699,236.986 59.958,226.408 52.627 L 223.181 50.391 142.255 50.221 C 69.595 50.068,61.089 50.177,58.984 51.292 M270.703 101.124 C 259.282 103.387,239.844 112.765,239.844 116.012 C 239.844 117.045,332.969 210.160,333.987 210.144 C 336.875 210.100,346.022 192.756,348.401 182.813 C 359.619 135.916,317.675 91.817,270.703 101.124 M58.835 118.385 C 47.130 124.218,46.959 142.078,58.550 148.197 L 62.022 150.030 117.601 149.820 L 173.181 149.609 176.409 147.373 C 184.659 141.655,185.965 128.945,179.060 121.581 C 174.046 116.234,176.566 116.442,116.755 116.423 L 62.807 116.406 58.835 118.385 M159.650 195.505 C 116.900 238.326,103.087 252.613,102.434 254.688 C 101.072 259.009,89.842 338.845,89.857 344.099 C 89.883 353.798,96.836 360.137,107.463 360.152 C 112.727 360.159,192.344 348.549,195.703 347.284 C 198.135 346.369,211.255 333.679,254.883 290.044 L 310.938 233.980 263.472 186.519 L 216.006 139.058 159.650 195.505 M60.570 184.034 C 45.691 189.596,46.692 212.090,62.009 216.378 C 67.362 217.877,104.411 217.163,107.438 215.502 C 119.510 208.880,120.250 192.122,108.768 185.372 L 105.078 183.203 84.375 183.039 C 67.680 182.907,63.071 183.099,60.570 184.034 "
+                                    stroke="none" fill="currentColor" fill-rule="evenodd"></path>
+                            </g>
+                        </svg>
+                    </span>
+
+                    <div class="flex grow flex-col items-start justify-center gap-0">
+                        <span class=" font-semibold text-charcoal-300">@Model.Events.TotalEventsDrafted</span>
+                        <span class="text-sm text-pumpkin-600">Drafted Events</span>
+                    </div>
+                </div>
+
+                @* Opened Events *@
+                <div
+                    class="flex items-center justify-between gap-3 rounded-xl border-l-4 border-pumpkin-800 bg-charcoal-900">
+                    <span class="flex shrink items-center p-3 rounded-l-lg bg-charcoal-950 text-pumpkin-700">
+                        <svg class="size-10" xmlns="http://www.w3.org/2000/svg"
+                            xmlns:xlink="http://www.w3.org/1999/xlink" width="400" height="400" viewBox="0, 0, 400,400">
+                            <g>
+                                <path
+                                    d="M149.361 1.586 C 143.899 4.916,143.647 6.605,143.909 38.086 C 144.136 65.519,144.172 66.059,145.878 68.452 C 150.919 75.519,160.876 75.730,166.016 68.879 C 167.515 66.881,167.578 65.582,167.578 36.719 C 167.578 3.445,167.722 4.427,162.379 1.238 C 159.377 -0.555,152.574 -0.373,149.361 1.586 M312.500 37.476 C 310.996 37.760,308.887 38.445,307.813 38.999 C 306.738 39.553,272.751 73.077,232.285 113.498 L 158.710 186.990 163.782 192.909 C 191.310 225.031,192.279 269.116,166.163 301.168 C 157.655 311.610,151.213 313.499,145.067 307.354 C 140.272 302.559,140.471 296.612,145.620 290.877 C 170.087 263.623,168.432 230.010,141.233 201.776 C 136.172 196.523,132.031 192.068,132.031 191.877 C 132.031 190.559,117.768 130.141,116.797 127.344 C 111.477 112.027,91.281 103.344,76.388 109.971 C 68.911 113.297,69.537 104.925,69.534 201.570 L 69.531 286.343 53.827 301.960 C 37.920 317.779,35.938 320.378,35.938 325.404 C 35.938 330.046,36.967 331.212,71.828 366.016 L 105.476 399.609 170.528 399.609 L 235.580 399.609 240.642 397.101 C 245.290 394.797,313.847 328.056,312.466 327.179 C 312.270 327.055,310.041 325.898,307.512 324.609 C 296.163 318.823,287.778 306.331,286.264 292.955 L 285.736 288.281 282.516 288.272 C 264.269 288.219,245.409 268.911,245.324 250.195 C 245.313 247.779,245.169 247.656,242.352 247.656 C 218.917 247.656,199.574 221.235,205.822 197.759 C 208.629 187.214,207.158 188.860,270.818 125.000 C 316.643 79.029,330.760 64.423,331.977 61.719 C 337.774 48.838,326.521 34.831,312.500 37.476 M86.639 39.273 C 77.781 45.191,79.307 52.639,91.898 64.931 C 102.878 75.650,108.608 76.904,114.734 69.928 C 120.540 63.315,119.261 58.284,109.124 47.862 C 98.343 36.777,93.274 34.841,86.639 39.273 M212.891 38.982 C 194.121 50.804,188.855 69.595,203.227 73.465 C 212.023 75.833,230.649 59.301,230.649 49.126 C 230.649 40.031,220.463 34.212,212.891 38.982 M279.551 150.313 C 274.084 152.265,232.378 193.072,229.001 199.774 C 221.659 214.344,237.177 230.393,251.953 223.510 C 258.456 220.481,301.194 176.107,302.345 171.189 C 305.558 157.463,292.645 145.636,279.551 150.313 M312.500 200.744 C 307.516 201.727,305.217 203.638,287.388 221.615 C 268.758 240.401,267.977 241.480,267.977 248.438 C 267.977 260.954,281.004 269.338,292.799 264.412 C 297.270 262.544,329.343 230.389,331.721 225.391 C 337.958 212.277,326.768 197.928,312.500 200.744 M338.617 253.464 C 334.216 255.691,312.880 276.703,310.684 280.973 C 303.740 294.471,315.808 309.736,330.643 306.220 C 335.944 304.964,360.686 281.273,362.985 275.252 C 368.699 260.289,352.950 246.208,338.617 253.464 "
+                                    stroke="none" fill="currentColor" fill-rule="evenodd"></path>
+                            </g>
+                        </svg>
+                    </span>
+
+                    <div class="flex grow flex-col items-start justify-center gap-0">
+                        <span class=" font-semibold text-charcoal-300">@Model.Events.TotalEventsOpened</span>
+                        <span class="text-sm text-pumpkin-600">Opened Events</span>
+                    </div>
+                </div>
+
+                @* Ongoing Events *@
+                <div
+                    class="flex items-center justify-between gap-3 rounded-xl border-l-4 border-pumpkin-800 bg-charcoal-900">
+                    <span class="flex shrink items-center p-3 rounded-l-lg bg-charcoal-950 text-pumpkin-700">
+                        <svg class="size-10" xmlns="http://www.w3.org/2000/svg"
+                            xmlns:xlink="http://www.w3.org/1999/xlink" width="400" height="400" viewBox="0, 0, 400,400">
+                            <g>
+                                <path
+                                    d="M107.422 67.650 C 91.394 69.804,84.285 71.849,73.307 77.465 C 40.938 94.024,23.564 129.287,33.561 158.140 C 42.147 182.921,73.442 192.730,91.016 176.148 L 94.141 173.199 90.234 172.287 C 64.262 166.218,70.508 133.987,97.656 133.985 C 127.637 133.983,138.997 177.436,117.499 209.889 C 99.010 237.801,52.985 254.948,19.141 246.534 C 16.563 245.893,14.189 245.356,13.867 245.340 C 13.545 245.325,13.281 257.617,13.281 272.656 L 13.281 300.000 200.000 300.000 L 386.719 300.000 386.719 277.414 L 386.719 254.828 379.883 254.299 C 331.108 250.530,286.892 219.228,229.619 147.923 C 191.034 99.884,169.191 81.086,141.406 72.005 C 131.381 68.728,115.011 66.631,107.422 67.650 M263.672 152.274 C 245.635 154.623,244.892 155.006,248.878 159.901 C 291.494 212.218,335.266 241.634,377.280 246.191 C 387.848 247.337,387.195 248.145,384.458 237.309 C 370.695 182.814,317.381 145.280,263.672 152.274 M13.281 320.313 L 13.281 332.813 200.000 332.813 L 386.719 332.813 386.719 320.313 L 386.719 307.813 200.000 307.813 L 13.281 307.813 13.281 320.313 "
+                                    stroke="none" fill="currentColor" fill-rule="evenodd"></path>
+                            </g>
+                        </svg>
+                    </span>
+
+                    <div class="flex grow flex-col items-start justify-center gap-0">
+                        <span class=" font-semibold text-charcoal-300">@Model.Events.TotalEventsOngoing</span>
+                        <span class="text-sm text-pumpkin-600">Ongoing Events</span>
+                    </div>
+                </div>
+
+                @* Completed Events *@
+                <div
+                    class="flex items-center justify-between gap-3 rounded-xl border-l-4 border-pumpkin-800 bg-charcoal-900">
+                    <span class="flex shrink items-center p-3 rounded-l-lg bg-charcoal-950 text-pumpkin-700">
+                        <svg class="size-10" xmlns="http://www.w3.org/2000/svg"
+                            xmlns:xlink="http://www.w3.org/1999/xlink" width="400" height="400" viewBox="0, 0, 400,400">
+                            <g>
+                                <path
+                                    d="M128.226 43.455 C 121.773 46.671,118.750 52.906,118.750 62.997 L 118.750 66.406 97.781 66.406 C 79.469 66.406,76.049 66.601,70.789 67.947 C 51.839 72.793,37.878 87.528,33.994 106.778 C 31.973 116.797,32.579 307.864,34.651 314.063 C 40.394 331.239,54.328 344.684,70.672 348.821 C 77.706 350.602,322.294 350.602,329.328 348.821 C 345.581 344.707,359.292 331.575,365.126 314.536 C 367.377 307.960,368.184 117.573,366.006 106.778 C 362.122 87.528,348.161 72.793,329.211 67.947 C 323.955 66.602,320.532 66.406,302.335 66.406 L 281.482 66.406 280.985 59.971 C 279.021 34.498,246.964 34.856,246.892 60.352 L 246.875 66.406 200.000 66.406 L 153.125 66.406 153.108 60.352 C 153.065 45.266,141.014 37.083,128.226 43.455 M118.983 106.590 C 120.800 132.339,153.035 131.833,153.108 106.055 L 153.125 100.000 200.000 100.000 L 246.875 100.000 246.875 106.097 C 246.875 117.904,252.367 124.343,262.891 124.875 C 274.267 125.449,280.103 119.542,281.022 106.523 L 281.492 99.865 301.097 100.128 L 320.703 100.391 324.432 102.582 C 331.681 106.843,332.384 108.871,332.664 126.307 L 332.905 141.406 200.000 141.406 L 67.095 141.406 67.336 126.236 L 67.578 111.067 69.933 107.719 C 74.771 100.840,77.328 100.210,100.861 100.090 L 118.518 100.000 118.983 106.590 M240.041 201.115 C 249.723 204.570,254.525 215.490,250.090 223.966 C 247.534 228.851,199.788 278.129,195.154 280.664 C 186.000 285.673,182.216 283.812,164.818 265.743 C 145.085 245.249,142.847 237.904,153.630 229.016 C 161.853 222.237,168.296 223.602,179.341 234.462 C 183.663 238.711,187.396 242.188,187.638 242.188 C 187.880 242.188,196.059 233.838,205.812 223.633 C 229.325 199.033,231.041 197.903,240.041 201.115 "
+                                    stroke="none" fill="currentColor" fill-rule="evenodd"></path>
+                            </g>
+                        </svg>
+                    </span>
+
+                    <div class="flex grow flex-col items-start justify-center gap-0">
+                        <span class=" font-semibold text-charcoal-300">@Model.Events.TotalEventsCompleted</span>
+                        <span class="text-sm text-pumpkin-600">Completed Events</span>
+                    </div>
+                </div>
+
+                @* Postponed Events *@
+                <div
+                    class="flex items-center justify-between gap-3 rounded-xl border-l-4 border-pumpkin-800 bg-charcoal-900">
+                    <span class="flex shrink items-center p-3 rounded-l-lg bg-charcoal-950 text-pumpkin-700">
+                        <svg class="size-10" xmlns="http://www.w3.org/2000/svg"
+                            xmlns:xlink="http://www.w3.org/1999/xlink" width="400" height="400" viewBox="0, 0, 400,400">
+                            <g>
+                                <path
+                                    d="M205.078 31.797 C 130.925 38.534,68.295 95.526,54.876 168.475 L 53.556 175.652 37.129 175.918 C 16.996 176.244,12.686 178.106,10.135 187.578 C 7.969 195.623,8.015 195.693,40.160 232.284 C 79.120 276.633,73.892 276.699,113.684 231.363 C 128.526 214.452,141.140 199.687,141.715 198.550 C 145.560 190.948,142.342 181.606,134.375 177.243 C 132.901 176.435,127.396 176.109,111.914 175.910 C 100.635 175.765,91.406 175.364,91.406 175.018 C 91.406 173.102,95.716 158.272,97.965 152.448 C 130.096 69.250,235.590 41.249,304.297 97.682 C 394.068 171.417,353.721 314.538,238.339 331.648 C 224.513 333.698,221.094 337.395,221.094 350.295 C 221.094 366.774,227.887 370.870,249.219 367.254 C 314.684 356.156,367.714 308.177,384.361 244.986 C 414.721 129.740,323.320 21.053,205.078 31.797 M206.868 103.865 C 203.342 104.981,200.060 107.766,198.225 111.199 L 196.484 114.453 196.484 164.063 L 196.484 213.672 198.258 216.991 C 199.233 218.817,201.492 221.278,203.278 222.460 L 206.525 224.609 243.692 224.831 C 294.118 225.133,293.736 225.318,293.746 200.481 C 293.755 178.077,290.899 175.781,263.029 175.781 L 246.162 175.781 245.932 145.117 C 245.672 110.250,245.650 110.128,238.911 105.665 C 235.473 103.388,212.461 102.095,206.868 103.865 "
+                                    stroke="none" fill="currentColor" fill-rule="evenodd"></path>
+                            </g>
+                        </svg>
+                    </span>
+
+                    <div class="flex grow flex-col items-start justify-center gap-0">
+                        <span class=" font-semibold text-charcoal-300">@Model.Events.TotalEventsPostponed</span>
+                        <span class="text-sm text-pumpkin-600">Postponed Events</span>
+                    </div>
+                </div>
+
+                @* Cancelled Events *@
+                <div
+                    class="flex items-center justify-between gap-3 rounded-xl border-l-4 border-pumpkin-800 bg-charcoal-900">
+                    <span class="flex shrink items-center p-3 rounded-l-lg bg-charcoal-950 text-pumpkin-700">
+                        <svg class="size-10" xmlns="http://www.w3.org/2000/svg"
+                            xmlns:xlink="http://www.w3.org/1999/xlink" width="400" height="400" viewBox="0, 0, 400,400">
+                            <g>
+                                <path
+                                    d="M87.500 25.000 L 87.500 37.500 65.210 37.500 C 37.495 37.500,33.872 38.381,24.056 47.513 C 13.872 56.986,12.500 62.054,12.500 90.210 L 12.500 112.500 187.500 112.500 L 362.500 112.500 362.500 90.376 C 362.500 62.607,361.566 58.741,352.517 49.067 C 342.968 38.858,337.950 37.500,309.790 37.500 L 287.500 37.500 287.500 25.000 L 287.500 12.500 275.000 12.500 L 262.500 12.500 262.500 25.000 L 262.500 37.500 187.500 37.500 L 112.500 37.500 112.500 25.000 L 112.500 12.500 100.000 12.500 L 87.500 12.500 87.500 25.000 M12.500 234.790 C 12.500 348.347,11.724 339.346,22.513 350.944 C 33.822 363.102,28.485 362.500,124.937 362.500 L 206.955 362.500 203.643 356.836 C 145.899 258.091,258.270 145.231,356.445 203.369 L 362.500 206.955 362.500 172.227 L 362.500 137.500 187.500 137.500 L 12.500 137.500 12.500 234.790 M125.000 212.500 L 125.000 225.000 100.000 225.000 L 75.000 225.000 75.000 212.500 L 75.000 200.000 100.000 200.000 L 125.000 200.000 125.000 212.500 M282.031 213.992 C 206.158 230.768,186.785 330.228,251.059 372.994 C 317.565 417.246,404.903 355.697,385.274 278.410 C 373.834 233.364,326.891 204.074,282.031 213.992 M287.686 270.889 L 300.000 283.185 312.502 270.701 L 325.005 258.217 333.394 266.606 L 341.783 274.995 329.299 287.498 L 316.815 300.000 329.299 312.502 L 341.783 325.005 333.394 333.394 L 325.005 341.783 312.502 329.299 L 300.000 316.815 287.498 329.299 L 274.995 341.783 266.606 333.394 L 258.217 325.005 270.701 312.502 L 283.185 300.000 270.706 287.502 L 258.226 275.005 266.404 266.799 C 270.902 262.286,274.760 258.594,274.977 258.594 C 275.195 258.594,280.914 264.127,287.686 270.889 M125.000 287.500 L 125.000 300.000 100.000 300.000 L 75.000 300.000 75.000 287.500 L 75.000 275.000 100.000 275.000 L 125.000 275.000 125.000 287.500 "
+                                    stroke="none" fill="currentColor" fill-rule="evenodd"></path>
+                            </g>
+                        </svg>
+                    </span>
+
+                    <div class="flex grow flex-col items-start justify-center gap-0">
+                        <span class=" font-semibold text-charcoal-300">@Model.Events.TotalEventsCancelled</span>
+                        <span class="text-sm text-pumpkin-600">Cancelled Events</span>
+                    </div>
+                </div>
+
+
+            </div>
+
+            @* Per Event Section *@
+            <div class="flex flex-col gap-2 w-full">
+
+                @* Per Event Container *@
+                
+                <div class="flex flex-col gap-6 w-full border-2 border-dashed border-charcoal-900 rounded-lg px-3 py-6">
+
+                    @* Sub Header *@
+                    <div class="flex flex-col gap-3">
+                        <div class="flex items-center justify-between w-full">
+                            <div class="flex items-center gap-3">
+                                <span class="flex items-center justify-center text-pumpkin-700 p-1 rounded-lg text-lg">
+                                    <svg class="size-8" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                                        fill="currentColor" viewBox="0 0 256 256">
+                                        <path
+                                            d="M245.66,85.66l-32,32a8,8,0,0,1-11.32-11.32L220.69,88H208c-38.67,0-46.59,19-56.62,43.08C141.05,155.88,129.33,184,80,184H79a32,32,0,1,1,0-16h1c38.67,0,46.59-19,56.62-43.08C147,100.12,158.67,72,208,72h12.69L202.34,53.66a8,8,0,0,1,11.32-11.32l32,32A8,8,0,0,1,245.66,85.66Z">
+                                        </path>
+                                    </svg>
+                                </span>
+                                <h2 class="font-semibold text-2xl text-charcoal-300">Per Event</h2>
+                            </div>
+
+                            @* Right Side *@
+                            <div class="flex items-center gap-3 h-full">
+
+                                @* Events Dropdown *@
+                                <div id="events-dropdowwn-list" x-data="{ open: false }" class="relative w-72">
+                                    <h3 class="text-sm text-charcoal-300">Selected Event</h3>
+                                    <button type="button" x-on:click="open = !open" x-ref="eventDropdownButton"
+                                        class="w-full select-none duration-200 ease-in-out flex items-center justify-between gap-2 px-3 py-1 rounded-md border bg-charcoal-900 border-pumpkin-800 focus:border-pumpkin-500 text-charcoal-300 focus:text-charcoal-300 selection:text-pumpkin-50 selection:bg-pumpkin-700 placeholder-charcoal-700">
+
+                                        <span id="event-dropdown-text"
+                                            class="w-full text-left truncate text-sm font-medium">
+                                            @(Model.SelectedEventDetails.SelectedEvent?.ShortName ?? "None")
+                                        </span>
+
+                                        <svg class="size-3" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                                            fill="currentColor" viewBox="0 0 256 256">
+                                            <path
+                                                d="M216.49,104.49l-80,80a12,12,0,0,1-17,0l-80-80a12,12,0,0,1,17-17L128,159l71.51-71.52a12,12,0,0,1,17,17Z">
+                                            </path>
+                                        </svg>
+                                    </button>
+
+                                    @* Dropdown Content *@
+                                    <div x-cloak x-show="open" x-on:click.away="open = false"
+                                        x-anchor.bottom.offset.10="$refs.eventDropdownButton" x-transition
+                                        class="bg-charcoal-950 border border-pumpkin-800 rounded-md max-h-60 overflow-y-auto shadow-md w-full z-20">
+                                        @if (Model.SelectedEventDetails.SelectedEvent != null)
+                                        {
+                                            @foreach (var evt in Model.Events.GetEvents)
+                                            {
+                                                <div x-on:click="open = false" hx-get="/admin/select-event-dropdown/@evt.Id"
+                                                    hx-swap="none"
+                                                    class="duration-200 ease-in-out px-4 py-2 hover:bg-pumpkin-600 text-pumpkin-700 hover:text-pumpkin-50 cursor-pointer">
+                                                    <span class="truncate text-sm">@evt.ShortName</span>
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div class="flex flex-col items-center justify-center p-3 size-full text-pumpkin-700">
+                                                <svg class="size-16" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                                                    viewBox="0 0 256 256">
+                                                    <path
+                                                        d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM157.66,170.34a8,8,0,0,1-11.32,11.32L128,163.31l-18.34,18.35a8,8,0,0,1-11.32-11.32L116.69,152,98.34,133.66a8,8,0,0,1,11.32-11.32L128,140.69l18.34-18.35a8,8,0,0,1,11.32,11.32L139.31,152ZM208,80H48V48H72v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24Z">
+                                                    </path>
+                                                </svg>
+                                                <span class="font-semibold">
+                                                    No Events Found
+                                                </span>
+                                                <span class="text-sm">
+                                                    Try changing the date range.
+                                                </span>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+
+                                @* Buttons *@
+                                @* <div class="flex items-end justify-end gap-2 py-1 h-full">
+                                    <button
+                                        class="duration-200 ease-in-out border border-pumpkin-600 text-pumpkin-600 hover:border-pumpkin-600/50 hover:text-pumpkin-600/50 active:bg-pumpkin-600 active:text-pumpkin-50 p-1 rounded-lg">
+                                        <svg class="size-6" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="400" height="400" viewBox="0, 0, 400,400"><g><path d="M188.396 1.519 C 179.017 4.986,172.186 11.185,167.746 20.258 L 165.234 25.391 165.023 95.101 L 164.811 164.811 95.101 165.023 L 25.391 165.234 19.922 167.906 C -2.004 178.620,-7.043 207.925,10.094 225.062 C 12.766 227.735,16.569 230.455,19.922 232.094 L 25.391 234.766 95.101 234.977 L 164.811 235.189 165.023 304.899 L 165.234 374.609 167.906 380.078 C 169.545 383.431,172.265 387.234,174.938 389.906 C 192.075 407.043,221.380 402.004,232.094 380.078 L 234.766 374.609 234.977 304.899 L 235.189 235.189 304.899 234.977 L 374.609 234.766 380.078 232.094 C 383.431 230.455,387.234 227.735,389.906 225.062 C 407.043 207.925,402.004 178.620,380.078 167.906 L 374.609 165.234 304.899 165.023 L 235.189 164.811 234.977 95.101 L 234.766 25.391 232.094 19.922 C 224.320 4.012,204.376 -4.387,188.396 1.519 " stroke="none" fill="currentColor" fill-rule="evenodd"></path></g></svg>
+                                    </button>
+
+                                    <button
+                                        class="duration-200 ease-in-out border border-pumpkin-600 text-pumpkin-600 hover:border-pumpkin-600/50 hover:text-pumpkin-600/50 active:bg-pumpkin-600 active:text-pumpkin-50 p-1 rounded-lg">
+                                        <svg class="size-6" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                                            fill="currentColor" viewBox="0 0 256 256">
+                                            <path
+                                                d="M227.32,73.37,182.63,28.69a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H216a8,8,0,0,0,0-16H115.32l112-112A16,16,0,0,0,227.32,73.37ZM192,108.69,147.32,64l24-24L216,84.69Z">
+                                            </path>
+                                        </svg>
+                                    </button>
+
+                                    <button
+                                        class="duration-200 ease-in-out border border-red-600 text-red-600 hover:border-red-600/50 hover:text-red-600/50 active:bg-red-600 active:text-red-50 p-1 rounded-lg">
+                                        <svg class="size-6" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                                            fill="currentColor" viewBox="0 0 256 256">
+                                            <path
+                                                d="M224,56a8,8,0,0,1-8,8h-8V208a16,16,0,0,1-16,16H64a16,16,0,0,1-16-16V64H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,56ZM88,32h80a8,8,0,0,0,0-16H88a8,8,0,0,0,0,16Z">
+                                            </path>
+                                        </svg>
+                                    </button>
+                                </div> *@
+                            </div>
+                        </div>
+                    </div>
+
+                    @if(Model.SelectedEventDetails.SelectedEvent != null)
+                    {
+                        <div id="event-information-container" class="flex flex-col gap-6 w-full">
+                            <div id="organizer-and-event-per-event"
+                            class="text-sm flex flex-col border-2 border-dashed border-charcoal-900 text-charcoal-500 rounded-lg px-6 mx-3 py-3">
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="size-10 rounded-full">
+                                    @if (Model.SelectedEventDetails.OrganizerAvatar != null)
+                                    {
+                                        <img class="object-cover rounded-full size-full"
+                                            src="/avatar/@Model.SelectedEventDetails.OrganizerAvatar"
+                                            alt="Organizer Avatar" loading="lazy">
+                                    }
+                                    else
+                                    {
+                                        <svg class="rounded-full text-charcoal-600" xmlns="http://www.w3.org/2000/svg"
+                                            xmlns:xlink="http://www.w3.org/1999/xlink" width="400" height="400"
+                                            viewBox="0, 0, 400,400">
+                                            <g>
+                                                <path
+                                                    d="M176.172 0.866 C 93.868 10.736,25.169 71.441,5.478 151.697 C -3.051 186.459,-1.676 227.565,9.147 261.328 C 20.494 296.728,48.476 337.791,73.179 355.294 L 75.655 357.048 76.178 351.766 C 80.395 309.166,106.791 270.961,145.195 251.873 L 153.280 247.854 150.273 245.639 C 83.673 196.571,114.046 92.549,196.154 88.509 C 281.749 84.297,319.310 194.390,249.756 245.617 L 246.777 247.810 254.834 251.851 C 293.358 271.172,319.608 309.189,323.822 351.766 L 324.345 357.048 326.821 355.335 C 332.287 351.554,353.875 328.959,360.283 320.313 C 450.002 199.243,381.887 29.005,233.012 2.229 C 222.507 0.340,187.549 -0.499,176.172 0.866 M187.891 112.092 C 147.646 119.548,124.716 163.943,141.811 201.308 C 164.580 251.077,235.420 251.077,258.189 201.308 C 279.667 154.363,238.910 102.639,187.891 112.092 M187.500 262.241 C 134.297 270.665,98.469 311.641,98.442 364.095 L 98.438 373.112 106.836 377.516 C 164.632 407.823,234.656 407.835,293.164 377.547 L 301.563 373.199 301.558 364.139 C 301.527 302.684,245.905 252.993,187.500 262.241 "
+                                                    stroke="none" fill="currentColor" fill-rule="evenodd"></path>
+                                            </g>
+                                        </svg>
+                                    }
+                                </span>
+                                <span
+                                    class="text-lg font-semibold italic text-charcoal-600">@Model.SelectedEventDetails.OrganizerName</span>
+                                <span
+                                    class="text-xs rounded-full px-2 py-1 italic text-charcoal-300 bg-charcoal-800">Organizer</span>
+                            </div>
+                            <span class="flex items-start gap-3 italic">
+                                <span class="flex items-start gap-1">
+                                    <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                                        fill="currentColor" viewBox="0 0 256 256">
+                                        <path
+                                            d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM128,168a16,16,0,1,1,16-16A16,16,0,0,1,128,168Zm80-88H48V48H72v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24Z">
+                                        </path>
+                                    </svg>
+                                    @Model.SelectedEventDetails.SelectedEvent!.Name
+                                </span>
+                                @{
+                                    var color = "";
+
+                                    if (Model.SelectedEventDetails.SelectedEvent.Status == EventStatus.Draft)
+                                    {
+                                        color = "text-zinc-300 bg-zinc-900";
+                                    }
+                                    else if (Model.SelectedEventDetails.SelectedEvent.Status == EventStatus.Open)
+                                    {
+                                        color = "text-blue-300 bg-blue-900";
+                                    }
+                                    else if (Model.SelectedEventDetails.SelectedEvent.Status == EventStatus.Ongoing)
+                                    {
+                                        color = "text-green-300 bg-green-900";
+                                    }
+                                    else if (Model.SelectedEventDetails.SelectedEvent.Status == EventStatus.Completed)
+                                    {
+                                        color = "text-indigo-300 bg-indigo-900";
+                                    }
+                                    else if (Model.SelectedEventDetails.SelectedEvent.Status == EventStatus.Postponed)
+                                    {
+                                        color = "text-orange-300 bg-orange-900";
+                                    }
+                                    else if (Model.SelectedEventDetails.SelectedEvent.Status == EventStatus.Cancelled)
+                                    {
+                                        color = "text-red-300 bg-red-900";
+                                    }
+                                }
+                                <span class="text-xs rounded-full px-2 py-1 italic @color">
+                                    @Model.SelectedEventDetails.SelectedEvent.Status
+                                </span>
+                            </span>
+                            <span class="flex items-start gap-1 italic">
+                                <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                                    fill="currentColor" viewBox="0 0 256 256">
+                                    <path
+                                        d="M221.8,175.94C216.25,166.38,208,139.33,208,104a80,80,0,1,0-160,0c0,35.34-8.26,62.38-13.81,71.94A16,16,0,0,0,48,200H88.81a40,40,0,0,0,78.38,0H208a16,16,0,0,0,13.8-24.06ZM128,216a24,24,0,0,1-22.62-16h45.24A24,24,0,0,1,128,216Z">
+                                    </path>
+                                </svg>
+                                @Model.SelectedEventDetails.Time
+                            </span>
+                            <span class="flex items-start gap-1 italic">
+                                <svg class="size-4" xmlns="http://www.w3.orlass=" flex items-center g/2000/svg"
+                                    width="32" height="32" fill="currentColor" viewBox="0 0 256 256">
+                                    <path
+                                        d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm-4,48a12,12,0,1,1-12,12A12,12,0,0,1,124,72Zm12,112a16,16,0,0,1-16-16V128a8,8,0,0,1,0-16,16,16,0,0,1,16,16v40a8,8,0,0,1,0,16Z">
+                                    </path>
+                                </svg>
+                                @Model.SelectedEventDetails.SelectedEvent!.Description
+                            </span>
+                            </div>
+
+                            @* Bookings Container *@
+                            <div id="bookings-per-event"
+                        class="flex flex-col gap-3 w-full px-9 selection:bg-carribean-700 selection:text-carribean-100">
+                        <div class="flex items-center gap-3">
+                            <span class="bg-carribean-700 w-1.5 h-5 rounded-lg"></span>
+                            <div class="flex items-center gap-2 font-medium text-lg text-charcoal-300">
+                                Bookings
+
+                                <span class="px-2 py-1 rounded-md text-xs bg-charcoal-900 text-charcoal-300">
+                                    @Model.SelectedEventDetails.TotalBooked
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center flex-wrap gap-6">
+
+                            @* Paid Bookings *@
+                            <div
+                                class="flex flex-1 items-center justify-between gap-3 rounded-xl border-l-4 border-carribean-800 bg-charcoal-900">
+                                <span
+                                    class="flex shrink items-center p-3 rounded-l-lg bg-charcoal-950 text-carribean-700">
+                                    <svg class="size-10" xmlns="http://www.w3.org/2000/svg"
+                                        xmlns:xlink="http://www.w3.org/1999/xlink" width="400" height="400"
+                                        viewBox="0, 0, 400,400">
+                                        <g>
+                                            <path
+                                                d="M64.564 1.483 C 58.997 5.152,59.389 -0.666,59.356 78.906 C 59.330 143.639,58.978 158.553,57.382 162.713 C 56.904 163.958,57.866 164.063,69.838 164.063 L 82.813 164.063 82.807 85.742 C 82.802 10.334,82.747 7.339,81.330 5.189 C 78.925 1.540,75.900 0.010,71.094 0.010 C 68.195 0.010,66.070 0.490,64.564 1.483 M104.285 2.136 C 104.589 3.325,105.149 6.406,105.529 8.984 C 105.910 11.576,106.254 93.148,106.297 191.406 L 106.376 369.141 123.474 384.570 C 132.877 393.057,140.957 400.000,141.428 400.000 C 141.899 400.000,147.163 395.781,153.125 390.625 C 159.087 385.469,164.361 381.250,164.844 381.250 C 165.327 381.250,170.600 385.469,176.563 390.625 C 182.525 395.781,187.798 400.000,188.281 400.000 C 188.764 400.000,194.038 395.781,200.000 390.625 C 205.962 385.469,211.236 381.250,211.719 381.250 C 212.202 381.250,217.475 385.469,223.438 390.625 C 229.400 395.781,234.673 400.000,235.156 400.000 C 235.639 400.000,240.913 395.781,246.875 390.625 C 252.837 385.469,258.111 381.250,258.594 381.250 C 259.077 381.250,264.350 385.469,270.313 390.625 C 276.275 395.781,281.543 400.000,282.020 400.000 C 282.496 400.000,290.577 393.057,299.977 384.570 L 317.067 369.141 317.127 348.633 L 317.188 328.125 223.438 328.125 L 129.688 328.125 129.688 222.656 L 129.688 117.188 223.461 117.188 L 317.235 117.188 317.016 71.289 L 316.797 25.391 314.125 19.922 C 310.629 12.766,304.421 6.559,297.266 3.063 L 291.797 0.391 197.764 0.183 L 103.731 -0.025 104.285 2.136 M223.438 35.156 L 223.438 46.875 188.281 46.875 L 153.125 46.875 153.125 35.156 L 153.125 23.438 188.281 23.438 L 223.438 23.438 223.438 35.156 M270.313 35.156 L 270.313 46.875 258.594 46.875 L 246.875 46.875 246.875 35.156 L 246.875 23.438 258.594 23.438 L 270.313 23.438 270.313 35.156 M12.505 113.477 C 12.510 154.445,12.585 156.754,13.983 158.874 C 18.689 166.013,29.748 166.013,34.455 158.874 C 35.852 156.754,35.927 154.445,35.932 113.477 L 35.938 70.313 24.219 70.313 L 12.500 70.313 12.505 113.477 M223.438 82.031 L 223.438 93.750 188.281 93.750 L 153.125 93.750 153.125 82.031 L 153.125 70.313 188.281 70.313 L 223.438 70.313 223.438 82.031 M270.313 82.031 L 270.313 93.750 258.594 93.750 L 246.875 93.750 246.875 82.031 L 246.875 70.313 258.594 70.313 L 270.313 70.313 270.313 82.031 M153.125 164.063 L 153.125 187.500 270.313 187.500 L 387.500 187.500 387.500 164.063 L 387.500 140.625 270.313 140.625 L 153.125 140.625 153.125 164.063 M153.125 257.813 L 153.125 304.688 270.313 304.688 L 387.500 304.688 387.500 257.813 L 387.500 210.938 270.313 210.938 L 153.125 210.938 153.125 257.813 M340.625 246.094 L 340.625 257.813 317.188 257.813 L 293.750 257.813 293.750 246.094 L 293.750 234.375 317.188 234.375 L 340.625 234.375 340.625 246.094 "
+                                                stroke="none" fill="currentColor" fill-rule="evenodd"></path>
+                                        </g>
+                                    </svg>
+                                </span>
+
+                                <div class="flex grow flex-col items-start justify-center gap-0">
+                                    <span
+                                        class=" font-semibold text-charcoal-300">@Model.SelectedEventDetails.TotalPaidBookings</span>
+                                    <span class="text-sm text-carribean-600 whitespace-nowrap pe-10">Paid
+                                        Bookings</span>
+                                </div>
+                            </div>
+
+                            @* Confirmed Bookings *@
+                            <div
+                                class="flex flex-1 items-center justify-between gap-3 rounded-xl border-l-4 border-carribean-800 bg-charcoal-900">
+                                <span
+                                    class="flex shrink items-center p-3 rounded-l-lg bg-charcoal-950 text-carribean-700">
+                                    <svg class="size-10" xmlns="http://www.w3.org/2000/svg"
+                                        xmlns:xlink="http://www.w3.org/1999/xlink" width="400" height="400"
+                                        viewBox="0, 0, 400,400">
+                                        <g>
+                                            <path
+                                                d="M25.781 76.527 C 20.627 78.297,14.881 84.029,13.440 88.839 C 12.766 91.091,12.500 102.270,12.500 128.411 C 12.500 171.613,11.522 167.901,23.203 169.049 C 57.309 172.401,56.817 227.430,22.649 230.938 C 11.844 232.047,12.499 229.372,12.508 272.410 L 12.515 308.984 14.354 312.934 C 15.370 315.115,17.713 318.184,19.586 319.788 C 26.092 325.357,16.167 325.000,164.595 325.000 L 298.438 325.000 298.438 312.855 C 298.438 299.259,299.344 296.875,304.516 296.875 C 309.393 296.875,310.156 299.027,310.156 312.787 L 310.156 325.083 341.211 324.846 L 372.266 324.609 376.542 322.184 C 386.917 316.299,387.500 313.575,387.500 271.016 C 387.500 230.289,387.993 232.109,376.652 230.948 C 342.110 227.413,342.289 172.430,376.854 169.042 C 388.476 167.903,387.501 171.669,387.492 127.930 L 387.485 91.016 385.646 87.066 C 380.478 75.969,376.819 75.000,340.093 75.000 L 310.938 75.000 310.938 87.145 C 310.938 100.573,310.002 103.125,305.078 103.125 C 300.154 103.125,299.219 100.573,299.219 87.145 L 299.219 75.000 164.648 75.026 C 34.783 75.050,29.928 75.103,25.781 76.527 M309.020 123.011 C 311.792 125.784,312.040 156.200,309.318 159.660 C 307.079 162.507,303.077 162.507,300.838 159.660 C 298.116 156.200,298.364 125.784,301.136 123.011 C 302.191 121.957,303.965 121.094,305.078 121.094 C 306.191 121.094,307.965 121.957,309.020 123.011 M190.090 137.463 C 233.907 148.670,253.045 200.409,226.949 237.109 C 198.253 277.467,137.291 272.061,116.046 227.274 C 93.069 178.837,138.135 124.175,190.090 137.463 M184.948 192.026 L 167.092 209.834 156.778 199.448 C 145.503 188.094,143.891 187.274,139.558 190.682 C 134.483 194.674,135.842 197.238,151.027 212.334 C 169.378 230.577,165.085 231.367,191.585 204.867 C 214.774 181.678,215.559 180.489,210.692 175.917 C 206.010 171.519,204.669 172.358,184.948 192.026 M308.654 181.190 L 310.938 183.474 310.938 199.975 C 310.938 218.240,310.341 220.313,305.078 220.313 C 299.816 220.313,299.219 218.240,299.219 199.975 L 299.219 183.474 301.502 181.190 C 302.758 179.934,304.367 178.906,305.078 178.906 C 305.789 178.906,307.398 179.934,308.654 181.190 M309.318 240.340 C 312.040 243.800,311.792 274.216,309.020 276.989 C 307.965 278.043,306.191 278.906,305.078 278.906 C 299.826 278.906,299.219 276.815,299.219 258.735 C 299.219 240.063,299.729 238.281,305.078 238.281 C 306.979 238.281,308.144 238.847,309.318 240.340 "
+                                                stroke="none" fill="currentColor" fill-rule="evenodd"></path>
+                                        </g>
+                                    </svg>
+                                </span>
+
+                                <div class="flex grow flex-col items-start justify-center gap-0">
+                                    <span
+                                        class=" font-semibold text-charcoal-300">@Model.SelectedEventDetails.TotalConfirmedBookings</span>
+                                    <span class="text-sm text-carribean-600 whitespace-nowrap pe-10">Confirmed
+                                        Bookings</span>
+                                </div>
+                            </div>
+
+                            @* Cancelled Bookings *@
+                            <div
+                                class="flex flex-1 items-center justify-between gap-3 rounded-xl border-l-4 border-carribean-800 bg-charcoal-900">
+                                <span
+                                    class="flex shrink items-center p-3 rounded-l-lg bg-charcoal-950 text-carribean-700">
+                                    <svg class="size-10" xmlns="http://www.w3.org/2000/svg"
+                                        xmlns:xlink="http://www.w3.org/1999/xlink" width="400" height="400"
+                                        viewBox="0, 0, 400,400">
+                                        <g>
+                                            <path
+                                                d="M76.517 26.787 C 61.886 31.775,51.351 42.975,47.639 57.489 C 46.273 62.831,46.094 66.163,46.098 86.258 C 46.105 123.806,45.687 123.394,83.789 123.420 L 108.594 123.438 108.594 243.975 L 108.594 364.513 110.352 367.992 C 112.844 372.925,116.288 375.000,121.984 375.000 L 126.550 375.000 136.517 367.437 C 141.999 363.277,148.770 358.070,151.563 355.865 C 154.355 353.660,157.048 351.613,157.545 351.317 C 158.066 351.007,164.518 355.475,172.779 361.867 C 195.668 379.577,194.043 379.549,215.938 362.599 C 226.457 354.457,231.642 350.897,232.275 351.384 C 232.786 351.776,239.355 356.842,246.875 362.643 C 269.041 379.742,267.022 379.795,290.620 361.481 C 297.283 356.310,303.159 351.756,303.677 351.362 C 304.327 350.868,309.062 354.114,318.912 361.806 C 335.993 375.144,336.235 375.279,342.253 374.844 C 347.436 374.469,350.830 372.083,352.831 367.408 C 354.836 362.721,354.385 65.404,352.361 57.489 C 348.528 42.502,337.085 30.759,321.929 26.260 C 318.106 25.125,305.992 25.002,199.663 25.020 L 81.641 25.040 76.517 26.787 M99.071 52.658 C 107.005 56.761,108.584 61.601,108.589 81.836 L 108.594 97.656 90.234 97.656 L 71.875 97.656 71.875 81.927 C 71.875 64.342,72.351 61.707,76.376 57.005 C 81.963 50.477,91.370 48.676,99.071 52.658 M198.777 86.700 C 200.668 87.620,207.951 94.253,216.781 103.099 L 231.609 117.953 247.640 102.027 C 262.254 87.509,263.966 86.053,266.994 85.559 C 276.288 84.046,283.866 94.473,279.476 102.734 C 278.791 104.023,271.534 111.747,263.350 119.898 L 248.470 134.718 263.993 150.367 C 283.033 169.563,284.639 173.330,277.023 180.946 C 269.811 188.158,265.914 186.438,247.061 167.727 L 231.216 152.002 215.803 167.370 C 207.326 175.822,199.401 183.106,198.191 183.556 C 190.453 186.437,182.031 180.839,182.031 172.814 C 182.031 167.856,182.373 167.410,199.099 150.586 L 214.438 135.156 199.513 120.117 C 182.429 102.902,182.031 102.395,182.031 97.834 C 182.031 88.583,190.739 82.793,198.777 86.700 M291.391 228.712 C 300.200 233.138,300.214 245.341,291.415 249.805 L 287.950 251.563 231.450 251.563 C 185.212 251.563,174.493 251.367,172.436 250.487 C 162.947 246.427,162.199 233.109,171.210 228.669 C 175.339 226.635,287.336 226.675,291.391 228.712 M292.327 271.709 C 300.241 276.630,299.726 288.276,291.405 292.579 C 287.376 294.662,173.957 294.299,170.501 292.192 C 161.974 286.993,163.576 273.140,173.027 270.350 C 174.338 269.963,200.790 269.712,232.422 269.787 L 289.453 269.922 292.327 271.709 "
+                                                stroke="none" fill="currentColor" fill-rule="evenodd"></path>
+                                        </g>
+                                    </svg>
+                                </span>
+
+                                <div class="flex grow flex-col items-start justify-center gap-0">
+                                    <span
+                                        class=" font-semibold text-charcoal-300">@Model.SelectedEventDetails.TotalCancelledBookings</span>
+                                    <span class="text-sm text-carribean-600 whitespace-nowrap pe-10">Cancelled
+                                        Bookings</span>
+                                </div>
+                            </div>
+
+                            @* Refunded Bookings *@
+                            <div
+                                class="flex flex-1 items-center justify-between gap-3 rounded-xl border-l-4 border-carribean-800 bg-charcoal-900">
+                                <span
+                                    class="flex shrink items-center p-3 rounded-l-lg bg-charcoal-950 text-carribean-700">
+                                    <svg class="size-10" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="400" height="400" viewBox="0, 0, 400,400"><g><path d="M37.500 33.698 C 37.500 47.220,41.753 55.065,50.481 57.644 C 54.651 58.876,134.848 58.996,139.238 57.777 C 148.593 55.179,152.291 48.729,152.322 34.961 L 152.344 25.000 94.922 25.000 L 37.500 25.000 37.500 33.698 M278.522 66.797 L 255.872 73.254 255.866 81.354 C 255.842 111.486,215.684 120.800,203.830 93.423 C 201.528 88.108,203.460 88.036,181.193 94.270 L 162.592 99.477 167.636 104.924 C 181.652 120.062,187.202 133.944,189.501 159.611 C 190.947 175.762,214.206 176.196,217.905 160.141 C 218.349 158.216,218.720 153.564,218.731 149.805 L 218.750 142.969 255.854 142.969 L 292.959 142.969 293.159 200.912 L 293.359 258.854 296.660 259.955 C 303.690 262.298,310.395 270.623,312.853 280.060 C 313.505 282.563,314.206 284.779,314.410 284.983 C 314.801 285.374,360.286 272.760,361.752 271.855 C 362.407 271.450,309.975 82.188,303.807 62.695 C 302.815 59.561,305.331 59.153,278.522 66.797 M58.799 147.461 L 59.055 223.828 60.815 230.078 C 67.254 252.947,86.688 275.618,109.961 287.412 L 113.281 289.094 113.281 251.631 L 113.281 214.167 109.850 211.356 C 103.909 206.487,103.535 200.126,109.108 198.727 C 112.584 197.855,113.749 198.726,152.290 231.055 C 172.908 248.350,190.248 262.500,190.822 262.500 C 192.650 262.500,199.099 251.718,201.256 245.056 C 208.045 224.089,202.677 204.073,185.756 187.256 L 177.256 178.809 177.012 164.600 C 176.609 141.170,170.740 125.462,157.407 112.128 C 148.156 102.878,138.591 98.100,122.832 94.857 C 117.866 93.836,116.211 87.436,120.117 84.359 C 122.220 82.702,126.936 82.587,130.869 84.096 C 131.842 84.470,132.031 83.450,132.031 77.818 L 132.031 71.094 95.287 71.094 L 58.543 71.094 58.799 147.461 M230.274 160.010 C 229.184 172.036,219.530 181.679,206.444 183.813 C 203.544 184.286,201.049 184.758,200.900 184.861 C 200.750 184.965,201.925 186.743,203.510 188.814 C 217.438 207.004,220.211 235.161,210.103 255.751 C 202.220 271.806,193.401 277.714,184.324 273.020 C 182.603 272.131,145.184 241.308,127.148 225.924 C 125.849 224.816,125.781 226.663,125.781 263.160 L 125.781 301.563 128.770 301.563 C 137.289 301.563,137.237 312.122,128.711 313.696 L 125.781 314.236 125.781 344.618 L 125.781 375.000 150.670 375.000 L 175.558 375.000 175.992 368.671 C 178.323 334.657,228.435 334.550,230.309 368.555 L 230.665 375.000 255.567 375.000 L 280.469 375.000 280.469 344.600 L 280.469 314.200 277.347 313.672 C 269.087 312.277,269.398 301.563,277.699 301.563 L 280.469 301.563 280.469 228.516 L 280.469 155.469 255.577 155.469 L 230.686 155.469 230.274 160.010 M172.411 303.261 C 177.634 308.168,173.221 313.672,164.063 313.672 C 154.834 313.672,150.721 308.583,155.824 303.480 C 158.555 300.749,169.582 300.604,172.411 303.261 M211.473 303.261 C 216.736 308.205,212.284 313.672,202.994 313.672 C 194.003 313.672,189.879 308.488,194.886 303.480 C 197.617 300.749,208.644 300.604,211.473 303.261 M250.536 303.261 C 255.798 308.205,251.346 313.672,242.057 313.672 C 233.066 313.672,228.941 308.488,233.949 303.480 C 236.680 300.749,247.707 300.604,250.536 303.261 " stroke="none" fill="currentColor" fill-rule="evenodd"></path></g></svg>
+                                </span>
+
+                                <div class="flex grow flex-col items-start justify-center gap-0">
+                                    <span
+                                        class=" font-semibold text-charcoal-300">@Model.SelectedEventDetails.TotalRefundedBookings</span>
+                                    <span class="text-sm text-carribean-600 whitespace-nowrap pe-10">Refunded
+                                        Bookings</span>
+                                </div>
+                            </div>
+                        </div>
+                            </div>
+
+                            @* Resources Container *@
+                            <div id="resources-per-event"
+                            class="flex flex-col gap-3 w-full px-9 selection:bg-rose-700 selection:text-rose-100">
+                            @{
+                                var Resources = Model.SelectedEventDetails.GetResources;
+                            }
+
+                            <div class="flex items-center gap-3">
+                                <span class="bg-rose-700 w-1.5 h-5 rounded-lg"></span>
+                                <div class="flex items-center gap-2 font-medium text-lg text-charcoal-300">
+                                    Resources
+
+                                    <span class="px-2 py-1 rounded-md text-xs bg-charcoal-900 text-charcoal-300">
+                                        @Resources.Count
+                                    </span>
+                                </div>
+                            </div>
+
+                            @* List of Resources *@
+                            @if (Resources != null && Resources.Any() && Model.SelectedEventDetails.SelectedEvent != null)
+                            {
+                                <div
+                                    class="relative overflow-y-auto min-h-96 max-h-96 space-y-4 scrollbar-thin scrollbar-track-charcoal-900 scrollbar-thumb-charcoal-700 pe-4">
+
+                                    @foreach (var resource in Resources)
+                                    {
+                                        var evt = resource.Event;
+                                        var duration = evt.EndAt - evt.StartAt;
+                                        var totalHoursPerDay = (evt.EndAt - evt.StartAt).TotalHours;
+                                        var StartHour = evt.StartAt.Hour;
+                                        var EndHour = evt.EndAt.Hour;
+
+                                        var ImageFileName = Model.SelectedEventDetails.ResourceImage.GetValueOrDefault(resource.Id);
+                                        decimal TotalResourcesWorth = 0.0m;
+                                        switch (resource.CostType)
+                                        {
+                                            case "Per Hour":
+                                                TotalResourcesWorth = (decimal)duration.TotalHours * resource.Cost;
+                                                break;
+
+                                            case "Per Day":
+                                                TotalResourcesWorth = (decimal)duration.TotalDays * resource.Cost;
+                                                break;
+
+                                            case "Fixed Rate":
+                                            case "In Bulk":
+                                                TotalResourcesWorth = resource.Cost;
+                                                break;
+
+                                            case "Per Unit":
+                                                if (resource.ResourceEquipment != null)
+                                                    TotalResourcesWorth = resource.ResourceEquipment.Quantity * resource.Cost;
+                                                else if (resource.ResourceFurniture != null)
+                                                    TotalResourcesWorth = resource.ResourceFurniture.Quantity * resource.Cost;
+                                                else
+                                                    TotalResourcesWorth = 0m;
+                                                break;
+
+                                            case "Per Serving":
+                                                TotalResourcesWorth = resource.ResourceCatering.GuestCapacity * resource.Cost;
+                                                break;
+
+                                            default:
+                                                TotalResourcesWorth = 0m;
+                                                break;
+                                        }
+
+                                        @* Resource Card *@
+                                        <div
+                                            class="flex flex-1 items-center justify-between gap-3 rounded-xl border-l-4 border-rose-800 bg-charcoal-900">
+
+                                            @* Image *@
+                                            <span class="flex shrink items-center size-14">
+                                                <img class="object-cover size-full rounded-l-lg" src="/resources/@ImageFileName"
+                                                    alt="Venue Images"  loading="lazy">
+                                            </span>
+
+                                            @* Body/Content *@
+                                            <div class="flex grow flex-col items-start justify-center gap-0">
+                                                <div class="min-w-96 truncate font-semibold text-charcoal-300">
+                                                    @resource.Name
+                                                </div>
+                                                <div class="flex items-center gap-2">
+                                                    <span class="text-xs font-light text-rose-600 whitespace-nowrap">
+                                                        @resource.ResourceType
+                                                    </span>
+                                                    <span class="text-xs bg-charcoal-800 text-charcoal-300 px-2 py-0.5 rounded-lg">
+                                                        ₱@resource.Cost.ToString("N2")
+                                                    </span>
+                                                    <span class="text-xs bg-charcoal-800 text-charcoal-300 px-2 py-0.5 rounded-lg">
+                                                        @resource.CostType
+                                                    </span>
+                                                    <span class="text-xs bg-rose-700 text-rose-50 px-2 py-0.5 rounded-lg">
+                                                        ₱@TotalResourcesWorth.ToString("N2")
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+
+                                @* Counters *@
+                                <div class="flex flex-wrap items-center gap-6 w-full">
+
+                                    @* Resource Costs *@
+                                    <div
+                                        class="flex flex-1 items-center justify-between gap-3 rounded-xl border-l-4 border-rose-800 bg-charcoal-900">
+                                        <span class="flex shrink items-center p-3 rounded-l-lg bg-charcoal-950 text-rose-700">
+                                            <svg class="size-10" xmlns="http://www.w3.org/2000/svg"
+                                                xmlns:xlink="http://www.w3.org/1999/xlink" width="400" height="400"
+                                                viewBox="0, 0, 400,400">
+                                                <g>
+                                                    <path
+                                                        d="M121.630 21.254 C 80.890 32.885,47.843 42.671,48.193 43.000 C 48.542 43.330,82.851 53.119,124.434 64.754 L 200.041 85.908 275.997 64.698 C 353.712 42.997,352.876 43.240,352.222 42.587 C 350.787 41.151,203.283 0.007,199.740 0.053 C 196.922 0.090,173.338 6.492,121.630 21.254 M12.399 70.898 L 0.408 91.016 0.145 96.875 C -0.251 105.699,3.699 112.802,10.715 115.879 C 19.277 119.634,139.574 152.579,144.922 152.633 C 151.158 152.696,154.972 151.114,159.115 146.748 C 162.095 143.607,189.238 98.575,188.851 97.414 C 188.646 96.798,27.376 50.960,24.890 50.811 C 24.615 50.795,18.994 59.834,12.399 70.898 M292.578 73.831 C 230.499 91.306,211.350 96.976,211.420 97.861 C 211.565 99.682,238.219 143.839,240.930 146.748 C 244.974 151.089,248.829 152.695,255.078 152.642 C 260.463 152.596,380.839 119.626,389.321 115.874 C 396.392 112.745,400.337 105.545,399.874 96.615 L 399.583 91.016 387.597 70.898 C 381.004 59.834,375.209 50.821,374.719 50.870 C 374.229 50.919,337.266 61.251,292.578 73.831 M182.075 135.704 C 166.932 160.908,160.785 165.974,145.313 166.002 C 138.694 166.014,71.789 148.376,29.492 135.468 C 28.198 135.073,28.125 138.317,28.125 196.029 L 28.125 257.007 30.273 259.306 C 32.116 261.277,79.158 275.759,80.252 274.691 C 80.348 274.598,80.969 271.904,81.631 268.706 C 92.054 218.393,137.137 177.023,185.981 172.949 C 193.785 172.298,193.028 175.471,192.784 144.458 L 192.578 118.224 182.075 135.704 M207.217 144.922 L 207.422 172.266 213.672 172.872 C 264.695 177.826,308.406 218.460,318.762 270.566 C 319.331 273.429,320.003 274.987,320.575 274.768 C 321.075 274.576,331.855 271.542,344.531 268.025 C 364.970 262.354,367.821 261.369,369.727 259.319 L 371.875 257.007 371.875 196.029 C 371.875 138.312,371.802 135.074,370.508 135.481 C 334.984 146.649,261.979 165.923,255.038 165.967 C 239.242 166.065,233.222 161.111,217.595 135.156 L 207.011 117.578 207.217 144.922 M187.636 185.968 C 98.246 197.221,60.648 305.505,124.163 368.774 C 191.832 436.181,307.302 388.375,307.266 292.969 C 307.241 228.521,250.779 178.019,187.636 185.968 M204.723 202.772 C 206.228 204.375,206.652 205.800,206.894 210.067 L 207.193 215.371 211.059 216.362 C 228.346 220.792,242.188 238.224,242.188 255.563 C 242.188 262.600,237.630 265.803,232.269 262.534 C 229.722 260.982,229.647 260.776,228.521 252.377 C 227.225 242.703,219.563 233.397,210.165 230.081 L 207.031 228.976 207.031 257.792 L 207.031 286.608 211.500 287.907 C 252.234 299.749,252.307 356.401,211.605 369.163 L 207.194 370.546 206.887 375.992 C 206.132 389.350,192.969 388.214,192.969 374.791 L 192.969 370.598 188.477 369.202 C 174.284 364.791,163.727 354.296,159.454 340.347 C 157.646 334.449,157.331 326.863,158.814 324.932 C 163.073 319.384,171.094 322.467,171.094 329.652 C 171.094 340.943,183.224 356.250,192.172 356.250 C 192.728 356.250,192.923 347.151,192.783 327.692 L 192.578 299.133 187.455 297.409 C 147.893 284.097,148.275 228.343,188.008 216.682 L 192.812 215.272 193.109 210.018 C 193.478 203.499,195.505 200.781,200.000 200.781 C 202.047 200.781,203.381 201.343,204.723 202.772 M189.453 230.298 C 165.881 239.487,164.968 272.809,187.999 283.353 C 190.358 284.433,192.445 285.159,192.638 284.966 C 192.831 284.773,192.896 272.120,192.783 256.848 L 192.578 229.080 189.453 230.298 M207.031 328.516 C 207.031 350.191,207.245 356.246,208.008 356.233 C 218.328 356.052,229.673 339.817,228.727 326.586 C 227.901 315.048,216.574 300.949,208.008 300.798 C 207.245 300.785,207.031 306.840,207.031 328.516 "
+                                                        stroke="none" fill="currentColor" fill-rule="evenodd"></path>
+                                                </g>
+                                            </svg>
+                                        </span>
+
+                                        <div class="flex grow flex-col items-start justify-center gap-0">
+                                            <span
+                                                class=" font-semibold text-charcoal-300">₱@Model.SelectedEventDetails.TotalResourceCosts.ToString("N2")</span>
+                                            <span class="text-sm text-rose-600 whitespace-nowrap pe-10">Resource Costs</span>
+                                        </div>
+                                    </div>
+
+                                    @* Total Revenue *@
+                                    <div
+                                        class="flex flex-1 items-center justify-between gap-3 rounded-xl border-l-4 border-rose-800 bg-charcoal-900">
+                                        <span class="flex shrink items-center p-3 rounded-l-lg bg-charcoal-950 text-rose-700">
+                                            <svg class="size-10" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="400" height="400" viewBox="0, 0, 400,400"><g><path d="M192.500 2.264 C 188.900 4.939,144.543 49.512,142.684 52.322 C 140.875 55.057,140.990 62.244,142.889 65.124 C 145.742 69.452,148.029 70.302,156.836 70.307 L 164.844 70.313 164.849 101.758 C 164.856 144.588,161.262 140.615,200.000 140.615 C 238.738 140.615,235.144 144.588,235.151 101.758 L 235.156 70.313 243.164 70.307 C 251.971 70.302,254.258 69.452,257.111 65.124 C 259.010 62.244,259.125 55.057,257.316 52.322 C 255.457 49.512,211.100 4.939,207.500 2.264 C 203.138 -0.977,196.862 -0.977,192.500 2.264 M51.875 17.889 C 48.275 20.564,3.918 65.137,2.059 67.947 C 0.250 70.682,0.365 77.869,2.264 80.749 C 5.117 85.077,7.404 85.927,16.211 85.932 L 24.219 85.938 24.224 109.570 C 24.231 143.256,21.241 140.615,59.375 140.615 C 97.509 140.615,94.519 143.256,94.526 109.570 L 94.531 85.938 102.539 85.932 C 111.346 85.927,113.633 85.077,116.486 80.749 C 118.385 77.869,118.500 70.682,116.691 67.947 C 114.832 65.137,70.475 20.564,66.875 17.889 C 62.513 14.648,56.237 14.648,51.875 17.889 M333.125 17.889 C 329.525 20.564,285.168 65.137,283.309 67.947 C 281.500 70.682,281.615 77.869,283.514 80.749 C 286.367 85.077,288.654 85.927,297.461 85.932 L 305.469 85.938 305.474 109.570 C 305.481 143.256,302.491 140.615,340.625 140.615 C 378.759 140.615,375.769 143.256,375.776 109.570 L 375.781 85.938 383.789 85.932 C 392.596 85.927,394.883 85.077,397.736 80.749 C 399.635 77.869,399.750 70.682,397.941 67.947 C 396.082 65.137,351.725 20.564,348.125 17.889 C 343.763 14.648,337.487 14.648,333.125 17.889 M73.828 166.152 C -21.914 178.115,-24.919 231.520,69.526 242.604 C 80.040 243.838,91.406 244.122,91.406 243.151 C 91.406 239.546,107.760 226.537,119.096 221.125 C 136.244 212.938,168.036 205.469,185.737 205.469 C 193.526 205.469,185.046 190.449,172.942 182.804 C 152.714 170.029,105.835 162.153,73.828 166.152 M284.766 166.152 C 250.846 170.390,229.572 178.039,218.171 190.094 C 211.363 197.292,209.285 205.469,214.263 205.469 C 231.942 205.469,263.911 212.969,280.889 221.099 C 292.234 226.532,308.594 239.553,308.594 243.151 C 308.594 244.973,334.214 242.793,348.199 239.781 C 417.542 224.842,416.194 183.254,345.911 169.190 C 330.018 166.010,298.454 164.442,284.766 166.152 M179.297 228.652 C 73.275 241.900,85.631 303.732,194.761 306.038 C 297.791 308.214,333.383 250.288,240.443 231.690 C 224.549 228.510,192.986 226.942,179.297 228.652 M0.781 250.009 C 0.781 270.164,28.393 285.434,72.889 289.888 C 83.997 291.000,82.714 292.467,82.857 278.488 L 82.976 266.797 76.840 266.225 C 46.420 263.388,22.993 256.850,4.883 246.143 L 0.781 243.718 0.781 250.009 M394.922 246.259 C 378.840 256.319,353.358 263.409,323.160 266.225 L 317.024 266.797 317.143 278.488 C 317.286 292.467,316.003 291.000,327.111 289.888 C 371.760 285.419,399.792 269.825,399.052 249.868 L 398.828 243.815 394.922 246.259 M0.781 296.884 C 0.781 316.577,26.400 331.313,69.374 336.340 C 84.559 338.117,82.813 339.526,82.813 325.498 L 82.813 313.496 75.977 312.953 C 48.184 310.747,22.858 303.645,4.883 293.018 L 0.781 290.593 0.781 296.884 M394.922 293.134 C 378.964 303.116,351.609 310.763,324.023 312.953 L 317.188 313.496 317.188 325.498 C 317.188 339.526,315.441 338.117,330.626 336.340 C 373.752 331.296,399.775 316.237,399.052 296.743 L 398.828 290.690 394.922 293.134 M106.250 312.389 C 106.250 335.681,141.427 351.786,194.761 352.913 C 252.617 354.135,294.494 337.044,293.586 312.580 L 293.359 306.481 287.015 310.120 C 241.758 336.081,155.542 335.360,110.352 308.643 L 106.250 306.218 106.250 312.389 M106.250 359.264 C 106.250 382.556,141.427 398.661,194.761 399.788 C 252.617 401.010,294.494 383.919,293.586 359.455 L 293.359 353.356 287.015 356.995 C 241.758 382.956,155.542 382.235,110.352 355.518 L 106.250 353.093 106.250 359.264 " stroke="none" fill="currentColor" fill-rule="evenodd"></path></g></svg>
+                                        </span>
+
+                                        <div class="flex grow flex-col items-start justify-center gap-0">
+                                            <span
+                                                class=" font-semibold text-charcoal-300">₱@Model.SelectedEventDetails.TotalEntryFee.ToString("N2")</span>
+                                            <span class="text-sm text-rose-600 whitespace-nowrap pe-10">Total Revenue</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div
+                                    class="h-96 relative w-full flex flex-col items-center justify-center border-2 border-dashed border-charcoal-900 text-charcoal-600 rounded-lg">
+                                    <svg class="size-24" xmlns="http://www.w3.org/2000/svg"
+                                        xmlns:xlink="http://www.w3.org/1999/xlink" width="400" height="400"
+                                        viewBox="0, 0, 400,400">
+                                        <g>
+                                            <path
+                                                d="M125.623 35.817 C 71.989 64.086,3.112 101.357,1.758 102.844 C -0.186 104.979,-0.606 109.534,0.848 112.725 C 1.918 115.074,1.961 115.099,30.178 129.672 L 53.715 141.828 28.752 154.703 C 13.209 162.720,3.074 168.411,1.894 169.787 C -0.663 172.768,-0.728 178.006,1.758 180.782 C 4.303 183.624,130.438 250.781,133.231 250.781 C 134.604 250.781,147.709 244.470,167.298 234.375 C 184.807 225.352,199.523 217.969,200.000 217.969 C 200.477 217.969,215.193 225.352,232.702 234.375 C 252.291 244.470,265.396 250.781,266.769 250.781 C 269.562 250.781,395.697 183.624,398.242 180.782 C 400.728 178.006,400.663 172.768,398.106 169.787 C 396.926 168.411,386.791 162.720,371.248 154.703 L 346.285 141.828 369.822 129.672 C 398.039 115.099,398.082 115.074,399.152 112.725 C 400.606 109.534,400.186 104.979,398.242 102.846 C 396.005 100.391,270.896 33.590,267.505 33.040 C 265.350 32.690,260.269 35.060,233.008 49.127 C 215.425 58.201,200.571 65.625,200.000 65.625 C 199.429 65.625,184.655 58.242,167.169 49.219 C 132.066 31.104,133.617 31.604,125.623 35.817 M254.126 114.047 C 283.599 129.292,307.648 141.830,307.568 141.910 C 307.488 141.990,283.253 154.559,253.712 169.841 L 200.003 197.626 146.073 169.731 L 92.143 141.835 98.611 138.532 C 102.168 136.715,126.348 124.178,152.344 110.673 C 178.340 97.167,199.818 86.164,200.073 86.223 C 200.328 86.281,224.652 98.801,254.126 114.047 M70.558 241.323 C 66.312 243.987,66.334 243.796,66.574 275.369 C 66.788 303.450,66.861 304.709,68.359 306.200 C 70.391 308.221,179.163 366.340,181.961 366.900 C 183.133 367.134,185.399 366.780,186.996 366.113 C 192.412 363.851,192.244 365.909,192.008 304.611 L 191.797 249.871 189.245 247.592 C 184.779 243.602,183.273 244.020,160.547 255.552 C 131.648 270.217,134.299 270.349,101.172 252.605 C 77.139 239.733,74.590 238.793,70.558 241.323 M319.062 241.872 C 316.957 242.988,306.445 248.589,295.703 254.318 C 266.118 270.098,268.033 270.056,239.453 255.552 C 216.727 244.020,215.221 243.602,210.755 247.592 L 208.203 249.871 207.992 304.611 C 207.756 365.909,207.588 363.851,213.004 366.113 C 214.601 366.780,216.867 367.134,218.039 366.900 C 220.837 366.340,329.609 308.221,331.641 306.200 C 333.494 304.357,334.547 247.773,332.790 244.489 C 330.333 239.898,324.782 238.840,319.062 241.872 "
+                                                stroke="none" fill="currentColor" fill-rule="evenodd"></path>
+                                        </g>
+                                    </svg>
+                                    <span class="font-semibold">
+                                        No resources allocated yet.
+                                    </span>
+                                </div>
+                            }
+                            </div>
+
+                            @* Feedbacks Container *@
+                            <div id="feedbacks-per-event"
+                        class="flex flex-col gap-3 w-full px-9 selection:bg-sky-700 selection:text-sky-100">
+                        
+                        <div class="flex items-center gap-3">
+                            <span class="bg-sky-700 w-1.5 h-5 rounded-lg"></span>
+                            <div class="flex items-center gap-2 font-medium text-lg text-charcoal-300">
+                                Feedbacks
+
+                                <span class="px-2 py-1 rounded-md text-xs bg-charcoal-900 text-charcoal-300">
+                                    @Model.SelectedEventDetails.TotalFeedbacks
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center flex-wrap gap-6">
+                            
+                            @if(Model.SelectedEventDetails.GetFeedbacks.Any())
+                            {
+                                @foreach(var feedback in Model.SelectedEventDetails.GetFeedbacks)
+                                {
+                                    var parts = new List<string> { feedback.User.FirstName! };
+                                    if (!string.IsNullOrWhiteSpace(feedback.User.MiddleName))
+                                        parts.Add(feedback.User.MiddleName);
+                                    parts.Add(feedback.User.LastName!);
+                                    if (!string.IsNullOrWhiteSpace(feedback.User.ExtensionName))
+                                        parts.Add(feedback.User.ExtensionName);
+                                    var FullName = string.Join(" ", parts);
+    
+                                    @* Feedback Card *@
+                                    <div
+                                        class="flex flex-1 items-center justify-between gap-3 rounded-xl border-l-4 border-sky-800 bg-charcoal-900">
+                                        <span
+                                            class="flex shrink items-center p-3 rounded-l-lg bg-charcoal-950 text-sky-700">
+                                            @if (Model.SelectedEventDetails.FeedbacksAvatar.GetValueOrDefault(feedback.UserId, null) != null)
+                                            {
+                                                <img class="object-cover rounded-full size-full"
+                                                    src="/avatar/@Model.SelectedEventDetails.FeedbacksAvatar.GetValueOrDefault(feedback.UserId)"
+                                                    alt="Feedbacker Avatar"  loading="lazy">
+                                            }
+                                            else
+                                            {
+                                                <svg class="rounded-full text-charcoal-600" xmlns="http://www.w3.org/2000/svg"
+                                                    xmlns:xlink="http://www.w3.org/1999/xlink" width="400" height="400"
+                                                    viewBox="0, 0, 400,400">
+                                                    <g>
+                                                        <path
+                                                            d="M176.172 0.866 C 93.868 10.736,25.169 71.441,5.478 151.697 C -3.051 186.459,-1.676 227.565,9.147 261.328 C 20.494 296.728,48.476 337.791,73.179 355.294 L 75.655 357.048 76.178 351.766 C 80.395 309.166,106.791 270.961,145.195 251.873 L 153.280 247.854 150.273 245.639 C 83.673 196.571,114.046 92.549,196.154 88.509 C 281.749 84.297,319.310 194.390,249.756 245.617 L 246.777 247.810 254.834 251.851 C 293.358 271.172,319.608 309.189,323.822 351.766 L 324.345 357.048 326.821 355.335 C 332.287 351.554,353.875 328.959,360.283 320.313 C 450.002 199.243,381.887 29.005,233.012 2.229 C 222.507 0.340,187.549 -0.499,176.172 0.866 M187.891 112.092 C 147.646 119.548,124.716 163.943,141.811 201.308 C 164.580 251.077,235.420 251.077,258.189 201.308 C 279.667 154.363,238.910 102.639,187.891 112.092 M187.500 262.241 C 134.297 270.665,98.469 311.641,98.442 364.095 L 98.438 373.112 106.836 377.516 C 164.632 407.823,234.656 407.835,293.164 377.547 L 301.563 373.199 301.558 364.139 C 301.527 302.684,245.905 252.993,187.500 262.241 "
+                                                            stroke="none" fill="currentColor" fill-rule="evenodd"></path>
+                                                    </g>
+                                                </svg>
+                                            }
+                                        </span>
+
+                                        <div class="flex grow flex-col items-start justify-center">
+
+                                            @* Name of Feedbacker *@
+                                            <span class=" font-semibold text-charcoal-300">
+                                                @FullName
+                                            </span>
+
+                                            @* Dynamic Star Rating *@
+                                            @{
+                                                double rating = (double)Model.SelectedEventDetails.OverallRating;
+                                                int fullStars = (int)Math.Floor(rating);
+                                                bool hasHalfStar = (rating - fullStars) >= 0.4 && (rating - fullStars) < 0.75;
+                                                int emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+                                            }
+
+                                            <span class="flex items-center space-x-1">
+                                                @* Full stars *@
+                                                @for (int i = 0; i < fullStars; i++)
+                                                {
+                                                    <svg class="size-5 fill-yellow-400" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.97c.3.921-.755 1.688-1.54 1.118L10 13.347l-3.38 2.455c-.784.57-1.838-.197-1.54-1.118l1.287-3.97a1 1 0 00-.364-1.118L2.623 9.397c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.97z" />
+                                                    </svg>
+                                                }
+
+                                                @* Half star (optional) *@
+                                                @if (hasHalfStar)
+                                                {
+                                                    <svg class="size-5" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                                        <defs>
+                                                            <linearGradient id="half-yellow" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                                <stop offset="50%" stop-color="#facc15" />
+                                                                <stop offset="50%" stop-color="#9ca3af" />
+                                                            </linearGradient>
+                                                        </defs>
+                                                        <path fill="url(#half-yellow)" d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.97c.3.921-.755 1.688-1.54 1.118L10 13.347l-3.38 2.455c-.784.57-1.838-.197-1.54-1.118l1.287-3.97a1 1 0 00-.364-1.118L2.623 9.397c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.97z" />
+                                                    </svg>
+                                                }
+
+                                                @* Empty stars *@
+                                                @for (int i = 0; i < emptyStars; i++)
+                                                {
+                                                    <svg class="size-5 fill-charcoal-400" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.97c.3.921-.755 1.688-1.54 1.118L10 13.347l-3.38 2.455c-.784.57-1.838-.197-1.54-1.118l1.287-3.97a1 1 0 00-.364-1.118L2.623 9.397c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.97z" />
+                                                    </svg>
+                                                }
+                                            </span>
+
+                                            @* Comment *@
+                                            <span class="text-xs">
+                                                @feedback.Comments
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                }
+                            }
+                            else
+                            {
+                                <div
+                                    class="h-96 relative w-full flex flex-col items-center justify-center border-2 border-dashed border-charcoal-900 text-charcoal-600 rounded-lg">
+                                    <svg class="size-24" xmlns="http://www.w3.org/2000/svg"
+                                        xmlns:xlink="http://www.w3.org/1999/xlink" width="400" height="400"
+                                        viewBox="0, 0, 400,400">
+                                        <g>
+                                            <path
+                                                d="M125.623 35.817 C 71.989 64.086,3.112 101.357,1.758 102.844 C -0.186 104.979,-0.606 109.534,0.848 112.725 C 1.918 115.074,1.961 115.099,30.178 129.672 L 53.715 141.828 28.752 154.703 C 13.209 162.720,3.074 168.411,1.894 169.787 C -0.663 172.768,-0.728 178.006,1.758 180.782 C 4.303 183.624,130.438 250.781,133.231 250.781 C 134.604 250.781,147.709 244.470,167.298 234.375 C 184.807 225.352,199.523 217.969,200.000 217.969 C 200.477 217.969,215.193 225.352,232.702 234.375 C 252.291 244.470,265.396 250.781,266.769 250.781 C 269.562 250.781,395.697 183.624,398.242 180.782 C 400.728 178.006,400.663 172.768,398.106 169.787 C 396.926 168.411,386.791 162.720,371.248 154.703 L 346.285 141.828 369.822 129.672 C 398.039 115.099,398.082 115.074,399.152 112.725 C 400.606 109.534,400.186 104.979,398.242 102.846 C 396.005 100.391,270.896 33.590,267.505 33.040 C 265.350 32.690,260.269 35.060,233.008 49.127 C 215.425 58.201,200.571 65.625,200.000 65.625 C 199.429 65.625,184.655 58.242,167.169 49.219 C 132.066 31.104,133.617 31.604,125.623 35.817 M254.126 114.047 C 283.599 129.292,307.648 141.830,307.568 141.910 C 307.488 141.990,283.253 154.559,253.712 169.841 L 200.003 197.626 146.073 169.731 L 92.143 141.835 98.611 138.532 C 102.168 136.715,126.348 124.178,152.344 110.673 C 178.340 97.167,199.818 86.164,200.073 86.223 C 200.328 86.281,224.652 98.801,254.126 114.047 M70.558 241.323 C 66.312 243.987,66.334 243.796,66.574 275.369 C 66.788 303.450,66.861 304.709,68.359 306.200 C 70.391 308.221,179.163 366.340,181.961 366.900 C 183.133 367.134,185.399 366.780,186.996 366.113 C 192.412 363.851,192.244 365.909,192.008 304.611 L 191.797 249.871 189.245 247.592 C 184.779 243.602,183.273 244.020,160.547 255.552 C 131.648 270.217,134.299 270.349,101.172 252.605 C 77.139 239.733,74.590 238.793,70.558 241.323 M319.062 241.872 C 316.957 242.988,306.445 248.589,295.703 254.318 C 266.118 270.098,268.033 270.056,239.453 255.552 C 216.727 244.020,215.221 243.602,210.755 247.592 L 208.203 249.871 207.992 304.611 C 207.756 365.909,207.588 363.851,213.004 366.113 C 214.601 366.780,216.867 367.134,218.039 366.900 C 220.837 366.340,329.609 308.221,331.641 306.200 C 333.494 304.357,334.547 247.773,332.790 244.489 C 330.333 239.898,324.782 238.840,319.062 241.872 "
+                                                stroke="none" fill="currentColor" fill-rule="evenodd"></path>
+                                        </g>
+                                    </svg>
+                                    <span class="font-semibold">
+                                        No feedbacks on this event yet.
+                                    </span>
+                                </div>
+                            }
+                        </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div id="event-information-container" class="flex flex-col gap-6 w-full">
+                            <div
+                                class="h-96 relative w-full flex flex-col items-center justify-center border-2 border-dashed border-charcoal-900 text-charcoal-600 rounded-lg">
+                                <svg class="size-24" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                                    viewBox="0 0 256 256">
+                                    <path
+                                        d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM157.66,170.34a8,8,0,0,1-11.32,11.32L128,163.31l-18.34,18.35a8,8,0,0,1-11.32-11.32L116.69,152,98.34,133.66a8,8,0,0,1,11.32-11.32L128,140.69l18.34-18.35a8,8,0,0,1,11.32,11.32L139.31,152ZM208,80H48V48H72v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24Z">
+                                    </path>
+                                </svg>
+                                <span class="font-semibold">
+                                    No selected event.
+                                </span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="grid place-self-center border border-charcoal-900/65 my-16 w-1/2">
+
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            let summaryStartPicker = flatpickr("#summaryStartDate", {
+                dateFormat: "m-d-Y",
+                defaultDate: "@firstFormatted",
+                onChange: function (selectedDates) {
+                    if (selectedDates.length > 0) {
+                        let startDate = selectedDates[0];
+                        summaryEndPicker.set("minDate", startDate); // Set minDate for endDate
+                    }
+                }
+            });
+
+            let summaryEndPicker = flatpickr("#summaryEndDate", {
+                dateFormat: "m-d-Y",
+                defaultDate: "@currentFormatted",
+                onChange: function (selectedDates) {
+                    if (selectedDates.length > 0) {
+                        let endDate = selectedDates[0];
+                        summaryStartPicker.set("maxDate", endDate); // Set maxDate for startDate
+                    }
+                }
+            });
+
+            // let eventsStartPicker = flatpickr("#eventsStartDate", {
+            //     dateFormat: "m-d-Y",
+            //     defaultDate: "@firstFormatted",
+            //     onChange: function (selectedDates) {
+            //         if (selectedDates.length > 0) {
+            //             let startDate = selectedDates[0];
+            //             eventsEndPicker.set("minDate", startDate); // Set minDate for endDate
+            //         }
+            //     }
+            // });
+
+            // let eventsEndPicker = flatpickr("#eventsEndDate", {
+            //     dateFormat: "m-d-Y",
+            //     defaultDate: "@currentFormatted",
+            //     onChange: function (selectedDates) {
+            //         if (selectedDates.length > 0) {
+            //             let endDate = selectedDates[0];
+            //             eventsStartPicker.set("maxDate", endDate); // Set maxDate for startDate
+            //         }
+            //     }
+            // });
+
+            // Ensure initial values sync
+            let summaryStartDateValue = summaryStartPicker.selectedDates[0];
+            let summaryEndDateValue = summaryEndPicker.selectedDates[0];
+            // let eventsStartDateValue = eventsStartPicker.selectedDates[0];
+            // let eventsEndDateValue = eventsEndPicker.selectedDates[0];
+
+            if (summaryStartDateValue) {
+                summaryEndPicker.set("minDate", summaryStartDateValue);
+            }
+            if (summaryEndDateValue) {
+                summaryStartPicker.set("maxDate", summaryEndDateValue);
+            }
+            //if (eventsStartDateValue) {
+            //    summaryEndPicker.set("minDate", eventsStartDateValue);
+            //}
+            //if (eventsEndDateValue) {
+            //    summaryStartPicker.set("maxDate", eventsEndDateValue);
+            //}
+
+            const eventsChart = document.getElementById('eventsChart').getContext('2d');
+            const usersChart = document.getElementById('usersChart').getContext('2d');
+            const bookingsChart = document.getElementById('bookingsChart').getContext('2d');
+            const revenueChart = document.getElementById('revenueChart').getContext('2d');
+
+            let monthlyData = @Html.Raw(Json.Serialize(Model.Summary.MonthlyEvents));
+            let labels = monthlyData.map(x => x.month);
+            let counts = monthlyData.map(x => x.count);
+
+            const eventsPerMonth = new Chart(eventsChart, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '', // no legend
+                        data: counts,
+                        borderColor: '#FF7518', // 🎃 pumpkin
+                        backgroundColor: '#FF7518',
+                        tension: 0,
+                        pointRadius: 5,
+                        pointHoverRadius: 10,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            enabled: true,
+                            displayColors: false, // ✅ removes the color swatch
+                            callbacks: {
+                                label: (context) => `Events: ${context.formattedValue}`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: false,
+                            grid: { display: false }
+                        },
+                        y: {
+                            display: false,
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+
+            monthlyData = @Html.Raw(Json.Serialize(Model.Summary.MonthlyUsers));
+            labels = monthlyData.map(x => x.month);
+            counts = monthlyData.map(x => x.count);
+
+            const usersPerMonth = new Chart(usersChart, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '', // no legend
+                        data: counts,
+                        borderColor: '#FF7518', // 🎃 pumpkin
+                        backgroundColor: '#FF7518',
+                        tension: 0,
+                        pointRadius: 5,
+                        pointHoverRadius: 10,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            enabled: true,
+                            displayColors: false, // ✅ removes the color swatch
+                            callbacks: {
+                                label: (context) => `Users: ${context.formattedValue}`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: false,
+                            grid: { display: false }
+                        },
+                        y: {
+                            display: false,
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+
+            monthlyData = @Html.Raw(Json.Serialize(Model.Summary.MonthlyBookings));
+            labels = monthlyData.map(x => x.month);
+            counts = monthlyData.map(x => x.count);
+
+            const bookingsPerMonth = new Chart(bookingsChart, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '', // no legend
+                        data: counts,
+                        borderColor: '#FF7518', // 🎃 pumpkin
+                        backgroundColor: '#FF7518',
+                        tension: 0,
+                        pointRadius: 5,
+                        pointHoverRadius: 10,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            enabled: true,
+                            displayColors: false, // ✅ removes the color swatch
+                            callbacks: {
+                                label: (context) => `Bookings: ${context.formattedValue}`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: false,
+                            grid: { display: false }
+                        },
+                        y: {
+                            display: false,
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+
+            monthlyData = @Html.Raw(Json.Serialize(Model.Summary.MonthlyRevenue));
+            labels = monthlyData.map(x => x.month);
+            let networth = monthlyData.map(x => x.netWorth);
+
+            const revenuePerMonth = new Chart(revenueChart, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '', // no legend
+                        data: networth,
+                        borderColor: '#FF7518', // pumpkin
+                        backgroundColor: '#FF7518',
+                        tension: 0,
+                        pointRadius: 5,
+                        pointHoverRadius: 10,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            enabled: true,
+                            displayColors: false, // removes the color swatch
+                            callbacks: {
+                                label: (context) => {
+                                    let value = context.parsed.y;
+                                    return `Revenue: ₱${value.toLocaleString(undefined, {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    })}`
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: false,
+                            grid: { display: false }
+                        },
+                        y: {
+                            display: false,
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}

@@ -80,7 +80,7 @@ public class FeedbackService
 
         var userMap = feedbacks.ToDictionary(
             feedback => feedback.Id,
-            feedback => usersById.TryGetValue(feedback.UserId, out var user) ? GetFullName(user!.FirstName, user?.MiddleName, user!.LastName, user?.ExtensionName) : null
+            feedback => usersById.TryGetValue(feedback.UserId, out var user) ? GetFullName(user!.FirstName!, user?.MiddleName, user!.LastName!, user?.ExtensionName) : null
         );
 
         return userMap;

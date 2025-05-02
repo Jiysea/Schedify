@@ -9,21 +9,21 @@ public class User : IdentityUser<Guid>
 
     [Required]
     [StringLength(50)]
-    public required string FirstName { get; set; }
+    public string? FirstName { get; set; }
 
     [StringLength(35)]
     public string? MiddleName { get; set; }
 
     [Required]
     [StringLength(35)]
-    public required string LastName { get; set; }
+    public string? LastName { get; set; }
 
     [StringLength(10)]
     public string? ExtensionName { get; set; }
 
     [Required]
     [Column(TypeName = "date")]
-    public required DateTime Birthdate { get; set; }
+    public DateTime? Birthdate { get; set; }
 
     [Column(TypeName = "datetime2")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

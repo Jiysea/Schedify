@@ -59,7 +59,7 @@ public class AuthController : Controller
         var roles = await _userManager.GetRolesAsync(user);
 
         if (roles.Contains("Admin"))
-            Response.Headers.Append("HX-Redirect", Url.Action("Resources", "Admin"));
+            Response.Headers.Append("HX-Redirect", Url.Action("Dashboard", "Admin"));
         else if (roles.Contains("Organizer"))
             Response.Headers.Append("HX-Redirect", Url.Action("Events", "Organizer"));
         else if (roles.Contains("Attendee"))
@@ -83,7 +83,11 @@ public class AuthController : Controller
         try
         {
             // Phone Number custom validation
-            if (model.PhoneNumber.Length != 10)
+            if (model.PhoneNumber == null)
+            {
+                ModelState.AddModelError("PhoneNumber", "This field is required.");
+            }
+            else if (model.PhoneNumber.Length != 10)
             {
                 ModelState.AddModelError("PhoneNumber", "Value must be 10 digits.");
             }
@@ -96,6 +100,11 @@ public class AuthController : Controller
                 ModelState.AddModelError("PhoneNumber", "Value must be a number.");
             }
 
+            if (model.Email == null)
+            {
+                ModelState.AddModelError("Email", "This field is required.");
+            }
+
             if (!ModelState.IsValid)
             {
                 return PartialView("_ValidationMessages", ModelState);
@@ -103,7 +112,15 @@ public class AuthController : Controller
 
             var PhoneNumber = string.Concat(["+63", model.PhoneNumber]);
 
-            User user = new User
+            var user = await _userManager.FindByEmailAsync(model.Email!);
+
+            if (user != null)
+            {
+                ModelState.AddModelError("Email", "Email is already taken.");
+                return PartialView("_ValidationMessages", ModelState);
+            }
+
+            user = new User
             {
                 FirstName = model.FirstName,
                 MiddleName = model.MiddleName,
@@ -115,7 +132,10 @@ public class AuthController : Controller
                 PhoneNumber = PhoneNumber,
             };
 
-            var result = await _userManager.CreateAsync(user, model.Password);
+
+
+
+            var result = await _userManager.CreateAsync(user, model.Password!);
 
             if (!result.Succeeded)
             {

@@ -1,0 +1,134 @@
+@model string?
+
+@{
+    var currentUrl = Context.Request.Path;
+}
+
+<div
+    class="duration-500 ease-in-out flex flex-col absolute start-0 top-0 w-[80px] lg:w-[250px] h-full bg-charcoal-950 text-pumpkin-500 border-r-2 border-pumpkin-900">
+
+    <a href="/" class="flex items-center justify-center py-6 h-28 border-b-2 border-pumpkin-900">
+        <img class="duration-500 ease-in-out w-[70%] lg:w-0" src="~/images/small_logo_admin.png"
+            alt="Schedify Small Logo">
+        <img class="duration-500 ease-in-out w-0 lg:w-[70%]" src="~/images/logo_admin.png" alt="Schedify Logo">
+    </a>
+
+    <div class="flex grow flex-col gap-3 mt-3">
+        @* Dasboard *@
+        <span>
+            <a href="/admin/dashboard"
+                class="relative flex items-center justify-start gap-2 mx-2 p-2 h-10 font-medium rounded-md duration-200 ease-in-out @(currentUrl == "/admin/dashboard" ? "bg-coffee-600 hover:bg-coffee-700 active:bg-coffee-900 text-coffee-50" : "text-zinc-500 hover:bg-zinc-50")">
+                <svg class="absolute duration-500 ease-in-out left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-2 size-6 lg:size-5"
+                    xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256">
+                    <path
+                        d="M208,32H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32Zm-12.69,88L136,60.69V48h12.69L208,107.32V120ZM136,83.31,172.69,120H136Zm72,1.38L171.31,48H208ZM120,48v72H48V48ZM107.31,208,48,148.69V136H60.69L120,195.31V208ZM120,172.69,83.31,136H120Zm-72-1.38L84.69,208H48ZM208,208H136V136h72v72Z">
+                    </path>
+                </svg>
+                <span
+                    class="absolute left-9 whitespace-nowrap duration-500 ease-in-out opacity-0 lg:opacity-100 -translate-x-36 lg:translate-x-0">Dashboard</span>
+            </a>
+        </span>
+
+        @* Events *@
+        <span>
+            <a href="/admin/events"
+                class="relative flex items-center justify-start gap-2 mx-2 p-2 h-10 font-medium rounded-md duration-200 ease-in-out @(currentUrl == "/admin/events" ? "bg-coffee-600 hover:bg-coffee-700 active:bg-coffee-900 text-coffee-50" : "text-zinc-500 hover:bg-zinc-50")">
+                <svg class="absolute duration-500 ease-in-out left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-2 size-6 lg:size-5"
+                    xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256">
+                    <path
+                        d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Zm-68-76a12,12,0,1,1-12-12A12,12,0,0,1,140,132Zm44,0a12,12,0,1,1-12-12A12,12,0,0,1,184,132ZM96,172a12,12,0,1,1-12-12A12,12,0,0,1,96,172Zm44,0a12,12,0,1,1-12-12A12,12,0,0,1,140,172Zm44,0a12,12,0,1,1-12-12A12,12,0,0,1,184,172Z">
+                    </path>
+                </svg>
+
+                <span
+                    class="absolute left-9 whitespace-nowrap duration-500 ease-in-out opacity-0 lg:opacity-100 -translate-x-36 lg:translate-x-0">Events</span>
+            </a>
+        </span>
+
+        @* Resources *@
+        <span>
+            <a href="/admin/resources" @(currentUrl != "/admin/resources" ? "hx-boost=true" : "")
+                class="relative flex items-center justify-start gap-2 mx-2 p-2 h-10 font-medium rounded-md duration-200 ease-in-out @(currentUrl == "/admin/resources" ? "bg-coffee-600 hover:bg-coffee-700 active:bg-coffee-900 text-coffee-50" : "text-zinc-500 hover:bg-zinc-50")">
+                <svg class="absolute duration-500 ease-in-out left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-2 size-6 lg:size-5"
+                    xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256">
+                    <path
+                        d="M223.68,66.15,135.68,18a15.88,15.88,0,0,0-15.36,0l-88,48.17a16,16,0,0,0-8.32,14v95.64a16,16,0,0,0,8.32,14l88,48.17a15.88,15.88,0,0,0,15.36,0l88-48.17a16,16,0,0,0,8.32-14V80.18A16,16,0,0,0,223.68,66.15ZM128,32l80.34,44-29.77,16.3-80.35-44ZM128,120,47.66,76l33.9-18.56,80.34,44ZM40,90l80,43.78v85.79L40,175.82Zm176,85.78h0l-80,43.79V133.82l32-17.51V152a8,8,0,0,0,16,0V107.55L216,90v85.77Z">
+                    </path>
+                </svg>
+
+                <span
+                    class="absolute left-9 whitespace-nowrap duration-500 ease-in-out opacity-0 lg:opacity-100 -translate-x-36 lg:translate-x-0">Resources</span>
+            </a>
+        </span>
+
+        @* Logs *@
+        <span>
+            <a href="/admin/logs"
+                class="relative flex items-center justify-start gap-2 mx-2 p-2 h-10 font-medium rounded-md duration-200 ease-in-out @(currentUrl == "/admin/logs" ? "bg-coffee-600 hover:bg-coffee-700 active:bg-coffee-900 text-coffee-50" : "text-zinc-500 hover:bg-zinc-50")">
+                <svg class="absolute duration-500 ease-in-out left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-2 size-6 lg:size-5"
+                    xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 256 256">
+                    <path
+                        d="M136,80v43.47l36.12,21.67a8,8,0,0,1-8.24,13.72l-40-24A8,8,0,0,1,120,128V80a8,8,0,0,1,16,0Zm-8-48A95.44,95.44,0,0,0,60.08,60.15C52.81,67.51,46.35,74.59,40,82V64a8,8,0,0,0-16,0v40a8,8,0,0,0,8,8H72a8,8,0,0,0,0-16H49c7.15-8.42,14.27-16.35,22.39-24.57a80,80,0,1,1,1.66,114.75,8,8,0,1,0-11,11.64A96,96,0,1,0,128,32Z">
+                    </path>
+                </svg>
+                <span
+                    class="absolute left-9 whitespace-nowrap duration-500 ease-in-out opacity-0 lg:opacity-100 -translate-x-36 lg:translate-x-0">Logs</span>
+            </a>
+        </span>
+    </div>
+
+    <span x-data="{open: false}" class="relative flex flex-col grow justify-end my-4">
+        <button x-on:click="open = !open;" type="menu" x-ref="profileButton"
+            class="relative flex items-center justify-start gap-2 mx-2 p-2 h-10 font-medium rounded-md duration-200 ease-in-out text-zinc-500 hover:bg-coffee-700 hover:text-coffee-50 active:bg-coffee-800 active:text-coffee-100">
+
+            @if (Model != null)
+            {
+                <img class="object-cover rounded-full absolute duration-500 ease-in-out left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-2 size-6 lg:size-5" src="~/avatar/@Model"
+                    alt="User's Avatar">
+            }
+            else
+            {
+                <svg class="absolute duration-500 ease-in-out left-1/2 -translate-x-1/2 lg:translate-x-0 lg:left-2 size-6 lg:size-5" xmlns="http://www.w3.org/2000/svg"
+                    xmlns:xlink="http://www.w3.org/1999/xlink" width="400" height="400" viewBox="0, 0, 400,400">
+                    <g>
+                        <path
+                            d="M176.172 0.866 C 93.868 10.736,25.169 71.441,5.478 151.697 C -3.051 186.459,-1.676 227.565,9.147 261.328 C 20.494 296.728,48.476 337.791,73.179 355.294 L 75.655 357.048 76.178 351.766 C 80.395 309.166,106.791 270.961,145.195 251.873 L 153.280 247.854 150.273 245.639 C 83.673 196.571,114.046 92.549,196.154 88.509 C 281.749 84.297,319.310 194.390,249.756 245.617 L 246.777 247.810 254.834 251.851 C 293.358 271.172,319.608 309.189,323.822 351.766 L 324.345 357.048 326.821 355.335 C 332.287 351.554,353.875 328.959,360.283 320.313 C 450.002 199.243,381.887 29.005,233.012 2.229 C 222.507 0.340,187.549 -0.499,176.172 0.866 M187.891 112.092 C 147.646 119.548,124.716 163.943,141.811 201.308 C 164.580 251.077,235.420 251.077,258.189 201.308 C 279.667 154.363,238.910 102.639,187.891 112.092 M187.500 262.241 C 134.297 270.665,98.469 311.641,98.442 364.095 L 98.438 373.112 106.836 377.516 C 164.632 407.823,234.656 407.835,293.164 377.547 L 301.563 373.199 301.558 364.139 C 301.527 302.684,245.905 252.993,187.500 262.241 "
+                            stroke="none" fill="currentColor" fill-rule="evenodd"></path>
+                    </g>
+                </svg>
+            }
+            <span
+                class="absolute left-9 whitespace-nowrap duration-500 ease-in-out opacity-0 lg:opacity-100 -translate-x-36 lg:translate-x-0">Administrator</span>
+        </button>
+
+        <div x-cloak x-show="open" x-on:click.outside="open = false" x-anchor.top-start.offset.8="$refs.profileButton"
+            class="z-50 absolute flex flex-col items-center text-sm bg-white rounded-lg border-2 border-zinc-300 ">
+            <ul class="flex flex-col w-full">
+                <li>
+                    <a href="/admin/my-profile"
+                        class="first:rounded-t-md flex items-center justify-start w-full gap-2 p-2 font-medium duration-200 ease-in-out text-coffee-950 hover:text-coffee-50 active:text-coffee-50 hover:bg-coffee-700 active:bg-coffee-900">
+                        <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                            fill="currentColor" viewBox="0 0 256 256">
+                            <path
+                                d="M228.25,63.07l-4.66-2.69a23.6,23.6,0,0,0,0-8.76l4.66-2.69a8,8,0,0,0-8-13.86l-4.67,2.7A23.92,23.92,0,0,0,208,33.38V28a8,8,0,0,0-16,0v5.38a23.92,23.92,0,0,0-7.58,4.39l-4.67-2.7a8,8,0,1,0-8,13.86l4.66,2.69a23.6,23.6,0,0,0,0,8.76l-4.66,2.69a8,8,0,0,0,4,14.93,7.92,7.92,0,0,0,4-1.07l4.67-2.7A23.92,23.92,0,0,0,192,78.62V84a8,8,0,0,0,16,0V78.62a23.92,23.92,0,0,0,7.58-4.39l4.67,2.7a7.92,7.92,0,0,0,4,1.07,8,8,0,0,0,4-14.93ZM192,56a8,8,0,1,1,8,8A8,8,0,0,1,192,56Zm29.35,48.11a8,8,0,0,0-6.57,9.21A88.85,88.85,0,0,1,216,128a87.62,87.62,0,0,1-22.24,58.41,79.66,79.66,0,0,0-36.06-28.75,48,48,0,1,0-59.4,0,79.66,79.66,0,0,0-36.06,28.75A88,88,0,0,1,128,40a88.76,88.76,0,0,1,14.68,1.22,8,8,0,0,0,2.64-15.78,103.92,103.92,0,1,0,85.24,85.24A8,8,0,0,0,221.35,104.11ZM96,120a32,32,0,1,1,32,32A32,32,0,0,1,96,120ZM74.08,197.5a64,64,0,0,1,107.84,0,87.83,87.83,0,0,1-107.84,0Z">
+                            </path>
+                        </svg>
+                        <span>My Profile</span>
+                    </a>
+                </li>
+                <li class="flex items-center w-full">
+                    <button hx-post="/logout" hx-swap="none" type="submit"
+                        class="last:rounded-b-md flex items-center justify-start w-full gap-2 p-2 font-medium duration-200 ease-in-out text-coffee-950 hover:text-coffee-50 active:text-coffee-50 hover:bg-coffee-700 active:bg-coffee-900">
+                        <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                            fill="currentColor" viewBox="0 0 256 256">
+                            <path
+                                d="M120,216a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V40a8,8,0,0,1,8-8h64a8,8,0,0,1,0,16H56V208h56A8,8,0,0,1,120,216Zm109.66-93.66-40-40a8,8,0,0,0-11.32,11.32L204.69,120H112a8,8,0,0,0,0,16h92.69l-26.35,26.34a8,8,0,0,0,11.32,11.32l40-40A8,8,0,0,0,229.66,122.34Z">
+                            </path>
+                        </svg>
+                        Logout
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </span>
+</div>

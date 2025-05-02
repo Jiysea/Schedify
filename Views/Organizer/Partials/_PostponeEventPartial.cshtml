@@ -85,23 +85,41 @@
                 </span>
 
                 @* Event Duration *@
-                <div class="flex items-center justify-center col-span-full gap-2 relative w-full">
+                <div class="col-span-3 flex items-center justify-center gap-2 relative w-full">
 
                     <div class="flex flex-col gap-1 w-full">
-                        <label for="postpone-startat" class="text-xs text-coffee-500 whitespace-nowrap">
-                            Start At</label>
+                        <label for="postpone-startat" class="text-xs text-coffee-700 whitespace-nowrap">
+                            Start Date</label>
                         <input type="text" class="input-coffee p-2" id="postpone-startat" asp-for="StartAtString"
                             placeholder="Select a start time">
                         <div id="edit-validation-StartAt"></div>
                     </div>
 
                     <div class="flex flex-col gap-1 w-full">
-                        <label for="postpone-endat" class="text-xs text-coffee-500 whitespace-nowrap">
-                            End At</label>
+                        <label for="postpone-endat" class="text-xs text-coffee-700 whitespace-nowrap">
+                            End Date</label>
                         <input type="text" class="input-coffee p-2" id="postpone-endat" asp-for="EndAtString"
                             placeholder="Select an end time">
                         <div id="edit-validation-EndAt"></div>
                     </div>
+                </div>
+
+                @* Time Schedule *@
+                <div class="flex flex-col col-span-3 gap-1 relative w-full">
+                    <p for="shift" class="text-xs text-coffee-700">Time Schedule</p>
+                    <span class="flex items-center gap-2 w-full">
+                        <span class="flex flex-col items-start gap-2 w-full">
+                            <input type="text" class="input-coffee p-2" id="postpone-timestartdate" asp-for="TimeStartString"
+                                placeholder="Select a start time" />
+                            <div class="absolute top-full" id="validation-TimeStartString"></div>
+                        </span>
+                        <span class="text-coffee-700 text-xs">To</span>
+                        <span class="flex flex-col items-start gap-2 w-full">
+                            <input type="text" class="input-coffee p-2" id="postpone-timeenddate" asp-for="TimeEndString"
+                                placeholder="Select an end time" />
+                            <div class="absolute top-full" id="validation-TimeEndString"></div>
+                        </span>
+                    </span>
                 </div>
             </div>
 
@@ -129,9 +147,8 @@
 <script>
     document.addEventListener("htmx:afterSwap", () => {
         let startPicker = flatpickr("#postpone-startat", {
-            enableTime: true,
-            dateFormat: "Y-m-d H:i",
-            defaultDate: `@Model.StartAtString`,
+            enableTime: false,
+            dateFormat: "Y-m-d",
             minDate: `@Model.StartAtString`, // Tomorrow
             onChange: function (selectedDates) {
                 if (selectedDates.length > 0) {
@@ -141,10 +158,46 @@
         });
 
         let endPicker = flatpickr("#postpone-endat", {
-            enableTime: true,
-            dateFormat: "Y-m-d H:i",
+            enableTime: false,
+            dateFormat: "Y-m-d",
             defaultDate: `@Model.EndAtString`,
             minDate: `@Model.StartAtString`, // Tomorrow
+        });
+
+        const timeFromInstance = flatpickr("#postpone-timestartdate", {
+            enableTime: true,
+            dateFormat: "h:i K",
+            noCalendar: true,
+            onChange: function (selectedDates, dateStr) {
+                const timeEndInstance = document.querySelector("#postpone-timeenddate")._flatpickr;
+                if (timeEndInstance) {
+                    let fromDate = timeFromInstance.parseDate(dateStr, "h:i K");
+                    let toDate = timeEndInstance.selectedDates[0];
+                    if (!toDate || fromDate >= toDate) {
+                        let adjustedDate = new Date(fromDate);
+                        adjustedDate.setHours(fromDate.getHours() + 1);
+                        timeEndInstance.setDate(adjustedDate);
+                    }
+                }
+            }
+        });
+
+        const timeEndInstance = flatpickr("#postpone-timeenddate", {
+            enableTime: true,
+            dateFormat: "h:i K",
+            noCalendar: true,
+            onChange: function (selectedDates, dateStr) {
+                const timeFromInstance = document.querySelector("#postpone-timestartdate")._flatpickr;
+                if (timeFromInstance) {
+                    let toDate = timeEndInstance.parseDate(dateStr, "h:i K");
+                    let fromDate = timeFromInstance.selectedDates[0];
+                    if (!fromDate || toDate <= fromDate) {
+                        let adjustedDate = new Date(toDate);
+                        adjustedDate.setHours(toDate.getHours() - 1);
+                        timeFromInstance.setDate(adjustedDate);
+                    }
+                }
+            }
         });
     });
 </script>

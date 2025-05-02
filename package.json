@@ -22,7 +22,7 @@
     "@alpinejs/intersect": "^3.14.8",
     "@alpinejs/mask": "^3.14.8",
     "alpinejs": "^3.14.8",
-    "chart.js": "^4.4.8",
+    "chart.js": "^4.4.9",
     "cross-env": "^7.0.3",
     "flatpickr": "^4.6.13",
     "sweetalert2": "^11.17.2",
