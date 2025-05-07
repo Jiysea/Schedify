@@ -26,7 +26,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add Hosted Service for Updating Open Events to Ongoing
-// builder.Services.AddHostedService<EventStatusUpdater>();
+builder.Services.AddHostedService<EventStatusUpdater>();
 
 // Add Identity
 builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
