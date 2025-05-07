@@ -719,6 +719,9 @@ video {
 .right-10 {
   right: 2.5rem;
 }
+.right-2 {
+  right: 0.5rem;
+}
 .start-0 {
   inset-inline-start: 0px;
 }
@@ -1190,6 +1193,9 @@ video {
 .gap-0 {
   gap: 0px;
 }
+.gap-0\.5 {
+  gap: 0.125rem;
+}
 .gap-1 {
   gap: 0.25rem;
 }
@@ -1418,6 +1424,10 @@ video {
   --tw-bg-opacity: 1;
   background-color: rgb(254 243 199 / var(--tw-bg-opacity, 1));
 }
+.bg-black {
+  --tw-bg-opacity: 1;
+  background-color: rgb(0 0 0 / var(--tw-bg-opacity, 1));
+}
 .bg-black\/50 {
   background-color: rgb(0 0 0 / 0.5);
 }
@@ -1586,6 +1596,18 @@ video {
 .bg-zinc-900 {
   --tw-bg-opacity: 1;
   background-color: rgb(24 24 27 / var(--tw-bg-opacity, 1));
+}
+.bg-red-600 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(220 38 38 / var(--tw-bg-opacity, 1));
+}
+.bg-emerald-100 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(209 250 229 / var(--tw-bg-opacity, 1));
+}
+.bg-fuchsia-100 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(250 232 255 / var(--tw-bg-opacity, 1));
 }
 .fill-charcoal-400 {
   fill: #A9A19E;
@@ -1811,6 +1833,10 @@ video {
   --tw-text-opacity: 1;
   color: rgb(59 130 246 / var(--tw-text-opacity, 1));
 }
+.text-blue-600 {
+  --tw-text-opacity: 1;
+  color: rgb(37 99 235 / var(--tw-text-opacity, 1));
+}
 .text-carribean-600 {
   --tw-text-opacity: 1;
   color: rgb(74 143 150 / var(--tw-text-opacity, 1));
@@ -1882,6 +1908,10 @@ video {
 .text-emerald-600 {
   --tw-text-opacity: 1;
   color: rgb(5 150 105 / var(--tw-text-opacity, 1));
+}
+.text-fuchsia-600 {
+  --tw-text-opacity: 1;
+  color: rgb(192 38 211 / var(--tw-text-opacity, 1));
 }
 .text-green-300 {
   --tw-text-opacity: 1;
@@ -1990,6 +2020,18 @@ video {
 .text-zinc-700 {
   --tw-text-opacity: 1;
   color: rgb(63 63 70 / var(--tw-text-opacity, 1));
+}
+.text-orange-600 {
+  --tw-text-opacity: 1;
+  color: rgb(234 88 12 / var(--tw-text-opacity, 1));
+}
+.text-emerald-500 {
+  --tw-text-opacity: 1;
+  color: rgb(16 185 129 / var(--tw-text-opacity, 1));
+}
+.text-fuchsia-500 {
+  --tw-text-opacity: 1;
+  color: rgb(217 70 239 / var(--tw-text-opacity, 1));
 }
 .underline {
   text-decoration-line: underline;
@@ -2594,6 +2636,11 @@ textarea {
   background-color: rgb(113 113 122 / var(--tw-bg-opacity, 1));
 }
 
+.hover\:bg-red-700:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(185 28 28 / var(--tw-bg-opacity, 1));
+}
+
 .hover\:text-coffee-50:hover {
   --tw-text-opacity: 1;
   color: rgb(248 243 242 / var(--tw-text-opacity, 1));
@@ -2771,6 +2818,11 @@ textarea {
   background-color: rgb(82 82 91 / var(--tw-bg-opacity, 1));
 }
 
+.active\:bg-red-800:active {
+  --tw-bg-opacity: 1;
+  background-color: rgb(153 27 27 / var(--tw-bg-opacity, 1));
+}
+
 .active\:text-coffee-100:active {
   --tw-text-opacity: 1;
   color: rgb(241 231 228 / var(--tw-text-opacity, 1));
@@ -2829,6 +2881,11 @@ textarea {
 .active\:text-zinc-50:active {
   --tw-text-opacity: 1;
   color: rgb(250 250 250 / var(--tw-text-opacity, 1));
+}
+
+.active\:text-red-100:active {
+  --tw-text-opacity: 1;
+  color: rgb(254 226 226 / var(--tw-text-opacity, 1));
 }
 
 @media (min-width: 640px) {
@@ -2920,6 +2977,10 @@ textarea {
 }
 
 @media (min-width: 1280px) {
+
+  .xl\:col-span-1 {
+    grid-column: span 1 / span 1;
+  }
 
   .xl\:w-60 {
     width: 15rem;

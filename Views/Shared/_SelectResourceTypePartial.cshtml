@@ -107,10 +107,9 @@ else if (Model.ResourceType == ResourceType.Equipment)
             <span class="absolute size-full rounded-md start-0 top-0 p-2 bg-coffee-500 z-0"></span>
             <select
                 class="z-10 cursor-pointer px-2 py-1.5 text-sm rounded-md focus:outline-none border bg-coffee-200 border-coffee-500 text-coffee-950"
-                id="warrantyduration" asp-for="WarrantyDuration"
-                x-on:change="
-                    mask = ($event.target.value == '1') ? '99' : '999';
-                ">
+                id="warrantyduration" asp-for="WarrantyDuration" x-on:change="
+                                mask = ($event.target.value == '1') ? '99' : '999';
+                            ">
                 <option value="1" selected>By Year</option>
                 <option value="2">By Month</option>
             </select>
@@ -255,10 +254,9 @@ else if (Model.ResourceType == ResourceType.Furniture)
             <span class="absolute size-full rounded-md start-0 top-0 p-2 bg-coffee-500 z-0"></span>
             <select
                 class="z-10 cursor-pointer px-2 py-1.5 text-sm rounded-md focus:outline-none border bg-coffee-200 border-coffee-500 text-coffee-950"
-                id="warrantyduration" asp-for="WarrantyDuration"
-                x-on:change="
-                    mask = ($event.target.value == '1') ? '99' : '999';
-                ">
+                id="warrantyduration" asp-for="WarrantyDuration" x-on:change="
+                                mask = ($event.target.value == '1') ? '99' : '999';
+                            ">
                 <option value="1" selected>By Year</option>
                 <option value="2">By Month</option>
             </select>
@@ -308,7 +306,7 @@ else if (Model.ResourceType == ResourceType.Catering)
         </div>
 
         @* List of Menu Items *@
-        <div class="flex flex-col gap-1 col-span-full">
+        <div class="flex flex-col gap-1 col-span-full relative">
             <p class="Foods Listed:"></p>
             <div
                 class="flex flex-wrap items-center justify-center col-span-full gap-3 overflow-auto min-h-[70px] max-h-40 border border-coffee-300 rounded-md p-4 scrollbar-thin scrollbar-track-coffee-50 scrollbar-thumb-coffee-700">
@@ -335,11 +333,12 @@ else if (Model.ResourceType == ResourceType.Catering)
                 </template>
             </div>
 
-            <!-- Hidden Inputs for Model Binding -->
-            <template x-for="(item, index) in menuItems" :key="index">
-                <input type="hidden" :name="'MenuItems[' + index + ']'" :value="item" />
-            </template>
+            <div id="validation-MenuItems"></div>
         </div>
+        <!-- Hidden Inputs for Model Binding -->
+        <template x-for="(item, index) in menuItems" :key="index">
+            <input type="hidden" :name="'MenuItems[' + index + ']'" :value="item" />
+        </template>
     </div>
 }
 
@@ -388,10 +387,9 @@ else if (Model.ResourceType == ResourceType.Personnel)
         <span x-data="{ mask: '99' }" class="relative flex items-center gap-3">
             <input x-mask:dynamic="mask" class="input-coffee p-2" id="experience" asp-for="Experience"
                 placeholder="Type number of year or month" />
-            <select class="input-coffee p-2" id="experiencetype" asp-for="ExperienceType"
-                x-on:change="
-                    mask = ($event.target.value == '1') ? '99' : '999';
-                ">
+            <select class="input-coffee p-2" id="experiencetype" asp-for="ExperienceType" x-on:change="
+                                mask = ($event.target.value == '1') ? '99' : '999';
+                            ">
                 <option value="1" selected>By Year</option>
                 <option value="2">By Month</option>
             </select>

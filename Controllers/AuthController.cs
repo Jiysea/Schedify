@@ -132,9 +132,6 @@ public class AuthController : Controller
                 PhoneNumber = PhoneNumber,
             };
 
-
-
-
             var result = await _userManager.CreateAsync(user, model.Password!);
 
             if (!result.Succeeded)

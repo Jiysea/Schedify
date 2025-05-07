@@ -15,7 +15,7 @@ public class ViewBookingViewModel
     public string? PANLastDigits { get; set; }
     public DateTime StartAt { get; set; }
     public DateTime EndAt { get; set; }
-    public EventStatus Status { get; set; }
+    public EventStatus EventStatus { get; set; }
     public string TotalCost { get; set; } = null!;
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
@@ -24,4 +24,5 @@ public class ViewBookingViewModel
     public string FullAddress { get; set; } = null!;
     public Feedback? Feedback { get; set; }
     public bool IsFeedbackGiven { get; set; } = false;
+    public BookingStatus BookingStatus { get; set; }
 }

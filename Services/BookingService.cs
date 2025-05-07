@@ -175,6 +175,42 @@ public class BookingService
             return null;
         }
     }
+    public async Task<(bool IsSuccess, Dictionary<string, string>? Error, EventBooking? EventBooking)> CancelBookingByIdAsync(Guid EventBookingId)
+    {
+        using var transaction = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            var booking = await _context.EventBookings
+                .FirstOrDefaultAsync(eb => eb.Id == EventBookingId);
+            
+            // var user = await _userService.GetUserAsync();
+            // if (user == null)
+            //     return (false, new Dictionary<string, string> { { "Authentication", "User must be authenticated." } }, null);
+            
+            if (booking == null) return (false, new Dictionary<string, string> { { "NoBooking", "Booking not found." } }, null);
+
+            // if (booking.UserId != user.Id)
+            //     return (false, new Dictionary<string, string> { { "Authorization", "Invalid user." } }, null);
+
+            if (booking.Status != BookingStatus.Paid)
+            {
+                return (false, new Dictionary<string, string> { { "NotPaid", "Your booking is not paid." } }, null);
+            }
+
+            booking.Status = BookingStatus.Cancelled;
+
+            _context.Update(booking);
+            await _context.SaveChangesAsync();
+
+            await transaction.CommitAsync();
+            return (true, null, booking);
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            return (false, new Dictionary<string, string> { { "Exception", $"An error occurred: {ex.Message}" } }, null);
+        }
+    }
 
     // public async Task<(bool IsSuccess, Dictionary<string, string>? Error, Event? Event)> BookEventAsync(CUBookingViewModel model)
     // {

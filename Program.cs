@@ -9,6 +9,8 @@ using Schedify.Services;
 using Stripe;
 
 var builder = WebApplication.CreateBuilder(args);
+// Force Development environment for MonsterASP debugging
+builder.Environment.EnvironmentName = Environments.Development;
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

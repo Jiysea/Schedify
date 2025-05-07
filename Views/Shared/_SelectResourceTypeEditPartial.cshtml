@@ -334,11 +334,12 @@ else if (Model.ResourceType == ResourceType.Catering)
                 </template>
             </div>
 
+            <div id="edit-validation-MenuItems"></div>
+        </div>
             <!-- Hidden Inputs for Model Binding -->
             <template x-for="(item, index) in menuItems" :key="index">
                 <input type="hidden" :name="'MenuItems[' + index + ']'" :value="item" />
             </template>
-        </div>
     </div>
 }
 

@@ -17,7 +17,70 @@
 <main class="flex flex-col gap-5 p-6 relative">
 
     @* Resource Image *@
-    <div class="flex items-center justify-center gap-2 w-full h-56 py-6">
+    <div class="relative flex items-center justify-center gap-2 w-full h-56 py-6">
+        @if (Model.EventStatus == EventStatus.Ongoing || Model.EventStatus == EventStatus.Completed || Model.EventStatus
+                == EventStatus.Cancelled)
+        {
+            string message = Model.BookingStatus switch
+            {
+                BookingStatus.Paid => "Your ticket has not been confirmed yet.",
+                BookingStatus.Confirmed => "Your ticket is confirmed.",
+                BookingStatus.Cancelled => "Your ticket is cancelled.",
+                BookingStatus.Refunded => "Your ticket payment is refunded.",
+                _ => "There's something wrong with your ticket."
+            };
+
+            string color = Model.BookingStatus switch
+            {
+                BookingStatus.Paid => "bg-white text-blue-600",
+                BookingStatus.Confirmed => "bg-white text-emerald-600",
+                BookingStatus.Cancelled => "bg-white text-red-600",
+                BookingStatus.Refunded => "bg-white text-fuchsia-600",
+                _ => "bg-black text-white"
+            };
+
+            <div class="flex items-center gap-0.5 absolute top-2 right-2 rounded-md font-semibold text-xs px-3 py-1 @color">
+                @if (Model.BookingStatus == BookingStatus.Paid)
+                {
+                    <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                        viewBox="0 0 256 256">
+                        <path
+                            d="M148,200a20,20,0,1,1-20-20A20,20,0,0,1,148,200Zm-20-40a12,12,0,0,0,12-12V48a12,12,0,0,0-24,0V148A12,12,0,0,0,128,160Z">
+                        </path>
+                    </svg>
+                }
+                else if (Model.BookingStatus == BookingStatus.Confirmed)
+                {
+                    <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                        viewBox="0 0 256 256">
+                        <path
+                            d="M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z">
+                        </path>
+                    </svg>
+                }
+                else if (Model.BookingStatus == BookingStatus.Cancelled)
+                {
+                    <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                        viewBox="0 0 256 256">
+                        <path
+                            d="M208.49,191.51a12,12,0,0,1-17,17L128,145,64.49,208.49a12,12,0,0,1-17-17L111,128,47.51,64.49a12,12,0,0,1,17-17L128,111l63.51-63.52a12,12,0,0,1,17,17L145,128Z">
+                        </path>
+                    </svg>
+                }
+                else if (Model.BookingStatus == BookingStatus.Refunded)
+                {
+                    <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                        viewBox="0 0 256 256">
+                        <path
+                            d="M236,112a68.07,68.07,0,0,1-68,68H61l27.52,27.51a12,12,0,0,1-17,17l-48-48a12,12,0,0,1,0-17l48-48a12,12,0,1,1,17,17L61,156H168a44,44,0,0,0,0-88H80a12,12,0,0,1,0-24h88A68.07,68.07,0,0,1,236,112Z">
+                        </path>
+                    </svg>
+                }
+                <span>
+                    @message
+                </span>
+            </div>
+        }
         @if (Model.ImageFileName != null)
         {
             <img src="/resources/@Model.ImageFileName" alt="Resource Image" class="w-full h-56 object-cover rounded-md">
@@ -46,8 +109,10 @@
         </div>
 
         @* Buttons after ShortName *@
-        <div class="flex items-center justify-center gap-3">
-            @if (Model.Status == EventStatus.Open || Model.Status == EventStatus.Ongoing)
+        <div class="flex items-center justify-center gap-1">
+            @if ((Model.EventStatus == EventStatus.Open || Model.EventStatus == EventStatus.Ongoing || Model.EventStatus
+                        == EventStatus.Postponed) &&
+                        Model.BookingStatus == BookingStatus.Paid)
             {
                 <button type="button" hx-get="/attendee/view-ticket/@Model.Id" hx-swap="none"
                     class="duration-200 ease-in-out flex items-center justify-center gap-1 font-medium text-sm rounded-md px-2 py-1 bg-coffee-600 hover:bg-coffee-700 active:bg-coffee-800 text-coffee-50 active:text-coffee-100">
@@ -59,8 +124,36 @@
                     </svg>
                     See Ticket
                 </button>
+                <button type="button" hx-get="/attendee/cancel-ticket/@Model.Id" hx-swap="none"
+                    hx-confirm="Are you sure you want to cancel your ticket? You won't be refunded."
+                    class="duration-200 ease-in-out flex items-center justify-center gap-1 font-medium text-sm rounded-md px-2 py-1 bg-red-600 hover:bg-red-700 active:bg-red-800 text-red-50 active:text-red-100">
+                    <svg class="size-5" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                        width="400" height="400" viewBox="0, 0, 400,400">
+                        <g>
+                            <path
+                                d="M8.594 112.433 L 8.594 168.616 21.289 168.888 C 44.595 169.388,56.641 179.990,56.641 200.000 C 56.641 220.370,43.671 231.250,19.389 231.250 L 8.594 231.250 8.594 287.500 L 8.594 343.750 200.000 343.750 L 391.406 343.750 391.406 287.500 L 391.406 231.250 380.942 231.250 C 357.820 231.250,343.750 219.427,343.750 200.000 C 343.750 180.573,357.820 168.750,380.942 168.750 L 391.406 168.750 391.406 112.500 L 391.406 56.250 200.000 56.250 L 8.594 56.250 8.594 112.433 M358.409 113.012 L 358.203 137.742 354.128 139.127 C 297.914 158.231,297.061 240.287,352.874 259.786 L 358.203 261.648 358.409 286.293 L 358.616 310.938 200.011 310.938 L 41.406 310.938 41.406 286.304 C 41.406 263.522,41.509 261.639,42.773 261.255 C 102.568 243.098,104.582 159.093,45.703 139.070 L 41.797 137.742 41.591 113.012 L 41.384 88.281 200.000 88.281 L 358.616 88.281 358.409 113.012 M151.561 151.955 L 140.251 163.285 158.596 181.643 L 176.941 200.000 158.592 218.361 L 140.244 236.722 151.761 248.239 L 163.278 259.756 181.639 241.408 L 200.000 223.059 218.361 241.408 L 236.722 259.756 248.239 248.239 L 259.756 236.722 241.408 218.361 L 223.059 200.000 241.408 181.639 L 259.756 163.278 248.239 151.761 L 236.722 140.244 218.361 158.592 L 200.000 176.941 181.830 158.783 C 171.836 148.796,163.482 140.625,163.265 140.625 C 163.048 140.625,157.781 145.724,151.561 151.955 "
+                                stroke="none" fill="currentColor" fill-rule="evenodd"></path>
+                        </g>
+                    </svg>
+                </button>
             }
-            else
+            else if ((Model.EventStatus == EventStatus.Ongoing) &&
+            Model.BookingStatus == BookingStatus.Confirmed)
+            {
+                <span class="text-xs text-emerald-500 font-medium px-2">TICKET CONFIRMED</span>
+            }
+            else if ((Model.EventStatus == EventStatus.Cancelled) &&
+            Model.BookingStatus == BookingStatus.Refunded)
+            {
+                <span class="text-xs text-fuchsia-500 font-medium px-2">TICKET REFUNDED</span>
+            }
+            else if ((Model.EventStatus != EventStatus.Draft) &&
+            Model.BookingStatus == BookingStatus.Cancelled)
+            {
+                <span class="text-xs text-red-500 font-medium px-2">TICKET CANCELLED</span>
+            }
+            else if ((Model.EventStatus == EventStatus.Completed || Model.EventStatus == EventStatus.Cancelled) &&
+            Model.BookingStatus == BookingStatus.Confirmed)
             {
                 if (!Model.IsFeedbackGiven)
                 {
@@ -82,7 +175,8 @@
                     {
                         <div x-data="{ hover: false }" class="relative">
 
-                            <span x-data="{ rating: @Model.Feedback.Rating }" @@mouseenter="hover = true" @@mouseleave="hover = false"
+                            <span x-data="{ rating: @Model.Feedback.Rating }" @@mouseenter="hover = true"
+                                @@mouseleave="hover = false"
                                 class="relative flex items-center justify-center gap-1 overflow-hidden group">
 
                                 <template x-for="i in 5">
@@ -95,7 +189,9 @@
                                 </template>
 
                                 @* Edit Feedback Button *@
-                                <button type="button" x-on:click="updateFeedbackModal = true" hx-get="/attendee/open-edit-feedback-modal/@Model.Feedback.Id" hx-swap="innerHTML" hx-target="#updateFeedbackModalContent"
+                                <button type="button" x-on:click="updateFeedbackModal = true"
+                                    hx-get="/attendee/open-edit-feedback-modal/@Model.Feedback.Id" hx-swap="innerHTML"
+                                    hx-target="#updateFeedbackModalContent"
                                     class="duration-200 ease-in-out z-10 absolute right-1/2 p-1 rounded-md bg-coffee-600 text-coffee-50 translate-x-1/2 -translate-y-10 group-hover:translate-y-0">
                                     <svg class="size-4" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
                                         fill="currentColor" viewBox="0 0 256 256">
@@ -106,7 +202,8 @@
                                 </button>
                             </span>
 
-                            <div x-show="hover" x-transition.opacity class="absolute bottom-full left-0 w-full rounded-lg p-2 mb-2 border bg-coffee-50 border-coffee-500 text-xs line-clamp-3">
+                            <div x-show="hover" x-transition.opacity
+                                class="absolute bottom-full left-0 w-full rounded-lg p-2 mb-2 border bg-coffee-50 border-coffee-500 text-xs line-clamp-3">
                                 @Model.Feedback.Comments
                             </div>
                         </div>
@@ -162,7 +259,7 @@
                     Status
                 </span>
                 <span class="font-light text-coffee-700">
-                    @Model.Status
+                    @Model.EventStatus
                 </span>
             </div>
 

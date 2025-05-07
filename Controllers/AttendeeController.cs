@@ -53,6 +53,40 @@ public class AttendeeController : Controller
         return View(viewModel);
     }
 
+    // Redirects to View Ticket page
+    [HttpGet("attendee/view-ticket/{EventBookingId}")]
+    public IActionResult ViewTicket(Guid EventBookingId)
+    {
+        var plainBytes = Encoding.UTF8.GetBytes(EventBookingId.ToString());
+        var base64Token = Convert.ToBase64String(plainBytes);
+
+        Response.Headers.Append("HX-Redirect", Url.Action("ViewTicket", "Payment", new { token = base64Token }));
+        return Content(string.Empty);
+    }
+
+    [HttpGet("attendee/cancel-ticket/{EventBookingId}")]
+    public async Task<IActionResult> CancelTicket(Guid EventBookingId)
+    {
+        var result = await _bookingService.CancelBookingByIdAsync(EventBookingId);
+        var viewModel = GetBookingsViewModel();
+
+        if (!result.IsSuccess)
+        {
+            // Split error messages and add them to ModelState
+            foreach (var error in result.Error!)
+            {
+                var errorJson = $"{{\"closeModal\": true, \"clearValidations\": true, \"showToast\": {{ \"title\": \"{error.Value}\", \"icon\": \"error\", \"timer\": 3000 }} }}";
+                Response.Headers.Append("HX-Trigger", errorJson);
+                return PartialView("~/Views/Attendee/Partials/_UpdateBookingsListPartial.cshtml", viewModel);
+            }
+        }
+
+        // Define the Toastr event in the HX-Trigger header
+        var toastrJson = "{\"closeModal\": true, \"clearValidations\": true, \"showToast\": { \"title\": \"Successfully cancelled a booking!\", \"icon\": \"success\", \"timer\": 3000 }}";
+        Response.Headers.Append("HX-Trigger", toastrJson);
+        return PartialView("~/Views/Attendee/Partials/_UpdateBookingsListPartial.cshtml", viewModel);
+    }
+
     // ---------------------------------------------------------------------------------------------------------------------------
     // # View Booking Modal
     // ---------------------------------------------------------------------------------------------------------------------------
@@ -92,7 +126,7 @@ public class AttendeeController : Controller
             PANLastDigits = payment.PANLastDigits,
             StartAt = evt.StartAt,
             EndAt = evt.EndAt,
-            Status = evt.Status,
+            EventStatus = evt.Status,
             TotalCost = booking.TotalPrice.ToString("N2"),
             CreatedAt = evt.CreatedAt,
             UpdatedAt = evt.UpdatedAt,
@@ -101,6 +135,7 @@ public class AttendeeController : Controller
             FullAddress = fullAddress,
             Feedback = feedback,
             IsFeedbackGiven = feedback == null ? false : true,
+            BookingStatus = booking.Status,
         };
 
         return PartialView("~/Views/Attendee/Partials/_ViewBookingPartial.cshtml", viewModel);
@@ -250,17 +285,6 @@ public class AttendeeController : Controller
         };
 
         return View(viewModel);
-    }
-
-    // Redirects to View Ticket page
-    [HttpGet("attendee/view-ticket/{EventBookingId}")]
-    public IActionResult ViewTicket(Guid EventBookingId)
-    {
-        var plainBytes = Encoding.UTF8.GetBytes(EventBookingId.ToString());
-        var base64Token = Convert.ToBase64String(plainBytes);
-
-        Response.Headers.Append("HX-Redirect", Url.Action("ViewTicket", "Payment", new { token = base64Token }));
-        return Content(string.Empty);
     }
 
     [HttpGet("attendee/checkout/{EventId}")]

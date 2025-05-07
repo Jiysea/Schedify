@@ -36,7 +36,10 @@ public class AdminController : Controller
         var AvatarFileName = await _userService.GetUserAvatarFileNameAsync();
         var summary = await _adminService.GetDashboardSummaryAsync(null, null);
         var events = await _adminService.GetDashboardEventsAsync(null, null);
-        var perEvents = await _adminService.GetEventDashboardByIdAsync(events!.GetEvents.First()!.Id);
+        
+        var firstEvent = events?.GetEvents?.FirstOrDefault();
+        Guid? selectedId = firstEvent?.Id ?? Guid.Empty;
+        var perEvents = await _adminService.GetEventDashboardByIdAsync(selectedId);
 
         var viewModel = new DashboardViewModel
         {
